@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-rose-soft: var(--rose-soft);
+  --color-lavender: var(--lavender);
+  --color-coral: var(--coral);
+  --color-navy: var(--navy);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #FFF8F0;
+  --foreground: #1A1A4E;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A4E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A4E;
+  --primary: #1A1A4E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFD6D6;
+  --secondary-foreground: #1A1A4E;
+  --muted: #F5EFE8;
+  --muted-foreground: #6B6B9A;
+  --accent: #FF6B8A;
+  --accent-foreground: #FFFFFF;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #EAD9D9;
+  --input: #F5EFE8;
+  --ring: #FF6B8A;
+  --rose-soft: #FFD6D6;
+  --lavender: #E8DEFF;
+  --coral: #FF6B8A;
+  --navy: #1A1A4E;
+}
+
+/* ── TEAL THEME ──────────────────────────────────────────────────────────── */
+[data-theme="teal"] {
+  --background: #0F1923;
+  --foreground: #E8F5F3;
+  --card: #162230;
+  --card-foreground: #E8F5F3;
+  --popover: #162230;
+  --popover-foreground: #E8F5F3;
+  --primary: #2DD4BF;
+  --primary-foreground: #0F1923;
+  --secondary: #1E3040;
+  --secondary-foreground: #E8F5F3;
+  --muted: #1A2D3E;
+  --muted-foreground: #7FBFB5;
+  --accent: #2DD4BF;
+  --accent-foreground: #0F1923;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #1E3A4A;
+  --input: #1A2D3E;
+  --ring: #2DD4BF;
+  --rose-soft: #1E3040;
+  --lavender: #1A3545;
+  --coral: #2DD4BF;
+  --navy: #0F1923;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+.font-body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Wave/scallop decoration */
+.wave-divider {
+  position: relative;
+  overflow: hidden;
+}
+.wave-divider::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 48'%3E%3Cpath fill='%23FFF8F0' d='M0,24 C360,48 1080,0 1440,24 L1440,48 L0,48 Z'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: cover;
+}
+
+/* Gradient blob background */
+.blob-bg {
+  background: radial-gradient(ellipse at 20% 50%, #FFD6D680 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, #E8DEFF80 0%, transparent 60%),
+              #FFF8F0;
+}
+[data-theme="teal"] .blob-bg {
+  background: radial-gradient(ellipse at 20% 50%, #2DD4BF18 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, #0e4a5a30 0%, transparent 60%),
+              #0F1923;
+}
+
+/* Card hover effect */
+.wish-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.wish-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 107, 138, 0.15);
+}
+[data-theme="teal"] .wish-card:hover {
+  box-shadow: 0 12px 32px rgba(45, 212, 191, 0.15);
+}

@@ -1,0 +1,46 @@
+import { Route, Switch } from "wouter";
+import { Provider } from "./components/provider";
+import { AgentFeedback, RunableBadge } from "@runablehq/website-runtime";
+import { I18nProvider } from "./lib/i18n";
+import { ThemeProvider } from "./lib/theme";
+import { Navbar } from "./components/Navbar";
+import { Toaster } from "./components/ui/sonner";
+import LandingPage from "./pages/index";
+import SignIn from "./pages/sign-in";
+import SignUp from "./pages/sign-up";
+import Dashboard from "./pages/dashboard";
+import ListDetail from "./pages/list-detail";
+import SharedList from "./pages/shared";
+import Explore from "./pages/explore";
+import Impressum from "./pages/impressum";
+import Profile from "./pages/profile";
+import Feed from "./pages/feed";
+
+function App() {
+  return (
+    <Provider>
+      <I18nProvider>
+        <ThemeProvider>
+        <Navbar />
+        <Switch>
+          <Route path="/" component={LandingPage} />
+          <Route path="/sign-in" component={SignIn} />
+          <Route path="/sign-up" component={SignUp} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/list/:id" component={ListDetail} />
+          <Route path="/shared/:token" component={SharedList} />
+          <Route path="/explore" component={Explore} />
+          <Route path="/impressum" component={Impressum} />
+          <Route path="/profile" component={Profile} />
+          <Route path="/feed" component={Feed} />
+        </Switch>
+        <Toaster richColors position="bottom-center" />
+        {import.meta.env.DEV && <AgentFeedback />}
+        {<RunableBadge />}
+        </ThemeProvider>
+      </I18nProvider>
+    </Provider>
+  );
+}
+
+export default App;
