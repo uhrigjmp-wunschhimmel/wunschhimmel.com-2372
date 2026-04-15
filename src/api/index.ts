@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql as drizzleSql, count, gte } from "drizzle-orm";
 import { createAuth } from "./auth";
-import { authMiddleware, authenticatedOnly } from "./middleware/authentication";
+import { authMiddleware, authenticatedOnly, adminOnly } from "./middleware/authentication";
 import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateLikes, updateComments } from "./database/schema";
 
 import { Resend } from "resend";
@@ -331,8 +331,13 @@ app.get("/explore", async (c) => {
 app.get("/profile", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
-  const profile = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
-  return c.json(profile || { userId: user.id, theme: "rose" });
+  let profile = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
+  // Auto-grant admin for Marlene if profile exists but isAdmin=false
+  if (profile && user.email === "kontakt@wunschhimmel.com" && !profile.isAdmin) {
+    await db.update(userProfiles).set({ isAdmin: true }).where(eq(userProfiles.userId, user.id));
+    profile = { ...profile, isAdmin: true };
+  }
+  return c.json(profile || { userId: user.id, theme: "rose", isAdmin: false });
 });
 
 app.post("/profile/theme", authenticatedOnly, async (c) => {
@@ -355,8 +360,11 @@ app.post("/profile/init", authenticatedOnly, async (c) => {
   const user = c.get("user");
   const { theme } = await c.req.json<{ theme: string }>();
   const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
+  const isAdmin = user.email === "kontakt@wunschhimmel.com";
   if (!existing) {
-    await db.insert(userProfiles).values({ userId: user.id, theme: ["rose", "teal"].includes(theme) ? theme : "rose" });
+    await db.insert(userProfiles).values({ userId: user.id, theme: ["rose", "teal"].includes(theme) ? theme : "rose", isAdmin });
+  } else if (isAdmin && !existing.isAdmin) {
+    await db.update(userProfiles).set({ isAdmin: true }).where(eq(userProfiles.userId, user.id));
   }
   return c.json({ theme });
 });
@@ -515,6 +523,111 @@ app.get("/feed", async (c) => {
     return { ...u, list, likeCount: likes.length, likes, comments, avatarUrl: profile?.avatarUrl || null, ownerName: owner?.name || "Anonym" };
   }));
   return c.json(enriched);
+});
+
+// ── Admin stats ───────────────────────────────────────────────────────────────
+app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
+  const db = drizzle(env.DB, { schema });
+  const { user: authUser } = await import("./database/auth-schema");
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Parallel aggregate queries
+  const [
+    allUsers,
+    allWishlists,
+    allWishes,
+    allShares,
+    allUpdates,
+    allLikes,
+    allComments,
+    recentWishlists,
+    publicLists,
+  ] = await Promise.all([
+    db.select({ id: authUser.id, name: authUser.name, email: authUser.email, createdAt: authUser.createdAt }).from(authUser).all(),
+    db.select().from(wishlists).all(),
+    db.select().from(wishes).all(),
+    db.select().from(shareInvitations).all(),
+    db.select().from(listUpdates).all(),
+    db.select().from(updateLikes).all(),
+    db.select().from(updateComments).all(),
+    db.select({ userId: wishlists.userId, updatedAt: wishlists.updatedAt })
+      .from(wishlists)
+      .where(gte(wishlists.updatedAt, thirtyDaysAgo))
+      .all(),
+    db.select({ id: wishlists.id }).from(wishlists).where(eq(wishlists.isPublic, true)).all(),
+  ]);
+
+  // Registrations grouped by day (last 30 days)
+  const regsByDay: Record<string, number> = {};
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  for (const u of allUsers) {
+    const d = new Date(u.createdAt as string);
+    if (d >= cutoff) {
+      const key = d.toISOString().slice(0, 10);
+      regsByDay[key] = (regsByDay[key] || 0) + 1;
+    }
+  }
+  // Fill last 30 days
+  const registrationsByDay = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    const key = d.toISOString().slice(0, 10);
+    registrationsByDay.push({ date: key, count: regsByDay[key] || 0 });
+  }
+
+  // Top domains from productUrl
+  const domainCounts: Record<string, number> = {};
+  for (const w of allWishes) {
+    if (w.productUrl) {
+      try {
+        const hostname = new URL(w.productUrl).hostname.replace(/^www\./, "");
+        domainCounts[hostname] = (domainCounts[hostname] || 0) + 1;
+      } catch { /* invalid url */ }
+    }
+  }
+  const topDomains = Object.entries(domainCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([domain, count]) => ({ domain, count }));
+
+  // Active users (created/updated a wishlist in last 30 days)
+  const activeUserIds = new Set(recentWishlists.map(w => w.userId));
+
+  // Per-user stats
+  const userStats = allUsers.map(u => {
+    const userLists = allWishlists.filter(l => l.userId === u.id);
+    const wishCount = allWishes.filter(w => userLists.some(l => l.id === w.wishlistId)).length;
+    const shareCount = allShares.filter(s => s.sentByUserId === u.id).length;
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      createdAt: u.createdAt,
+      listCount: userLists.length,
+      wishCount,
+      shareCount,
+      isActive: activeUserIds.has(u.id),
+    };
+  }).sort((a, b) => b.listCount - a.listCount);
+
+  return c.json({
+    totals: {
+      users: allUsers.length,
+      wishlists: allWishlists.length,
+      wishes: allWishes.length,
+      links: allWishes.filter(w => !!w.productUrl).length,
+      shares: allShares.length,
+      publicLists: publicLists.length,
+      updates: allUpdates.length,
+      likes: allLikes.length,
+      comments: allComments.length,
+      activeUsers: activeUserIds.size,
+    },
+    registrationsByDay,
+    topDomains,
+    users: userStats,
+  });
 });
 
 app.get("/ping", (c) => c.json({ message: `Pong! ${Date.now()}` }));

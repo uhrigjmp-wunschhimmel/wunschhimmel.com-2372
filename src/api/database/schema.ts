@@ -10,6 +10,7 @@ export const userProfiles = sqliteTable("user_profiles", {
   theme: text("theme").notNull().default("rose"),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
+  isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 

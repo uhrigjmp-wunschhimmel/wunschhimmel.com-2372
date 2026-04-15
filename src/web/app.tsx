@@ -15,6 +15,7 @@ import Explore from "./pages/explore";
 import Impressum from "./pages/impressum";
 import Profile from "./pages/profile";
 import Feed from "./pages/feed";
+import Admin from "./pages/admin";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/impressum" component={Impressum} />
           <Route path="/profile" component={Profile} />
           <Route path="/feed" component={Feed} />
+          <Route path="/admin" component={Admin} />
         </Switch>
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}
