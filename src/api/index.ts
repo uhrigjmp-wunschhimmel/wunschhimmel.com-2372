@@ -153,6 +153,25 @@ app.delete("/wishlists/:id", authenticatedOnly, async (c) => {
   return c.json({ success: true });
 });
 
+// ── Amazon Affiliate helper ───────────────────────────────────────────────────
+const AMAZON_AFFILIATE_TAG = "wunschhimme00-21";
+const AMAZON_DOMAINS = /^(www\.)?(amazon\.(de|com|co\.uk|fr|it|es|nl|pl|se|co\.jp|ca|com\.au|com\.br|com\.mx|in|sg|ae|sa|com\.tr)|(amzn\.(to|eu)))/i;
+
+function injectAmazonTag(url: string): string {
+  try {
+    const u = new URL(url);
+    if (!AMAZON_DOMAINS.test(u.hostname)) return url;
+    // Handle short links — can't inject tag, return as-is
+    if (u.hostname.includes("amzn.to") || u.hostname.includes("amzn.eu")) return url;
+    u.searchParams.set("tag", AMAZON_AFFILIATE_TAG);
+    // Remove other affiliate tags that might conflict
+    u.searchParams.delete("ref");
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 // ── Wishes ───────────────────────────────────────────────────────────────────
 app.post("/wishlists/:id/wishes", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
@@ -170,6 +189,7 @@ app.post("/wishlists/:id/wishes", authenticatedOnly, async (c) => {
     priority?: string;
   }>();
   if (!body.title) return c.json({ error: "title required" }, 400);
+  if (body.productUrl) body.productUrl = injectAmazonTag(body.productUrl);
   const id = nanoid();
   await db.insert(wishes).values({ id, wishlistId: list.id, ...body });
   const wish = await db.select().from(wishes).where(eq(wishes.id, id)).get();
@@ -184,6 +204,7 @@ app.patch("/wishes/:id", authenticatedOnly, async (c) => {
   const list = await db.select().from(wishlists).where(eq(wishlists.id, wish.wishlistId)).get();
   if (!list || list.userId !== user.id) return c.json({ error: "forbidden" }, 403);
   const body = await c.req.json();
+  if (body.productUrl) body.productUrl = injectAmazonTag(body.productUrl);
   await db.update(wishes).set(body).where(eq(wishes.id, wish.id));
   const updated = await db.select().from(wishes).where(eq(wishes.id, wish.id)).get();
   return c.json(updated);

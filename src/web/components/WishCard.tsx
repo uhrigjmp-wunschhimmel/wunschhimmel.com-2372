@@ -10,6 +10,20 @@ interface WishCardProps {
   onImageUpdated?: () => void;
 }
 
+const AFFILIATE_TAG = "wunschhimme00-21";
+const AMAZON_RE = /^(www\.)?(amazon\.(de|com|co\.uk|fr|it|es|nl|pl|se|co\.jp|ca|com\.au|com\.br|com\.mx|in|sg|ae|sa|com\.tr))/i;
+
+function withAffiliateTag(url: string): string {
+  try {
+    const u = new URL(url);
+    if (!AMAZON_RE.test(u.hostname)) return url;
+    u.searchParams.set("tag", AFFILIATE_TAG);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 const priorityColors: Record<string, string> = {
   high: "bg-accent text-primary-foreground",
   medium: "bg-[#E8DEFF] text-foreground",
@@ -118,7 +132,7 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
         <div className="flex items-center gap-2 mt-3">
           {wish.productUrl && (
             <a
-              href={wish.productUrl}
+              href={withAffiliateTag(wish.productUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 text-center text-sm bg-[#1A1A4E] text-primary-foreground px-3 py-2 rounded-full font-body font-semibold hover:bg-[#2d2d7e] transition-colors"
