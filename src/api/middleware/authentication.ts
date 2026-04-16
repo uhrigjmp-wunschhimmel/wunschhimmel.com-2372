@@ -37,6 +37,23 @@ export const adminOnly = createMiddleware(async (c, next) => {
   if (!session) return c.json({ message: "You are not authenticated" }, 401);
   const user = c.get("user");
   const db = drizzle(env.DB, { schema });
+
+  // Auto-grant admin for Marlene on first access
+  const ADMIN_EMAIL = "kontakt@wunschhimmel.com";
+  if (user.email === ADMIN_EMAIL) {
+    const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
+    if (existing && !existing.isAdmin) {
+      await db.update(userProfiles).set({ isAdmin: true }).where(eq(userProfiles.userId, user.id));
+      return next();
+    } else if (!existing) {
+      // Profile doesn't exist yet — create it with isAdmin=true
+      await db.insert(userProfiles).values({ userId: user.id, theme: "rose", isAdmin: true });
+      return next();
+    }
+    // Already isAdmin=true
+    return next();
+  }
+
   const profile = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
   if (!profile?.isAdmin) return c.json({ message: "Forbidden" }, 403);
   return next();
