@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 
 interface WishCardProps {
@@ -7,6 +7,7 @@ interface WishCardProps {
   shareToken?: string;
   onDelete?: (id: string) => void;
   onReserved?: () => void;
+  onImageUpdated?: () => void;
 }
 
 const priorityColors: Record<string, string> = {
@@ -15,11 +16,36 @@ const priorityColors: Record<string, string> = {
   low: "bg-[#FFD6D6] text-foreground",
 };
 
-export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved }: WishCardProps) {
+export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onImageUpdated }: WishCardProps) {
   const { t } = useI18n();
   const [reserveName, setReserveName] = useState("");
   const [showReserveInput, setShowReserveInput] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/wishes/${wish.id}/image`, {
+        method: "POST",
+        body: fd,
+        credentials: "include",
+      });
+      if (res.ok) {
+        const { imageUrl } = await res.json() as { imageUrl: string };
+        setLocalImageUrl(imageUrl);
+        onImageUpdated?.();
+      }
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const displayImage = localImageUrl || wish.imageUrl;
 
   const handleReserve = async () => {
     if (!reserveName.trim() || !shareToken) return;
@@ -40,16 +66,34 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved }: Wi
   return (
     <div className="wish-card bg-white rounded-2xl overflow-hidden border border-border shadow-sm">
       {/* Product image */}
-      {wish.imageUrl && (
-        <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/30">
+      {displayImage ? (
+        <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/30 relative group">
           <img
-            src={wish.imageUrl}
+            src={displayImage}
             alt={wish.title}
             className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
           />
+          {isOwner && (
+            <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+              <span className="text-white text-xs font-semibold bg-black/50 px-3 py-1.5 rounded-full">
+                {uploadingImage ? "Lädt hoch…" : "🖼️ Bild ändern"}
+              </span>
+              <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
+            </label>
+          )}
         </div>
-      )}
+      ) : isOwner ? (
+        <label className="w-full h-28 flex flex-col items-center justify-center gap-1 bg-[#FFD6D6]/20 border-b border-border cursor-pointer hover:bg-[#FFD6D6]/40 transition-colors">
+          <span className="text-2xl">{uploadingImage ? "⏳" : "🖼️"}</span>
+          <span className="text-xs text-muted-foreground font-body">
+            {uploadingImage ? "Lädt hoch…" : "Bild hinzufügen"}
+          </span>
+          <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
+        </label>
+      ) : null}
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-1">

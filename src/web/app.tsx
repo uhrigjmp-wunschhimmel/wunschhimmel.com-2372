@@ -16,6 +16,8 @@ import Impressum from "./pages/impressum";
 import Profile from "./pages/profile";
 import Feed from "./pages/feed";
 import Admin from "./pages/admin";
+import ForgotPassword from "./pages/forgot-password";
+import ResetPassword from "./pages/reset-password";
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/profile" component={Profile} />
           <Route path="/feed" component={Feed} />
           <Route path="/admin" component={Admin} />
+          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route path="/reset-password" component={ResetPassword} />
         </Switch>
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}

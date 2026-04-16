@@ -41,6 +41,7 @@ export default function ListDetail() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [price, setPrice] = useState("");
   const [priority, setPriority] = useState<string>("medium");
   const [scraping, setScraping] = useState(false);
@@ -125,7 +126,7 @@ export default function ListDetail() {
     if (!title.trim()) return;
     setSaving(true);
     try {
-      await api.addWish(list.id, {
+      const newWish = await api.addWish(list.id, {
         title,
         description: desc || undefined,
         imageUrl: imageUrl || undefined,
@@ -133,6 +134,17 @@ export default function ListDetail() {
         productUrl: url || undefined,
         priority,
       });
+      // Upload image file if one was manually selected
+      if (imageFile && newWish?.id) {
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        const imgRes = await fetch(`/api/wishes/${newWish.id}/image`, {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        if (!imgRes.ok) console.warn("Image upload failed");
+      }
       await fetchList();
       setShowAddModal(false);
       resetForm();
@@ -189,7 +201,7 @@ export default function ListDetail() {
   };
 
   const resetForm = () => {
-    setUrl(""); setTitle(""); setDesc(""); setImageUrl(""); setPrice(""); setPriority("medium");
+    setUrl(""); setTitle(""); setDesc(""); setImageUrl(""); setImageFile(null); setPrice(""); setPriority("medium");
   };
 
   if (!session) { navigate("/sign-in"); return null; }
@@ -393,13 +405,47 @@ export default function ListDetail() {
             </div>
 
             {/* Preview */}
-            {(imageUrl || title) && (
+            {(imageUrl || imageFile || title) && (
               <div className="mb-4 flex gap-3 bg-background rounded-xl p-3 border border-border">
-                {imageUrl && <img src={imageUrl} alt="" className="w-16 h-16 object-cover rounded-lg shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />}
+                {(imageUrl || imageFile) && (
+                  <img
+                    src={imageFile ? URL.createObjectURL(imageFile) : imageUrl}
+                    alt=""
+                    className="w-16 h-16 object-cover rounded-lg shrink-0"
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="font-body font-semibold text-sm text-foreground truncate">{title}</div>
                   {price && <div className="font-body text-sm text-accent font-bold">€{price}</div>}
                 </div>
+              </div>
+            )}
+
+            {/* Manual image upload (fallback if no URL or scrape found no image) */}
+            {!imageUrl && (
+              <div className="mb-4">
+                <label className="flex items-center gap-2 cursor-pointer font-body text-sm font-semibold px-4 py-2.5 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent transition-colors w-full justify-center">
+                  🖼️ {imageFile ? "Bild ändern" : "Bild manuell hochladen (optional)"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const f = e.target.files?.[0];
+                      if (f) setImageFile(f);
+                    }}
+                  />
+                </label>
+                {imageFile && (
+                  <button
+                    type="button"
+                    onClick={() => setImageFile(null)}
+                    className="mt-1 text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                  >
+                    ✕ Bild entfernen
+                  </button>
+                )}
               </div>
             )}
 

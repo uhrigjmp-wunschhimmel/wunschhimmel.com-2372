@@ -46,7 +46,16 @@ export default function SignIn() {
               />
             </div>
             <div>
-              <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("password_label")}</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-body font-semibold text-foreground">{t("password_label")}</label>
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-xs font-body text-accent hover:underline"
+                >
+                  Passwort vergessen?
+                </button>
+              </div>
               <input
                 type="password"
                 value={password}

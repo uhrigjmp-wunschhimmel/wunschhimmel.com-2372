@@ -39,18 +39,33 @@ export default function Admin() {
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    authClient.getSession().then(({ data }) => {
-      if (!data?.user) { navigate("/sign-in"); return; }
-      fetch("/api/admin/stats", { credentials: "include" })
-        .then(async (r) => {
-          if (r.status === 403) { navigate("/dashboard"); return; }
-          if (!r.ok) throw new Error("Failed to load stats");
-          const data = await r.json();
-          setStats(data);
-        })
-        .catch(() => setError("Fehler beim Laden der Daten."))
-        .finally(() => setLoading(false));
-    });
+    async function load() {
+      const { data: session } = await authClient.getSession();
+      if (!session?.user) {
+        navigate("/sign-in");
+        return;
+      }
+      try {
+        const r = await fetch("/api/admin/stats", { credentials: "include" });
+        if (r.status === 401) {
+          navigate("/sign-in");
+          return;
+        }
+        if (r.status === 403) {
+          setError("Kein Admin-Zugang für dieses Konto.");
+          setLoading(false);
+          return;
+        }
+        if (!r.ok) throw new Error("Failed to load stats");
+        const json = await r.json();
+        setStats(json);
+      } catch {
+        setError("Fehler beim Laden der Daten. Bitte Seite neu laden.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   const statCard = (label: string, value: number | string, sub?: string) => (
@@ -82,8 +97,15 @@ export default function Admin() {
   );
 
   if (error) return (
-    <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "var(--color-destructive)" }}>{error}</div>
+    <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16, padding: 24 }}>
+      <div style={{ fontSize: 32 }}>🔒</div>
+      <div style={{ color: "var(--color-destructive)", fontWeight: 600, fontSize: 16 }}>{error}</div>
+      <button
+        onClick={() => { setError(""); setLoading(true); window.location.reload(); }}
+        style={{ padding: "10px 24px", borderRadius: 12, background: "var(--color-accent)", color: "var(--color-accent-foreground)", border: "none", cursor: "pointer", fontWeight: 600 }}
+      >
+        Erneut versuchen
+      </button>
     </div>
   );
 

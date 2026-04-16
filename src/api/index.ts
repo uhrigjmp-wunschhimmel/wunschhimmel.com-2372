@@ -369,6 +369,27 @@ app.post("/profile/init", authenticatedOnly, async (c) => {
   return c.json({ theme });
 });
 
+// ── Wish image upload ─────────────────────────────────────────────────────────
+app.post("/wishes/:id/image", authenticatedOnly, async (c) => {
+  const db = drizzle(env.DB, { schema });
+  const user = c.get("user");
+  const wish = await db.select().from(wishes).where(eq(wishes.id, c.req.param("id"))).get();
+  if (!wish) return c.json({ error: "not found" }, 404);
+  const list = await db.select().from(wishlists).where(eq(wishlists.id, wish.wishlistId)).get();
+  if (!list || list.userId !== user.id) return c.json({ error: "forbidden" }, 403);
+
+  const formData = await c.req.formData();
+  const file = formData.get("file") as File | null;
+  if (!file) return c.json({ error: "file required" }, 400);
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const key = `wishes/${wish.id}.${ext}`;
+  await env.BUCKET.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+  const imageUrl = `/api/files/${key}`;
+  await db.update(wishes).set({ imageUrl }).where(eq(wishes.id, wish.id));
+  return c.json({ imageUrl });
+});
+
 // ── Avatar upload ─────────────────────────────────────────────────────────────
 app.post("/profile/avatar", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
