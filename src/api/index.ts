@@ -39,9 +39,9 @@ app.post("/scrape", authenticatedOnly, async (c) => {
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; Wunschhimmel/1.0; +https://wunschhimmel.de)",
-        Accept: "text/html",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
       },
       signal: AbortSignal.timeout(8000),
     });
@@ -51,25 +51,42 @@ app.post("/scrape", authenticatedOnly, async (c) => {
       const m =
         html.match(new RegExp(`<meta[^>]*property=["']${property}["'][^>]*content=["']([^"']+)["']`, "i")) ||
         html.match(new RegExp(`<meta[^>]*content=["']([^"']+)["'][^>]*property=["']${property}["']`, "i")) ||
-        html.match(new RegExp(`<meta[^>]*name=["']${property}["'][^>]*content=["']([^"']+)["']`, "i"));
+        html.match(new RegExp(`<meta[^>]*name=["']${property}["'][^>]*content=["']([^"']+)["']`, "i")) ||
+        html.match(new RegExp(`<meta[^>]*content=["']([^"']+)["'][^>]*name=["']${property}["']`, "i"));
       return m ? m[1] : null;
     };
 
+    // Title: og:title → meta[name=title] → <title>
     const title =
       getMeta("og:title") ||
+      getMeta("title") ||
       html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ||
       "";
 
-    const image =
+    // Image: og:image → twitter:image → Amazon data-old-hires (high-res product image) → landingImage src
+    let image =
       getMeta("og:image") ||
       getMeta("twitter:image") ||
       "";
 
-    // Try to find price in structured data or meta
+    if (!image) {
+      // Amazon: grab first data-old-hires (high resolution product image)
+      const hiresMatch = html.match(/data-old-hires="(https:\/\/m\.media-amazon\.com\/images\/[^"]+)"/);
+      if (hiresMatch) {
+        image = hiresMatch[1];
+      } else {
+        // Fallback: landingImage src
+        const landingMatch = html.match(/id="landingImage"[^>]*src="([^"]+)"/);
+        if (landingMatch) image = landingMatch[1];
+      }
+    }
+
+    // Price: structured data → itemprop → Amazon span.a-price
     let price: number | null = null;
     const priceMatch =
       html.match(/"price":\s*"?(\d+(?:[.,]\d{1,2})?)"?/) ||
       html.match(/itemprop="price"[^>]*content="([^"]+)"/) ||
+      html.match(/class="[^"]*a-price-whole[^"]*"[^>]*>(\d+)/) ||
       html.match(/class="[^"]*price[^"]*"[^>]*>[\s€$£]*(\d+(?:[.,]\d{1,2})?)/i);
     if (priceMatch) {
       price = parseFloat(priceMatch[1].replace(",", "."));
@@ -243,7 +260,7 @@ app.post("/wishlists/:id/share", authenticatedOnly, async (c) => {
     });
     const resend = new Resend(env.RESEND_API_KEY);
     await resend.emails.send({
-      from: "Wunschhimmel <noreply@wunschhimmel.com>",
+      from: "Wunschhimmel <inspiration@wunschhimmel.com>",
       to: email,
       subject: `${user.name || "Jemand"} hat eine Wunschliste mit dir geteilt 🎁`,
       html: `
