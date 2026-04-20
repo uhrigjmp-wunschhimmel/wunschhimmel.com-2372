@@ -35,7 +35,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-2 text-sm font-body font-semibold px-4 py-2 rounded-full mb-6"
             style={{ background: rose, color: navy }}
           >
-            <span>✦</span> Kostenlos & ohne Kreditkarte
+            <span>✦</span> Kostenlos
           </div>
 
           <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 leading-tight" style={{ color: foreground }}>
