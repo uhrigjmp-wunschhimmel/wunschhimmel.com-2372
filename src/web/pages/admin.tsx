@@ -125,6 +125,7 @@ export default function Admin() {
       background: "var(--color-background)",
       color: "var(--color-foreground)",
       fontFamily: "Plus Jakarta Sans, sans-serif",
+      paddingTop: 64,
       paddingBottom: 80,
     }}>
       {/* Header */}

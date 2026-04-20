@@ -2,14 +2,24 @@ import { useLocation } from "wouter";
 import { authClient } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
   const { t, lang, setLang } = useI18n();
   const { theme, setTheme } = useTheme();
   const [, navigate] = useLocation();
   const { data: session } = authClient.useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const isTeal = theme === "teal";
+
+  useEffect(() => {
+    if (!session?.user) { setIsAdmin(false); return; }
+    fetch("/api/profile", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((p: any) => { if (p?.isAdmin) setIsAdmin(true); })
+      .catch(() => {});
+  }, [session?.user?.id]);
 
   const signOut = async () => {
     await authClient.signOut();
@@ -73,6 +83,16 @@ export function Navbar() {
               >
                 {isTeal ? "🌸" : "🌊"}
               </button>
+
+              {isAdmin && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="text-sm font-body font-semibold px-4 py-2 rounded-full transition-colors"
+                  style={{ background: isTeal ? "#2DD4BF" : "#FF6B8A", color: isTeal ? "#0F1923" : "#fff" }}
+                >
+                  ⚙️ Admin
+                </button>
+              )}
 
               <button
                 onClick={signOut}
