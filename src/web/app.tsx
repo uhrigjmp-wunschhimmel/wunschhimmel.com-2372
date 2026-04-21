@@ -4,6 +4,7 @@ import { AgentFeedback, RunableBadge } from "@runablehq/website-runtime";
 import { I18nProvider } from "./lib/i18n";
 import { ThemeProvider } from "./lib/theme";
 import { Navbar } from "./components/Navbar";
+import { CookieBanner } from "./components/CookieBanner";
 import { Toaster } from "./components/ui/sonner";
 import LandingPage from "./pages/index";
 import SignIn from "./pages/sign-in";
@@ -13,6 +14,7 @@ import ListDetail from "./pages/list-detail";
 import SharedList from "./pages/shared";
 import Explore from "./pages/explore";
 import Impressum from "./pages/impressum";
+import Datenschutz from "./pages/datenschutz";
 import Profile from "./pages/profile";
 import Feed from "./pages/feed";
 import Admin from "./pages/admin";
@@ -34,12 +36,14 @@ function App() {
           <Route path="/shared/:token" component={SharedList} />
           <Route path="/explore" component={Explore} />
           <Route path="/impressum" component={Impressum} />
+          <Route path="/datenschutz" component={Datenschutz} />
           <Route path="/profile" component={Profile} />
           <Route path="/feed" component={Feed} />
           <Route path="/admin" component={Admin} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
         </Switch>
+        <CookieBanner />
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}
         {<RunableBadge />}

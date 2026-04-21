@@ -318,7 +318,7 @@ export default function LandingPage() {
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: 24 }}>
           <button onClick={() => navigate("/impressum")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Impressum</button>
-          <button onClick={() => navigate("/impressum")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Datenschutz</button>
+          <button onClick={() => navigate("/datenschutz")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Datenschutz</button>
         </div>
         <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 12 }}>© {new Date().getFullYear()} Wunschhimmel</p>
       </footer>
