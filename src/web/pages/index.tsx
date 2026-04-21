@@ -1,188 +1,328 @@
 import { useLocation } from "wouter";
-import { useI18n } from "@/lib/i18n";
-import { useTheme } from "@/lib/theme";
 import { authClient } from "@/lib/auth";
 
 export default function LandingPage() {
-  const { t } = useI18n();
-  const { theme } = useTheme();
   const [, navigate] = useLocation();
   const { data: session } = authClient.useSession();
 
-  const isTeal = theme === "teal";
-  const accent = isTeal ? "#2DD4BF" : "#FF6B8A";
-  const navy = isTeal ? "#0F1923" : "#1A1A4E";
-  const rose = isTeal ? "#1E3040" : "#FFD6D6";
-  const lavender = isTeal ? "#1A3545" : "#E8DEFF";
-  const textMuted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const bg = isTeal ? "#0F1923" : "#FFF8F0";
-  const cardBg = isTeal ? "#162230" : "#FFFFFF";
-  const border = isTeal ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
-
-  const features = [
-    { icon: "🔗", title: t("feat1_title"), desc: t("feat1_desc") },
-    { icon: "📨", title: t("feat2_title"), desc: t("feat2_desc") },
-    { icon: "🎀", title: t("feat3_title"), desc: t("feat3_desc") },
-  ];
-
   return (
-    <div className="min-h-screen" style={{ background: bg, color: foreground }}>
-      {/* Hero */}
-      <section className="blob-bg pt-32 pb-0 relative">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div
-            className="inline-flex items-center gap-2 text-sm font-body font-semibold px-4 py-2 rounded-full mb-6"
-            style={{ background: rose, color: navy }}
-          >
-            <span>✦</span> Kostenlos
+    <div style={{ minHeight: "100vh", background: "#FFFBF5", fontFamily: "Plus Jakarta Sans, sans-serif", overflowX: "hidden" }}>
+
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section style={{ paddingTop: 100, paddingBottom: 0, position: "relative", background: "linear-gradient(180deg, #FFF5F8 0%, #FFFBF5 100%)" }}>
+
+        {/* Rainbow arc background */}
+        <div style={{ position: "absolute", top: 60, left: "50%", transform: "translateX(-50%)", width: "min(900px, 100%)", pointerEvents: "none", zIndex: 0 }}>
+          <svg viewBox="0 0 900 420" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", opacity: 0.18 }}>
+            <path d="M50,400 Q450,-100 850,400" stroke="#FF6B6B" strokeWidth="32" fill="none" strokeLinecap="round"/>
+            <path d="M80,400 Q450,-60 820,400" stroke="#FF9F40" strokeWidth="28" fill="none" strokeLinecap="round"/>
+            <path d="M110,400 Q450,-20 790,400" stroke="#FFD93D" strokeWidth="26" fill="none" strokeLinecap="round"/>
+            <path d="M140,400 Q450,20 760,400" stroke="#6BCB77" strokeWidth="24" fill="none" strokeLinecap="round"/>
+            <path d="M170,400 Q450,55 730,400" stroke="#4D96FF" strokeWidth="22" fill="none" strokeLinecap="round"/>
+            <path d="M200,400 Q450,90 700,400" stroke="#C77DFF" strokeWidth="20" fill="none" strokeLinecap="round"/>
+          </svg>
+        </div>
+
+        {/* Floating deco elements */}
+        {[
+          { emoji: "🎈", top: 120, left: "8%", size: 36, rot: -15 },
+          { emoji: "⭐", top: 160, right: "10%", size: 28, rot: 20 },
+          { emoji: "🎀", top: 220, left: "4%", size: 30, rot: 10 },
+          { emoji: "✨", top: 140, right: "6%", size: 32, rot: -10 },
+          { emoji: "🎊", top: 300, left: "12%", size: 26, rot: 5 },
+          { emoji: "💫", top: 280, right: "14%", size: 24, rot: -20 },
+        ].map((el, i) => (
+          <div key={i} style={{
+            position: "absolute", top: el.top,
+            ...(el.left ? { left: el.left } : { right: (el as any).right }),
+            fontSize: el.size, transform: `rotate(${el.rot}deg)`,
+            pointerEvents: "none", zIndex: 1, opacity: 0.7,
+          }}>{el.emoji}</div>
+        ))}
+
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "0 24px", textAlign: "center", position: "relative", zIndex: 2 }}>
+
+          {/* Badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "#FFE8F0", color: "#D63384",
+            borderRadius: 999, padding: "8px 20px", fontSize: 13,
+            fontWeight: 700, marginBottom: 24,
+            fontFamily: "Plus Jakarta Sans, Arial, sans-serif",
+          }}>
+            🌈 Kostenlos
           </div>
 
-          <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 leading-tight" style={{ color: foreground }}>
-            {t("hero_title").split("\n").map((line, i) => (
-              <span key={i}>
-                {i === 1 ? <em style={{ color: accent }} className="not-italic">{line}</em> : line}
-                {i === 0 && <br />}
-              </span>
-            ))}
+          {/* Headline */}
+          <h1 style={{
+            fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 800,
+            lineHeight: 1.15, marginBottom: 20, color: "#2D1B69",
+            fontFamily: "Playfair Display, serif",
+          }}>
+            Die virtuelle{" "}
+            <span style={{
+              background: "linear-gradient(135deg, #FF6B8A, #FF8FA3)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              Wunschkiste
+            </span>
+            <br />für deinen Kindergeburtstag 🎂
           </h1>
 
-          <p className="font-body text-lg max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: textMuted }}>
-            {t("hero_sub")}
+          <p style={{ fontSize: 18, color: "#7B6B8D", lineHeight: 1.7, marginBottom: 36, maxWidth: 560, margin: "0 auto 36px" }}>
+            Erstelle eine bunte Wunschliste, teile sie mit Familie & Freunden —
+            und sag Tschüss zu doppelten Geschenken!
           </p>
 
-          <div className="flex flex-wrap gap-4 justify-center">
+          {/* CTAs */}
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 48 }}>
             <button
               onClick={() => navigate(session ? "/dashboard" : "/sign-up")}
-              className="font-body font-semibold px-8 py-4 rounded-full text-lg transition-all hover:scale-105 shadow-lg"
-              style={{ background: accent, color: isTeal ? navy : "#fff", boxShadow: `0 8px 24px ${accent}40` }}
+              style={{
+                background: "linear-gradient(135deg, #FF6B8A 0%, #FF8FA3 100%)",
+                color: "#fff", border: "none", borderRadius: 999,
+                padding: "16px 36px", fontSize: 16, fontWeight: 700,
+                cursor: "pointer", boxShadow: "0 8px 28px rgba(255,107,138,0.35)",
+                transition: "transform 0.2s",
+              }}
+              onMouseOver={e => (e.currentTarget.style.transform = "scale(1.04)")}
+              onMouseOut={e => (e.currentTarget.style.transform = "scale(1)")}
             >
-              {t("hero_cta")} ✨
+              Wunschkiste erstellen 🎁
             </button>
             <button
               onClick={() => navigate("/explore")}
-              className="font-body font-semibold px-8 py-4 rounded-full text-lg transition-all hover:scale-105"
-              style={{ background: navy, color: isTeal ? "#2DD4BF" : "#fff", border: isTeal ? `1px solid #1E3A4A` : "none" }}
+              style={{
+                background: "#fff", color: "#2D1B69", border: "2px solid #E0D4FF",
+                borderRadius: 999, padding: "16px 36px", fontSize: 16, fontWeight: 700,
+                cursor: "pointer", transition: "transform 0.2s",
+              }}
+              onMouseOver={e => (e.currentTarget.style.transform = "scale(1.04)")}
+              onMouseOut={e => (e.currentTarget.style.transform = "scale(1)")}
             >
-              {t("hero_explore")}
+              Beispiele ansehen ✨
             </button>
           </div>
 
-          {/* Mock preview */}
-          <div className="mt-16 relative">
-            <div
-              className="rounded-3xl shadow-2xl p-6 max-w-lg mx-auto"
-              style={{ background: cardBg, border: `1px solid ${border}` }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl">🎂</span>
+          {/* Trust bar */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 32, flexWrap: "wrap", marginBottom: 56 }}>
+            {[
+              { icon: "🎈", text: "Kostenlos" },
+              { icon: "🌈", text: "Kinderleicht" },
+              { icon: "🎁", text: "Keine Doppelgeschenke" },
+              { icon: "💌", text: "Per Link teilen" },
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600, color: "#7B6B8D" }}>
+                <span style={{ fontSize: 20 }}>{t.icon}</span> {t.text}
+              </div>
+            ))}
+          </div>
+
+          {/* App mockup card */}
+          <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: 480 }}>
+            <div style={{
+              background: "#fff", borderRadius: 28, boxShadow: "0 24px 64px rgba(45,27,105,0.12)",
+              padding: 28, textAlign: "left", border: "1px solid #F0E8FF",
+            }}>
+              {/* List header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 16, background: "linear-gradient(135deg,#FFD93D,#FF9F40)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🎂</div>
                 <div>
-                  <div className="font-display font-bold" style={{ color: foreground }}>Meine Geburtstagsliste</div>
-                  <div className="text-xs font-body" style={{ color: textMuted }}>3 Wünsche · Privat</div>
+                  <div style={{ fontWeight: 800, fontSize: 16, color: "#2D1B69" }}>Lenas 6. Geburtstag 🎉</div>
+                  <div style={{ fontSize: 12, color: "#A89BBD", marginTop: 2 }}>4 Wünsche · Geteilt mit Familie</div>
                 </div>
               </div>
-              <div className="space-y-3">
-                {[
-                  { name: "Nike Air Max 2024", price: "€129", img: "👟", reserved: false },
-                  { name: "Kindle Paperwhite", price: "€149", img: "📚", reserved: true },
-                  { name: "Spotify Premium", price: "€12/Mo", img: "🎵", reserved: false },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ background: isTeal ? "#1A2D3E" : "#FFF8F0" }}
-                  >
-                    <span className="text-2xl">{item.img}</span>
-                    <div className="flex-1">
-                      <div className="font-body font-semibold text-sm" style={{ color: foreground }}>{item.name}</div>
-                      <div className="text-xs font-body font-bold" style={{ color: accent }}>{item.price}</div>
-                    </div>
-                    {item.reserved ? (
-                      <span className="text-xs px-2 py-1 rounded-full font-body" style={{ background: lavender, color: foreground }}>✓ Reserviert</span>
-                    ) : (
-                      <span className="text-xs px-2 py-1 rounded-full font-body" style={{ border: `1px solid ${accent}`, color: accent }}>Reservieren</span>
-                    )}
+              {/* Wish items */}
+              {[
+                { icon: "🧸", name: "Großes Kuscheltier", price: "€29", color: "#FFE8F0", reserved: false },
+                { icon: "🎨", name: "Malset Deluxe", price: "€24", color: "#E8F5FF", reserved: true },
+                { icon: "📚", name: "Bücherset Conni", price: "€18", color: "#F0FFE8", reserved: false },
+                { icon: "🎠", name: "Karussell-Spielzeug", price: "€35", color: "#F5E8FF", reserved: false },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 14px", borderRadius: 14, marginBottom: 8,
+                  background: item.color,
+                }}>
+                  <span style={{ fontSize: 22 }}>{item.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: "#2D1B69" }}>{item.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#FF6B8A" }}>{item.price}</div>
                   </div>
-                ))}
-              </div>
+                  {item.reserved ? (
+                    <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 999, background: "#6BCB77", color: "#fff", fontWeight: 700 }}>✓ Reserviert</span>
+                  ) : (
+                    <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 999, border: "1.5px solid #FF6B8A", color: "#FF6B8A", fontWeight: 700 }}>Schenken</span>
+                  )}
+                </div>
+              ))}
             </div>
-
-            <div
-              className="absolute -top-4 -right-4 text-xs font-body font-semibold px-3 py-2 rounded-full shadow-lg hidden md:block"
-              style={{ background: navy, color: isTeal ? "#2DD4BF" : "white", border: isTeal ? `1px solid #1E3A4A` : "none" }}
-            >
-              🔗 Link → Produkt ✓
-            </div>
-            <div
-              className="absolute -bottom-4 -left-4 text-xs font-body font-semibold px-3 py-2 rounded-full shadow-lg hidden md:block"
-              style={{ background: accent, color: isTeal ? navy : "#fff" }}
-            >
-              📨 Per E-Mail teilen
-            </div>
+            {/* Floating badge */}
+            <div style={{
+              position: "absolute", top: -14, right: -14,
+              background: "linear-gradient(135deg,#6BCB77,#4DAF5F)",
+              color: "#fff", borderRadius: 999, padding: "8px 14px",
+              fontSize: 12, fontWeight: 700, boxShadow: "0 4px 16px rgba(107,203,119,0.4)",
+            }}>🔒 Doppelschutz aktiv</div>
+            <div style={{
+              position: "absolute", bottom: -14, left: -14,
+              background: "linear-gradient(135deg,#4D96FF,#3D7FE0)",
+              color: "#fff", borderRadius: 999, padding: "8px 14px",
+              fontSize: 12, fontWeight: 700, boxShadow: "0 4px 16px rgba(77,150,255,0.4)",
+            }}>💌 Link geteilt ✓</div>
           </div>
         </div>
 
-        <div className="mt-20">
-          <svg viewBox="0 0 1440 60" className="w-full" preserveAspectRatio="none" style={{ height: 60, display: "block" }}>
-            <path fill={bg} d="M0,0 C360,60 1080,0 1440,40 L1440,60 L0,60 Z" />
+        {/* Wave divider */}
+        <div style={{ marginTop: 80 }}>
+          <svg viewBox="0 0 1440 70" style={{ width: "100%", display: "block", height: 70 }} preserveAspectRatio="none">
+            <path fill="#FFF0F8" d="M0,20 C360,70 1080,0 1440,40 L1440,70 L0,70 Z"/>
           </svg>
         </div>
       </section>
 
-      {/* Features */}
-      <section style={{ background: bg }} className="py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-center mb-16" style={{ color: foreground }}>
-            {t("features_title")} <span style={{ color: accent }}>✦</span>
+      {/* ── How it works ─────────────────────────────────────────────────── */}
+      <section style={{ background: "#FFF0F8", padding: "72px 24px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#FF6B8A", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>So einfach geht's</div>
+          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "#2D1B69", marginBottom: 48, fontFamily: "Playfair Display, serif" }}>
+            In 3 Schritten zur perfekten Wunschliste 🌟
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((f, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
-                style={{ background: cardBg, border: `1px solid ${border}` }}
-              >
-                <div className="text-4xl mb-4">{f.icon}</div>
-                <h3 className="font-display font-bold text-xl mb-2" style={{ color: foreground }}>{f.title}</h3>
-                <p className="font-body leading-relaxed" style={{ color: textMuted }}>{f.desc}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+            {[
+              { step: "1", icon: "📝", title: "Liste erstellen", desc: "Lege deine bunte Wunschkiste an — mit Fotos, Preisen und Links.", color: "#E0D4FF", accent: "#9B59B6" },
+              { step: "2", icon: "💌", title: "Mit Familie teilen", desc: "Schick den Link per WhatsApp, E-Mail oder einfach copy-paste.", color: "#FFD6E8", accent: "#E91E8C" },
+              { step: "3", icon: "🎁", title: "Wünsche werden reserviert", desc: "Verwandte reservieren Geschenke — du siehst was schon vergeben ist.", color: "#D4F5E0", accent: "#27AE60" },
+            ].map((s, i) => (
+              <div key={i} style={{ background: "#fff", borderRadius: 24, padding: "32px 24px", boxShadow: "0 4px 24px rgba(45,27,105,0.07)", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 16, right: 16, width: 36, height: 36, borderRadius: 999, background: s.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 16, color: s.accent }}>{s.step}</div>
+                <div style={{ fontSize: 44, marginBottom: 16 }}>{s.icon}</div>
+                <h3 style={{ fontWeight: 800, fontSize: 18, color: "#2D1B69", marginBottom: 10 }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: "#7B6B8D", lineHeight: 1.6 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Wave */}
+        <div style={{ marginTop: 72, marginLeft: -24, marginRight: -24 }}>
+          <svg viewBox="0 0 1440 70" style={{ width: "100%", display: "block", height: 70 }} preserveAspectRatio="none">
+            <path fill="#FFFBF5" d="M0,40 C480,0 960,70 1440,20 L1440,70 L0,70 Z"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* ── Features ─────────────────────────────────────────────────────── */}
+      <section style={{ background: "#FFFBF5", padding: "72px 24px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#FF6B8A", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>Features</div>
+            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "#2D1B69", fontFamily: "Playfair Display, serif" }}>
+              Alles was Eltern brauchen ✨
+            </h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+            {[
+              { icon: "🔗", title: "Produktlinks speichern", desc: "Link einfügen — Wunschhimmel holt Titel, Bild & Preis automatisch." },
+              { icon: "📨", title: "Per E-Mail & Link teilen", desc: "Oma bekommt einen Link, kein App-Download nötig." },
+              { icon: "🔒", title: "Kein Doppelschutz-Stress", desc: "Reservierte Geschenke sind für andere als vergeben markiert." },
+              { icon: "🌈", title: "Schöne Ansicht für Gäste", desc: "Deine Wunschliste sieht für Beschenkende toll aus — ohne Login." },
+              { icon: "🛍️", title: "Amazon-Links inklusive", desc: "Direkt auf Amazon verlinken — einfach für alle Schenkenden." },
+              { icon: "📱", title: "Auf allen Geräten", desc: "Egal ob Handy, Tablet oder PC — überall schön." },
+            ].map((f, i) => (
+              <div key={i} style={{
+                background: "#fff", borderRadius: 20, padding: "28px 24px",
+                boxShadow: "0 2px 16px rgba(45,27,105,0.06)", border: "1px solid #F0E8FF",
+              }}>
+                <div style={{ fontSize: 36, marginBottom: 14 }}>{f.icon}</div>
+                <h3 style={{ fontWeight: 800, fontSize: 16, color: "#2D1B69", marginBottom: 8 }}>{f.title}</h3>
+                <p style={{ fontSize: 13, color: "#7B6B8D", lineHeight: 1.6 }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
-      <section style={{ background: navy }} className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-8 left-8 text-8xl" style={{ color: accent }}>✦</div>
-          <div className="absolute bottom-8 right-8 text-8xl" style={{ color: accent }}>✦</div>
-          <div className="absolute top-1/2 left-1/3 text-6xl" style={{ color: accent }}>✦</div>
-        </div>
-        <div className="max-w-3xl mx-auto px-6 text-center relative">
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 text-white">
-            Bereit für deine <em style={{ color: isTeal ? "#2DD4BF" : "#FFD6D6" }} className="not-italic">erste Liste?</em>
+      {/* ── Use cases ────────────────────────────────────────────────────── */}
+      <section style={{ background: "#F5F0FF", padding: "72px 24px" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ fontSize: "clamp(26px,4vw,40px)", fontWeight: 800, color: "#2D1B69", marginBottom: 16, fontFamily: "Playfair Display, serif" }}>
+            Perfekt für jeden Anlass 🎉
           </h2>
-          <p className="font-body text-white/70 text-lg mb-8">Kostenlos, in weniger als einer Minute.</p>
+          <p style={{ fontSize: 16, color: "#7B6B8D", marginBottom: 48 }}>Nicht nur Geburtstage — Wunschhimmel passt zu allen Festen</p>
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 16 }}>
+            {[
+              { emoji: "🎂", label: "Kindergeburtstag" },
+              { emoji: "🎄", label: "Weihnachten" },
+              { emoji: "🐣", label: "Ostern" },
+              { emoji: "👶", label: "Babyshower" },
+              { emoji: "💍", label: "Hochzeit" },
+              { emoji: "🎓", label: "Schulanfang / Einschulung" },
+              { emoji: "🥳", label: "Erwachsenengeburtstag" },
+              { emoji: "💝", label: "Valentinstag" },
+            ].map((u, i) => (
+              <div key={i} style={{
+                background: "#fff", borderRadius: 999, padding: "12px 22px",
+                display: "flex", alignItems: "center", gap: 10,
+                fontWeight: 700, fontSize: 14, color: "#2D1B69",
+                boxShadow: "0 2px 12px rgba(45,27,105,0.08)", border: "1px solid #E0D4FF",
+              }}>
+                <span style={{ fontSize: 22 }}>{u.emoji}</span> {u.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ───────────────────────────────────────────────────── */}
+      <section style={{
+        background: "linear-gradient(135deg, #2D1B69 0%, #1A1A4E 100%)",
+        padding: "80px 24px", textAlign: "center", position: "relative", overflow: "hidden",
+      }}>
+        {/* Rainbow top border */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(90deg,#FF6B6B,#FF9F40,#FFD93D,#6BCB77,#4D96FF,#C77DFF)" }}/>
+        {/* Deco */}
+        {["🎈","🌟","🎊","✨","🎀","💫"].map((e, i) => (
+          <div key={i} style={{ position: "absolute", fontSize: 28, opacity: 0.15, top: `${15 + i * 12}%`, left: i % 2 === 0 ? `${5 + i * 3}%` : undefined, right: i % 2 !== 0 ? `${5 + i * 3}%` : undefined, pointerEvents: "none" }}>{e}</div>
+        ))}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 52, marginBottom: 16 }}>🌈</div>
+          <h2 style={{ fontSize: "clamp(28px,4vw,48px)", fontWeight: 800, color: "#fff", marginBottom: 16, fontFamily: "Playfair Display, serif" }}>
+            Bereit für die erste Wunschkiste?
+          </h2>
+          <p style={{ fontSize: 18, color: "rgba(255,255,255,0.7)", marginBottom: 40 }}>
+            Kostenlos, in weniger als einer Minute. Kein Stress mehr bei Geschenken!
+          </p>
           <button
             onClick={() => navigate(session ? "/dashboard" : "/sign-up")}
-            className="font-body font-semibold px-8 py-4 rounded-full text-lg transition-all hover:scale-105"
-            style={{ background: accent, color: isTeal ? navy : "#fff" }}
+            style={{
+              background: "linear-gradient(135deg,#FF6B8A,#FF8FA3)",
+              color: "#fff", border: "none", borderRadius: 999,
+              padding: "18px 48px", fontSize: 18, fontWeight: 800,
+              cursor: "pointer", boxShadow: "0 12px 36px rgba(255,107,138,0.45)",
+              transition: "transform 0.2s",
+            }}
+            onMouseOver={e => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseOut={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            Jetzt starten ✨
+            Jetzt kostenlos starten 🎁
           </button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ background: navy, borderTop: `1px solid ${border}` }} className="py-8 text-center font-body">
-        <p className="text-white/40 text-sm mb-2">© {new Date().getFullYear()} Wunschhimmel</p>
-        <p className="text-white/30 text-xs max-w-lg mx-auto px-4 mb-3">
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
+      <footer style={{ background: "#1A1A4E", padding: "32px 24px", textAlign: "center" }}>
+        <div style={{ fontSize: 24, marginBottom: 8 }}>✨</div>
+        <div style={{ fontWeight: 800, fontSize: 16, color: "#FFD6D6", marginBottom: 4, fontFamily: "Playfair Display, serif" }}>Wunschhimmel</div>
+        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginBottom: 12 }}>
           Als Amazon-Partner verdiene ich an qualifizierten Verkäufen.
         </p>
-        <button onClick={() => navigate("/impressum")} className="text-white/30 hover:text-white/60 text-xs transition-colors">
-          Impressum
-        </button>
+        <div style={{ display: "flex", justifyContent: "center", gap: 24 }}>
+          <button onClick={() => navigate("/impressum")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Impressum</button>
+          <button onClick={() => navigate("/impressum")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Datenschutz</button>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 12 }}>© {new Date().getFullYear()} Wunschhimmel</p>
       </footer>
+
     </div>
   );
 }
