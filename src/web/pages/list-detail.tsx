@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
@@ -7,6 +7,7 @@ import { WishCard } from "@/components/WishCard";
 import { UpdatePost } from "@/components/UpdatePost";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 
 const PRIORITY_OPTIONS = ["low", "medium", "high"] as const;
 
@@ -34,6 +35,8 @@ export default function ListDetail() {
   const [postingUpdate, setPostingUpdate] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [shareTab, setShareTab] = useState<"email" | "qr" | "apps">("email");
+  const qrRef = useRef<SVGSVGElement>(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Add wish form
@@ -514,48 +517,199 @@ export default function ListDetail() {
       {showShareModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-6">📨 {t("share_list")}</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-4">🔗 Liste teilen</h2>
 
             {/* Copy link */}
-            <div className="bg-background rounded-xl p-3 border border-border mb-6 flex items-center gap-3">
+            <div className="bg-background rounded-xl p-3 border border-border mb-5 flex items-center gap-3">
               <span className="font-body text-xs text-muted-foreground flex-1 truncate">{window.location.origin}/shared/{list.shareToken}</span>
               <button onClick={copyShareLink} className="text-xs bg-[#1A1A4E] text-primary-foreground px-3 py-1.5 rounded-full font-body font-semibold shrink-0">Kopieren</button>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("share_emails")}</label>
-                <input
-                  value={shareEmails}
-                  onChange={e => setShareEmails(e.target.value)}
-                  placeholder="freund@email.de, familie@email.de"
-                  className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("share_message")}</label>
-                <textarea
-                  value={shareMessage}
-                  onChange={e => setShareMessage(e.target.value)}
-                  rows={3}
-                  placeholder="Hey! Hier sind meine Wünsche..."
-                  className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl hover:bg-background transition-colors">
-                {t("cancel")}
+            {/* Tabs */}
+            <div className="flex gap-2 mb-5 bg-background rounded-xl p-1 border border-border">
+              <button
+                onClick={() => setShareTab("email")}
+                className="flex-1 py-2 rounded-lg font-body text-sm font-semibold transition-all"
+                style={{ background: shareTab === "email" ? "#1A1A4E" : "transparent", color: shareTab === "email" ? "#fff" : "#6B6B9A" }}
+              >
+                📨 E-Mail
               </button>
               <button
-                onClick={shareList}
-                disabled={sharing || !shareEmails.trim()}
-                className="flex-1 bg-accent text-primary-foreground font-body font-semibold py-3 rounded-xl hover:bg-[#ff5077] transition-colors disabled:opacity-60"
+                onClick={() => setShareTab("apps")}
+                className="flex-1 py-2 rounded-lg font-body text-sm font-semibold transition-all"
+                style={{ background: shareTab === "apps" ? "#1A1A4E" : "transparent", color: shareTab === "apps" ? "#fff" : "#6B6B9A" }}
               >
-                {sharing ? t("loading") : t("share_send")}
+                💬 Apps
+              </button>
+              <button
+                onClick={() => setShareTab("qr")}
+                className="flex-1 py-2 rounded-lg font-body text-sm font-semibold transition-all"
+                style={{ background: shareTab === "qr" ? "#1A1A4E" : "transparent", color: shareTab === "qr" ? "#fff" : "#6B6B9A" }}
+              >
+                📷 QR-Code
               </button>
             </div>
+
+            {/* Email tab */}
+            {shareTab === "email" && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("share_emails")}</label>
+                  <input
+                    value={shareEmails}
+                    onChange={e => setShareEmails(e.target.value)}
+                    placeholder="freund@email.de, familie@email.de"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("share_message")}</label>
+                  <textarea
+                    value={shareMessage}
+                    onChange={e => setShareMessage(e.target.value)}
+                    rows={3}
+                    placeholder="Hey! Hier sind meine Wünsche..."
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
+                  />
+                </div>
+                <div className="flex gap-3 mt-2">
+                  <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl hover:bg-background transition-colors">
+                    {t("cancel")}
+                  </button>
+                  <button
+                    onClick={shareList}
+                    disabled={sharing || !shareEmails.trim()}
+                    className="flex-1 bg-accent text-primary-foreground font-body font-semibold py-3 rounded-xl hover:bg-[#ff5077] transition-colors disabled:opacity-60"
+                  >
+                    {sharing ? t("loading") : t("share_send")}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Apps tab */}
+            {shareTab === "apps" && (() => {
+              const shareUrl = `${window.location.origin}/shared/${list.shareToken}`;
+              const shareText = `🎁 Schau mal meine Wunschliste an: ${list.emoji} ${list.title}`;
+              const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + "\n" + shareUrl)}`;
+              const signalUrl = `https://signal.me/#p=${encodeURIComponent(shareUrl)}`;
+              const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+              const nativeShare = async () => {
+                if (navigator.share) {
+                  await navigator.share({ title: `${list.emoji} ${list.title}`, text: shareText, url: shareUrl });
+                } else {
+                  navigator.clipboard.writeText(shareUrl);
+                  toast.success("Link kopiert!");
+                }
+              };
+              return (
+                <div className="flex flex-col gap-3">
+                  {/* Native share — prominent on mobile */}
+                  <button
+                    onClick={nativeShare}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-body font-semibold text-sm transition-all"
+                    style={{ background: "#2D1B69", color: "#fff" }}
+                  >
+                    <span style={{ fontSize: 22 }}>📤</span>
+                    <div className="text-left">
+                      <div className="font-semibold">Teilen über...</div>
+                      <div style={{ fontSize: 11, opacity: 0.7 }}>Öffnet alle installierten Apps</div>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-2 my-1">
+                    <div className="flex-1 h-px" style={{ background: "#EAD9D9" }} />
+                    <span className="font-body text-xs" style={{ color: "#9CA3AF" }}>oder direkt</span>
+                    <div className="flex-1 h-px" style={{ background: "#EAD9D9" }} />
+                  </div>
+
+                  {/* WhatsApp */}
+                  <a
+                    href={waUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl font-body font-semibold text-sm transition-all hover:opacity-90"
+                    style={{ background: "#25D366", color: "#fff", textDecoration: "none" }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp
+                  </a>
+
+                  {/* Signal */}
+                  <a
+                    href={waUrl.replace("wa.me", "signal.me").replace("?text=", "#p=")}
+                    onClick={e => { e.preventDefault(); navigator.clipboard.writeText(shareUrl); toast.success("Link kopiert – in Signal einfügen!"); }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl font-body font-semibold text-sm transition-all hover:opacity-90 cursor-pointer"
+                    style={{ background: "#3A76F0", color: "#fff", textDecoration: "none" }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5a7.5 7.5 0 110 15 7.5 7.5 0 010-15zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"/></svg>
+                    Signal <span style={{ fontSize: 11, opacity: 0.75, marginLeft: 4 }}>(Link wird kopiert)</span>
+                  </a>
+
+                  {/* Telegram */}
+                  <a
+                    href={telegramUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl font-body font-semibold text-sm transition-all hover:opacity-90"
+                    style={{ background: "#229ED9", color: "#fff", textDecoration: "none" }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Telegram
+                  </a>
+
+                  <button onClick={() => setShowShareModal(false)} className="w-full border border-border text-muted-foreground font-body py-2.5 rounded-xl text-sm hover:bg-background transition-colors mt-1">
+                    Schließen
+                  </button>
+                </div>
+              );
+            })()}
+
+            {/* QR tab */}
+            {shareTab === "qr" && (
+              <div className="flex flex-col items-center gap-4">
+                <div className="bg-white rounded-2xl p-4 border border-border shadow-sm">
+                  <QRCodeSVG
+                    ref={qrRef}
+                    value={`${window.location.origin}/shared/${list.shareToken}`}
+                    size={200}
+                    bgColor="#ffffff"
+                    fgColor="#2D1B69"
+                    level="M"
+                    includeMargin={false}
+                  />
+                </div>
+                <p className="font-body text-xs text-muted-foreground text-center">
+                  Einfach abscannen — kein Account nötig
+                </p>
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => {
+                      const svg = qrRef.current;
+                      if (!svg) return;
+                      const canvas = document.createElement("canvas");
+                      const size = 400;
+                      canvas.width = size; canvas.height = size;
+                      const ctx = canvas.getContext("2d")!;
+                      ctx.fillStyle = "#ffffff";
+                      ctx.fillRect(0, 0, size, size);
+                      const xml = new XMLSerializer().serializeToString(svg);
+                      const img = new Image();
+                      img.onload = () => {
+                        ctx.drawImage(img, 0, 0, size, size);
+                        const a = document.createElement("a");
+                        a.download = `wunschhimmel-qr-${list.title}.png`;
+                        a.href = canvas.toDataURL("image/png");
+                        a.click();
+                      };
+                      img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+                    }}
+                    className="flex-1 bg-[#1A1A4E] text-white font-body font-semibold py-3 rounded-xl text-sm hover:bg-[#2D1B69] transition-colors"
+                  >
+                    ⬇️ PNG herunterladen
+                  </button>
+                  <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl text-sm hover:bg-background transition-colors">
+                    Schließen
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
