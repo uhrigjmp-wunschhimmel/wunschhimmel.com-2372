@@ -34,7 +34,7 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => navigate("/")} className="flex items-center gap-2">
-          <span className="text-2xl">✨</span>
+          <img src="/logo-icon.png" alt="Wunschhimmel" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover" }} />
           <span
             className="font-display font-bold text-xl"
             style={{ color: isTeal ? "#2DD4BF" : "#FFD6D6" }}
