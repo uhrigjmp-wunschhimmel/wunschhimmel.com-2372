@@ -9,6 +9,7 @@ import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateL
 
 import { Resend } from "resend";
 import * as schema from "./database/schema";
+import { agentRoutes } from "./routes/agent";
 
 type Bindings = { DB: D1Database; BETTER_AUTH_SECRET: string; RUNABLE_URL: string; RESEND_API_KEY: string; BUCKET: R2Bucket };
 type Variables = { user: any; session: any };
@@ -17,6 +18,8 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>().basePath("a
 
 app.use(cors({ origin: "*", credentials: true }));
 app.use("*", authMiddleware);
+
+app.route("/agent", agentRoutes);
 
 // ── Auth routes ──────────────────────────────────────────────────────────────
 app.all("/auth/*", async (c) => {

@@ -5,6 +5,7 @@ import { I18nProvider } from "./lib/i18n";
 import { ThemeProvider } from "./lib/theme";
 import { Navbar } from "./components/Navbar";
 import { CookieBanner } from "./components/CookieBanner";
+import { WunschengelChat } from "./components/WunschengelChat";
 import { Toaster } from "./components/ui/sonner";
 import LandingPage from "./pages/index";
 import SignIn from "./pages/sign-in";
@@ -44,6 +45,7 @@ function App() {
           <Route path="/reset-password" component={ResetPassword} />
         </Switch>
         <CookieBanner />
+        <WunschengelChat />
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}
         {<RunableBadge />}
