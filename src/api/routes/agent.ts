@@ -9,5 +9,5 @@ export const agentRoutes = new Hono<{ Bindings: Bindings }>();
 agentRoutes.post("/messages", async (c) => {
   const { messages } = await c.req.json();
   const agent = createAgent();
-  return createAgentUIStreamResponse({ agent, messages });
+  return createAgentUIStreamResponse({ agent, uiMessages: messages });
 });
