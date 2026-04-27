@@ -10,6 +10,7 @@ type Product = {
   price: number | null; currency: string;
   imageUrl: string; affiliateUrl: string;
   category: string; tags: string[];
+  partnerId?: string;
 };
 
 type Wishlist = { id: string; title: string; emoji: string; };
@@ -148,7 +149,34 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
 }
 
 // ── Product Card ──────────────────────────────────────────────────────────────
-function ProductCard({ product, onAddWish }: { product: Product; onAddWish: (p: Product) => void }) {
+// Persistent session ID for click tracking (no auth needed)
+const SESSION_ID = (() => {
+  if (typeof window === "undefined") return "ssr";
+  const key = "wh_session_id";
+  const existing = sessionStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  sessionStorage.setItem(key, id);
+  return id;
+})();
+
+function trackClick(product: Product, meta: { recipient?: string | null; occasion?: string | null; budget?: string | null }) {
+  fetch("/track/click", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      productId: product.id,
+      partnerId: product.partnerId ?? "unknown",
+      affiliateUrl: product.affiliateUrl,
+      sessionId: SESSION_ID,
+      recipient: meta.recipient,
+      occasion: meta.occasion,
+      budget: meta.budget,
+    }),
+  }).catch(() => {});
+}
+
+function ProductCard({ product, onAddWish, trackMeta }: { product: Product; onAddWish: (p: Product) => void; trackMeta: { recipient?: string | null; occasion?: string | null; budget?: string | null } }) {
   const [imgError, setImgError] = useState(false);
   return (
     <div style={{ background:"#fff", borderRadius:16, overflow:"hidden", border:"1px solid #F0E8FF", boxShadow:"0 2px 12px rgba(45,27,105,0.08)", display:"flex", flexDirection:"column", minWidth:175, maxWidth:195, flexShrink:0 }}>
@@ -165,8 +193,12 @@ function ProductCard({ product, onAddWish }: { product: Product; onAddWish: (p: 
         <div style={{ fontSize:10, color:"#A89BBD", fontWeight:600 }}>{product.category}</div>
         <div style={{ fontSize:12, fontWeight:700, color:"#2D1B69", lineHeight:1.3 }}>{product.title}</div>
         <div style={{ fontSize:11, color:"#7B6B8D", lineHeight:1.4, flex:1 }}>{product.description.slice(0, 60)}…</div>
-        <div style={{ fontSize:13, fontWeight:800, color:"#FF6B8A", marginTop:2 }}>
-          {product.price != null ? `€ ${product.price.toFixed(2)}` : "Preis beim Händler"}
+        <div style={{ fontSize:13, fontWeight:800, color:"#FF6B8A", marginTop:2, display:"flex", alignItems:"center", gap:4 }}>
+          {product.price != null
+            ? `€ ${product.price.toFixed(2)}`
+            : product.tags?.includes("auf-amazon-suchen")
+              ? <span style={{ fontSize:10, fontWeight:700, color:"#E47911", background:"#FFF3E0", padding:"2px 6px", borderRadius:4 }}>amazon.de suchen →</span>
+              : "Preis beim Händler"}
         </div>
       </div>
       <div style={{ padding:"0 10px 10px", display:"flex", flexDirection:"column", gap:5 }}>
@@ -174,24 +206,25 @@ function ProductCard({ product, onAddWish }: { product: Product; onAddWish: (p: 
           🎁 Zur Wunschliste
         </button>
         <a href={product.affiliateUrl} target="_blank" rel="noopener noreferrer"
-          style={{ display:"block", textAlign:"center", background:"#F5F0FF", color:"#6D28D9", borderRadius:8, padding:"6px 0", fontSize:11, fontWeight:600, textDecoration:"none" }}>
-          Zum Shop ↗
+          onClick={() => trackClick(product, trackMeta)}
+          style={{ display:"block", textAlign:"center", background: product.tags?.includes("auf-amazon-suchen") ? "#FFF3E0" : "#F5F0FF", color: product.tags?.includes("auf-amazon-suchen") ? "#E47911" : "#6D28D9", borderRadius:8, padding:"6px 0", fontSize:11, fontWeight:600, textDecoration:"none" }}>
+          {product.tags?.includes("auf-amazon-suchen") ? "Auf Amazon suchen ↗" : "Zum Shop ↗"}
         </a>
       </div>
     </div>
   );
 }
 
-function ProductsRow({ products, onAddWish }: { products: Product[]; onAddWish: (p: Product) => void }) {
+function ProductsRow({ products, onAddWish, trackMeta }: { products: Product[]; onAddWish: (p: Product) => void; trackMeta: { recipient?: string | null; occasion?: string | null; budget?: string | null } }) {
   return (
     <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
-      {products.map(p => <ProductCard key={p.id} product={p} onAddWish={onAddWish} />)}
+      {products.map(p => <ProductCard key={p.id} product={p} onAddWish={onAddWish} trackMeta={trackMeta} />)}
     </div>
   );
 }
 
 // ── Message Part ─────────────────────────────────────────────────────────────
-function MessagePart({ part, hasProducts, onAddWish }: { part: UIMessage["parts"][number]; hasProducts: boolean; onAddWish: (p: Product) => void }) {
+function MessagePart({ part, hasProducts, onAddWish, trackMeta }: { part: UIMessage["parts"][number]; hasProducts: boolean; onAddWish: (p: Product) => void; trackMeta: { recipient?: string | null; occasion?: string | null; budget?: string | null } }) {
   if (part.type === "text" && part.text) {
     if (hasProducts) return null; // suppress prose when tiles are shown
     return <span style={{ whiteSpace:"pre-wrap", lineHeight:1.6 }}>{part.text}</span>;
@@ -202,7 +235,7 @@ function MessagePart({ part, hasProducts, onAddWish }: { part: UIMessage["parts"
       return <div style={{ display:"flex", alignItems:"center", gap:6, color:"#A89BBD", fontSize:12 }}><span style={{ display:"inline-block", animation:"wangel-spin 1s linear infinite" }}>✨</span> Suche Ideen…</div>;
     const products: Product[] = Array.isArray(tool.output) ? tool.output : [];
     if (!products.length) return <span style={{ color:"#A89BBD", fontSize:12 }}>Keine Treffer — versuche andere Suchbegriffe.</span>;
-    return <ProductsRow products={products} onAddWish={onAddWish} />;
+    return <ProductsRow products={products} onAddWish={onAddWish} trackMeta={trackMeta} />;
   }
   return null;
 }
@@ -310,8 +343,15 @@ export function WunschengelChat() {
     setRefineMode(false); setRefineInput(""); setMessages([]);
   };
 
-  // Hide the first auto-sent user message
-  const displayMessages = messages.filter((msg, idx) => !(msg.role === "user" && idx === 0));
+  // Hide auto-sent system command messages (first prompt, loadMore, doRefine)
+  const displayMessages = messages.filter((msg, idx) => {
+    if (msg.role !== "user") return true;
+    if (idx === 0) return false; // initial prompt
+    const text = (msg.parts.find(p => p.type === "text") as any)?.text ?? "";
+    if (text.startsWith("Zeige 6 andere Geschenkideen.")) return false;
+    if (text.startsWith("Verfeinere die Suche:") && text.includes("searchProducts sofort aufrufen")) return false;
+    return true;
+  });
 
   // Check if any assistant message has products
   const hasAnyProducts = displayMessages.some(msg =>
@@ -447,7 +487,8 @@ export function WunschengelChat() {
                         const hasProducts = msg.role === "assistant" && msg.parts.some(
                           p => p.type === "tool-searchProducts" && (p as any).state === "output-available" && Array.isArray((p as any).output) && (p as any).output.length > 0
                         );
-                        return msg.parts.map((part, i) => <MessagePart key={i} part={part} hasProducts={hasProducts} onAddWish={handleAddWish} />);
+                        const tm = { recipient: recipient?.label, occasion, budget };
+                        return msg.parts.map((part, i) => <MessagePart key={i} part={part} hasProducts={hasProducts} onAddWish={handleAddWish} trackMeta={tm} />);
                       })()}
                     </div>
                   </div>

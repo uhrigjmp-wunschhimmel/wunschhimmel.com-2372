@@ -692,6 +692,42 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
   });
 });
 
+// ── Product Click Tracking ────────────────────────────────────────────────────
+app.post("/track/click", async (c) => {
+  try {
+    const body = await c.req.json();
+    const { productId, partnerId, affiliateUrl, sessionId, recipient, occasion, budget } = body;
+    if (!productId || !sessionId) return c.json({ error: "missing fields" }, 400);
+
+    const session = c.get("session");
+    const userId = session?.user?.id ?? null;
+    const id = crypto.randomUUID();
+
+    const db = drizzle(c.env.DB);
+    await db.run(
+      sql`INSERT INTO product_clicks (id, session_id, user_id, product_id, partner_id, affiliate_url, recipient, occasion, budget)
+          VALUES (${id}, ${sessionId}, ${userId}, ${productId}, ${partnerId ?? "unknown"}, ${affiliateUrl ?? ""}, ${recipient ?? null}, ${occasion ?? null}, ${budget ?? null})`
+    );
+
+    // Forward to Plausible as custom event (fire-and-forget)
+    fetch("https://plausible.io/api/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "User-Agent": c.req.header("user-agent") ?? "" },
+      body: JSON.stringify({
+        domain: "wunschhimmel.de",
+        name: "Product Click",
+        url: c.req.header("referer") ?? "https://wunschhimmel.de",
+        props: { productId, partnerId, occasion, recipient },
+      }),
+    }).catch(() => {});
+
+    return c.json({ ok: true });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+
 app.get("/ping", (c) => c.json({ message: `Pong! ${Date.now()}` }));
 
 export default app;

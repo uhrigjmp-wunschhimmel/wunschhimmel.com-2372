@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { authClient } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
@@ -30,19 +30,34 @@ export default function SignUp() {
   const { t } = useI18n();
   const { setTheme } = useTheme();
   const [, navigate] = useLocation();
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [selectedTheme, setSelectedTheme] = useState<Theme>("rose");
   const [loading, setLoading] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+
+  // Bereits eingeloggt → direkt weiterleiten
+  useEffect(() => {
+    if (!sessionLoading && session?.user) navigate("/dashboard");
+  }, [session, sessionLoading]);
+
+  if (sessionLoading) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    setFieldError(null);
     setLoading(true);
     const { error } = await authClient.signUp.email({ name, email, password });
     if (error) {
       setLoading(false);
-      toast.error(error.message || "Registrierung fehlgeschlagen");
+      if (error.message?.toLowerCase().includes("already")) {
+        setFieldError("Diese E-Mail ist bereits registriert. Bitte einloggen.");
+      } else {
+        setFieldError(error.message || "Registrierung fehlgeschlagen");
+      }
       return;
     }
     // Save theme choice server-side
@@ -145,13 +160,29 @@ export default function SignUp() {
               />
             </div>
 
+            {fieldError && (
+              <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16 }}>⚠️</span>
+                <span style={{ fontSize: 13, color: "#B91C1C", fontWeight: 500 }}>{fieldError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full font-body font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 mt-2"
+              className="w-full font-body font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 mt-2 flex items-center justify-center gap-2"
               style={{ background: selectedTheme === "teal" ? "#2DD4BF" : "#FF6B8A", color: selectedTheme === "teal" ? "#0F1923" : "#fff" }}
             >
-              {loading ? t("loading") : `${t("signup_btn")} ✨`}
+              {loading ? (
+                <>
+                  <svg style={{ animation: "spin 0.8s linear infinite", width: 18, height: 18 }} viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
+                    <path d="M12 2 a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  </svg>
+                  Konto wird erstellt…
+                </>
+              ) : `${t("signup_btn")} ✨`}
             </button>
           </form>
 
