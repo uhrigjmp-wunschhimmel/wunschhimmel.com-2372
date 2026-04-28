@@ -24,6 +24,25 @@ function withAffiliateTag(url: string): string {
   }
 }
 
+// Stopwords rausfiltern, Schlagworte aus Titel extrahieren
+const STOPWORDS = new Set([
+  "der","die","das","ein","eine","für","mit","und","oder","auf","im","in","an","zu","von","bei",
+  "ist","als","zum","am","dem","den","des","sich","wie","nach","aus","set","box","pack","kit",
+]);
+
+function buildAmazonSearchUrl(title: string): string {
+  const words = title
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOPWORDS.has(w));
+  const query = [...new Set(words)].slice(0, 5).join(" ");
+  const url = new URL("https://www.amazon.de/s");
+  url.searchParams.set("k", query);
+  url.searchParams.set("tag", AFFILIATE_TAG);
+  return url.toString();
+}
+
 const priorityColors: Record<string, string> = {
   high: "bg-accent text-primary-foreground",
   medium: "bg-[#E8DEFF] text-foreground",
@@ -60,6 +79,8 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
   };
 
   const displayImage = localImageUrl || wish.imageUrl;
+  const hasProductUrl = !!wish.productUrl;
+  const amazonSearchUrl = buildAmazonSearchUrl(wish.title || "");
 
   const handleReserve = async () => {
     if (!reserveName.trim() || !shareToken) return;
@@ -79,7 +100,7 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
 
   return (
     <div className="wish-card bg-white rounded-2xl overflow-hidden border border-border shadow-sm">
-      {/* Product image */}
+      {/* Bild-Sektion */}
       {displayImage ? (
         <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/30 relative group">
           <img
@@ -98,16 +119,35 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
             </label>
           )}
         </div>
-      ) : isOwner ? (
-        <label className="w-full h-28 flex flex-col items-center justify-center gap-1 bg-[#FFD6D6]/20 border-b border-border cursor-pointer hover:bg-[#FFD6D6]/40 transition-colors">
-          <span className="text-2xl">{uploadingImage ? "⏳" : "🖼️"}</span>
-          <span className="text-xs text-muted-foreground font-body">
-            {uploadingImage ? "Lädt hoch…" : "Bild hinzufügen"}
-          </span>
-          <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
-            onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
-        </label>
-      ) : null}
+      ) : (
+        /* Kein Bild — Platzhalter */
+        <div className="w-full relative group" style={{ background: "linear-gradient(135deg, #FFF0F5 0%, #EDE9FF 100%)" }}>
+          {/* Demo-Icon */}
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: isOwner ? 112 : 100,
+            gap: 4,
+          }}>
+            <span style={{ fontSize: 44, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(255,107,138,0.25))" }}>🎁</span>
+          </div>
+
+          {/* Owner: Bild hinzufügen overlay */}
+          {isOwner && (
+            <label className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 cursor-pointer"
+              style={{ background: "rgba(45,27,105,0.55)", borderRadius: 0 }}>
+              <span style={{ fontSize: 22 }}>🖼️</span>
+              <span style={{ color: "#fff", fontSize: 11, fontWeight: 600 }}>
+                {uploadingImage ? "Lädt hoch…" : "Bild hinzufügen"}
+              </span>
+              <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
+            </label>
+          )}
+        </div>
+      )}
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -130,7 +170,8 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
         )}
 
         <div className="flex items-center gap-2 mt-3">
-          {wish.productUrl && (
+          {hasProductUrl ? (
+            /* Hat Link → Kaufen-Button */
             <a
               href={withAffiliateTag(wish.productUrl)}
               target="_blank"
@@ -139,9 +180,21 @@ export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onIm
             >
               {t("buy_btn")}
             </a>
+          ) : (
+            /* Kein Link → Amazon-Suche */
+            <a
+              href={amazonSearchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 text-center text-sm px-3 py-2 rounded-full font-body font-semibold transition-colors"
+              style={{ background: "#FF9900", color: "#fff" }}
+              title={`Nach „${wish.title}" auf Amazon suchen`}
+            >
+              Auf Amazon suchen →
+            </a>
           )}
 
-          {/* Guest: reserve button */}
+          {/* Gast: Reservieren */}
           {!isOwner && shareToken && (
             wish.isReserved ? (
               <span className="flex-1 text-center text-sm bg-[#E8DEFF] text-foreground px-3 py-2 rounded-full font-body font-medium">
