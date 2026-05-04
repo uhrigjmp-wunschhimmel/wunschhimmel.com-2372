@@ -75,16 +75,16 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background pt-24 pb-16 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex items-end justify-between mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
             <p className="font-body text-muted-foreground text-sm mb-1">Willkommen zurück,</p>
-            <h1 className="font-display text-4xl font-bold text-foreground">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground">
               {session.user.name || "Freund"} ✨
             </h1>
           </div>
           <button
             onClick={() => setShowNewModal(true)}
-            className="bg-accent text-primary-foreground font-body font-semibold px-6 py-3 rounded-full hover:bg-[#ff5077] transition-all hover:scale-105 shadow-lg shadow-[#FF6B8A]/30"
+            className="bg-accent text-primary-foreground font-body font-semibold px-6 py-3 rounded-full hover:bg-[#ff5077] transition-all hover:scale-105 shadow-lg shadow-[#FF6B8A]/30 w-full sm:w-auto"
           >
             + {t("new_list")}
           </button>
@@ -148,8 +148,8 @@ export default function Dashboard() {
 
       {/* New list modal */}
       {showNewModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl max-h-[92vh] overflow-y-auto">
             <h2 className="font-display text-2xl font-bold text-foreground mb-6">Neue Liste ✨</h2>
 
             {/* Emoji picker */}

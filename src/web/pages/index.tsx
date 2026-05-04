@@ -33,9 +33,29 @@ export default function LandingPage() {
       opacity: fading ? 0.6 : 1,
       transition: "opacity 0.18s ease, background 0.4s ease",
     }}>
+      {/* Mobile: hide floating emojis below 480px */}
+      <style>{`
+        @media (max-width: 480px) {
+          :root { --floating-emoji-display: none; }
+          .landing-hero-section { padding-top: 72px !important; }
+          .landing-section-pad { padding: 48px 16px !important; }
+          .landing-cta-wrap { flex-direction: column !important; align-items: stretch !important; }
+          .landing-cta-wrap button { width: 100% !important; text-align: center !important; }
+          .landing-trust-bar { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; justify-items: start !important; }
+          .landing-mockup-badge-tr { top: 8px !important; right: 8px !important; }
+          .landing-mockup-badge-bl { bottom: 8px !important; left: 8px !important; }
+          .landing-mockup-wrap { padding: 0 12px 0 !important; }
+          .landing-grid-steps { grid-template-columns: 1fr !important; }
+          .landing-grid-features { grid-template-columns: 1fr !important; }
+          .landing-banner-pad { padding: 56px 16px !important; }
+        }
+        @media (max-width: 640px) {
+          .landing-cta-banner-btn { padding: 14px 28px !important; font-size: 16px !important; }
+        }
+      `}</style>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{
+      <section className="landing-hero-section" style={{
         paddingTop: 100, paddingBottom: 0, position: "relative",
         background: t.heroGradient,
         transition: "background 0.4s ease",
@@ -57,7 +77,7 @@ export default function LandingPage() {
           </svg>
         </div>
 
-        {/* Floating emojis */}
+        {/* Floating emojis — hidden on narrow screens */}
         {t.floatingEmojis.map((emoji, i) => (
           <div key={i} style={{
             position: "absolute",
@@ -67,6 +87,7 @@ export default function LandingPage() {
             transform: `rotate(${[-15, 20, 10, -10, 5, -20][i] ?? 0}deg)`,
             pointerEvents: "none", zIndex: 1, opacity: 0.7,
             transition: "all 0.4s ease",
+            display: "var(--floating-emoji-display, block)",
           }}>{emoji}</div>
         ))}
 
@@ -104,7 +125,7 @@ export default function LandingPage() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 36 }}>
+          <div className="landing-cta-wrap" style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 36 }}>
             <button
               onClick={() => navigate(session ? "/dashboard" : "/sign-up")}
               style={{
@@ -134,7 +155,7 @@ export default function LandingPage() {
           </div>
 
           {/* Trust bar */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 28, flexWrap: "wrap", marginBottom: 40 }}>
+          <div className="landing-trust-bar" style={{ display: "flex", justifyContent: "center", gap: 28, flexWrap: "wrap", marginBottom: 40 }}>
             {[
               { icon: "🎈", text: "Kostenlos" },
               { icon: "🌈", text: "Kinderleicht" },
@@ -150,7 +171,7 @@ export default function LandingPage() {
         </div>
 
         {/* App mockup card */}
-        <div style={{ display: "flex", justifyContent: "center", padding: "0 24px 0" }}>
+        <div className="landing-mockup-wrap" style={{ display: "flex", justifyContent: "center", padding: "0 24px 0" }}>
           <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: 480 }}>
             <div style={{
               background: "#fff", borderRadius: 28, boxShadow: `0 24px 64px ${t.primary}1A`,
@@ -183,13 +204,13 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <div style={{
+            <div className="landing-mockup-badge-tr" style={{
               position: "absolute", top: -14, right: -14,
               background: "linear-gradient(135deg,#6BCB77,#4DAF5F)",
               color: "#fff", borderRadius: 999, padding: "8px 14px",
               fontSize: 12, fontWeight: 700, boxShadow: "0 4px 16px rgba(107,203,119,0.4)",
             }}>🔒 Doppelschutz aktiv</div>
-            <div style={{
+            <div className="landing-mockup-badge-bl" style={{
               position: "absolute", bottom: -14, left: -14,
               background: "linear-gradient(135deg,#4D96FF,#3D7FE0)",
               color: "#fff", borderRadius: 999, padding: "8px 14px",
@@ -207,13 +228,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────────────────────── */}
-      <section style={{ background: "#FFF0F8", padding: "72px 24px" }}>
+      <section className="landing-section-pad" style={{ background: "#FFF0F8", padding: "72px 24px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: t.accent, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, transition: "color 0.4s" }}>So einfach geht's</div>
           <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "#2D1B69", marginBottom: 48, fontFamily: "Playfair Display, serif" }}>
             In 3 Schritten zur perfekten Wunschliste 🌟
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+          <div className="landing-grid-steps" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))", gap: 24 }}>
             {[
               { step: "1", icon: "📝", title: "Liste erstellen", desc: "Lege deine bunte Wunschkiste an — mit Fotos, Preisen und Links.", color: `${t.accent}22`, accent: t.accent },
               { step: "2", icon: "💌", title: "Mit Familie teilen", desc: "Schick den Link per WhatsApp, E-Mail oder einfach copy-paste.", color: "#FFD6E8", accent: "#E91E8C" },
@@ -236,7 +257,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────────── */}
-      <section style={{ background: "#FFFBF5", padding: "72px 24px" }}>
+      <section className="landing-section-pad" style={{ background: "#FFFBF5", padding: "72px 24px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: t.accent, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, transition: "color 0.4s" }}>Features</div>
@@ -244,7 +265,7 @@ export default function LandingPage() {
               Alles was du brauchst ✨
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+          <div className="landing-grid-features" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))", gap: 20 }}>
             {[
               { icon: "🔗", title: "Produktlinks speichern", desc: "Link einfügen — Wunschhimmel holt Titel, Bild & Preis automatisch." },
               { icon: "📨", title: "Per E-Mail & Link teilen", desc: "Oma bekommt einen Link, kein App-Download nötig." },
@@ -268,7 +289,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Use cases ────────────────────────────────────────────────────── */}
-      <section style={{ background: "#F5F0FF", padding: "72px 24px" }}>
+      <section className="landing-section-pad" style={{ background: "#F5F0FF", padding: "72px 24px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(26px,4vw,40px)", fontWeight: 800, color: "#2D1B69", marginBottom: 16, fontFamily: "Playfair Display, serif" }}>
             Perfekt für jeden Anlass 🎉
@@ -305,7 +326,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA Banner ───────────────────────────────────────────────────── */}
-      <section style={{
+      <section className="landing-banner-pad" style={{
         background: `linear-gradient(135deg, ${t.primary} 0%, ${t.primary}CC 100%)`,
         padding: "80px 24px", textAlign: "center", position: "relative", overflow: "hidden",
         transition: "background 0.4s",
@@ -323,6 +344,7 @@ export default function LandingPage() {
             Kostenlos, in weniger als einer Minute. Kein Stress mehr bei Geschenken!
           </p>
           <button
+            className="landing-cta-banner-btn"
             onClick={() => navigate(session ? "/dashboard" : "/sign-up")}
             style={{
               background: `linear-gradient(135deg,${t.accent},${t.accent}CC)`,

@@ -219,42 +219,42 @@ export default function ListDetail() {
           <button onClick={() => navigate("/dashboard")} className="font-body text-sm text-muted-foreground hover:text-foreground mb-4 block transition-colors">
             ← Zurück
           </button>
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-4">
-              <span className="text-5xl">{list.emoji}</span>
-              <div>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <span className="text-4xl sm:text-5xl">{list.emoji}</span>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-display text-3xl font-bold text-foreground">{list.title}</h1>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-body font-medium ${list.isPublic ? "bg-[#E8DEFF] text-foreground" : "bg-[#FFD6D6] text-foreground"}`}>
+                  <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground leading-tight">{list.title}</h1>
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-body font-medium shrink-0 ${list.isPublic ? "bg-[#E8DEFF] text-foreground" : "bg-[#FFD6D6] text-foreground"}`}>
                     {list.isPublic ? t("public_badge") : t("private_badge")}
                   </span>
                 </div>
-                {list.description && <p className="font-body text-muted-foreground mt-1">{list.description}</p>}
+                {list.description && <p className="font-body text-muted-foreground mt-1 text-sm">{list.description}</p>}
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
               <button
                 onClick={() => { setEditTitle(list.title); setEditDesc(list.description || ""); setEditPublic(list.isPublic); setShowEditModal(true); }}
-                className="border border-border text-foreground font-body text-sm px-4 py-2 rounded-full hover:bg-white transition-colors"
+                className="border border-border text-foreground font-body text-sm px-4 py-2.5 rounded-full hover:bg-white transition-colors min-h-[44px]"
               >
                 ✏️ {t("edit_list")}
               </button>
               <button
                 onClick={copyShareLink}
-                className="border border-border text-foreground font-body text-sm px-4 py-2 rounded-full hover:bg-white transition-colors"
+                className="border border-border text-foreground font-body text-sm px-4 py-2.5 rounded-full hover:bg-white transition-colors min-h-[44px]"
               >
                 🔗 Link kopieren
               </button>
               <button
                 onClick={() => setShowShareModal(true)}
-                className="bg-[#1A1A4E] text-primary-foreground font-body text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#2d2d7e] transition-colors"
+                className="bg-[#1A1A4E] text-primary-foreground font-body text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#2d2d7e] transition-colors min-h-[44px]"
               >
                 📨 {t("share_list")}
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-accent text-primary-foreground font-body text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#ff5077] transition-colors"
+                className="bg-accent text-primary-foreground font-body text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#ff5077] transition-colors col-span-2 sm:col-span-1 min-h-[44px]"
               >
                 + {t("add_wish")}
               </button>
@@ -275,7 +275,7 @@ export default function ListDetail() {
             </button>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {list.wishes.map((wish: any) => (
               <WishCard
                 key={wish.id}
@@ -324,8 +324,8 @@ export default function ListDetail() {
 
       {/* Post update modal */}
       {showUpdateModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="rounded-3xl p-8 w-full max-w-md shadow-2xl" style={{ background: cardBg }}>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl" style={{ background: cardBg }}>
             <h2 className="font-display text-2xl font-bold mb-6" style={{ color: foreground }}>Update posten 🎉</h2>
             <div className="space-y-4">
               <textarea
@@ -383,8 +383,8 @@ export default function ListDetail() {
 
       {/* Add wish modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl max-h-[92vh] overflow-y-auto">
             <h2 className="font-display text-2xl font-bold text-foreground mb-6">Wunsch hinzufügen 🎁</h2>
 
             {/* URL scraper */}
@@ -470,7 +470,7 @@ export default function ListDetail() {
                   className="w-full bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-body font-semibold text-foreground mb-1">{t("wish_price")}</label>
                   <input
@@ -515,8 +515,8 @@ export default function ListDetail() {
 
       {/* Share modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl max-h-[92vh] overflow-y-auto">
             <h2 className="font-display text-2xl font-bold text-foreground mb-4">🔗 Liste teilen</h2>
 
             {/* Copy link */}
@@ -716,8 +716,8 @@ export default function ListDetail() {
 
       {/* Edit modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl">
             <h2 className="font-display text-2xl font-bold text-foreground mb-6">✏️ {t("edit_list")}</h2>
             <div className="space-y-3">
               <input
