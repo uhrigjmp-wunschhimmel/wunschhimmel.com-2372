@@ -384,23 +384,23 @@ export default function ListDetail() {
       {/* Add wish modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl max-h-[92vh] overflow-y-auto">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-6">Wunsch hinzufügen 🎁</h2>
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-y-auto" style={{ maxHeight: "calc(100dvh - 60px)", padding: "20px 20px 16px" }}>
+            <h2 className="font-display text-xl font-bold text-foreground mb-3">Wunsch hinzufügen 🎁</h2>
 
             {/* URL scraper */}
-            <div className="mb-4">
-              <label className="block text-sm font-body font-semibold text-foreground mb-1.5">{t("add_wish_url")}</label>
+            <div className="mb-3">
+              <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("add_wish_url")}</label>
               <div className="flex gap-2">
                 <input
                   value={url}
                   onChange={e => setUrl(e.target.value)}
                   placeholder="https://..."
-                  className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  className="flex-1 bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
                 />
                 <button
                   onClick={scrapeUrl}
                   disabled={scraping || !url.trim()}
-                  className="bg-[#1A1A4E] text-primary-foreground text-sm font-body font-semibold px-4 py-2.5 rounded-xl hover:bg-[#2d2d7e] transition-colors disabled:opacity-60 shrink-0"
+                  className="bg-[#1A1A4E] text-primary-foreground text-sm font-body font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d7e] transition-colors disabled:opacity-60 shrink-0"
                 >
                   {scraping ? "⏳" : t("load_preview")}
                 </button>
@@ -409,12 +409,12 @@ export default function ListDetail() {
 
             {/* Preview */}
             {(imageUrl || imageFile || title) && (
-              <div className="mb-4 flex gap-3 bg-background rounded-xl p-3 border border-border">
+              <div className="mb-3 flex gap-2 bg-background rounded-xl p-2 border border-border">
                 {(imageUrl || imageFile) && (
                   <img
                     src={imageFile ? URL.createObjectURL(imageFile) : imageUrl}
                     alt=""
-                    className="w-16 h-16 object-cover rounded-lg shrink-0"
+                    className="w-12 h-12 object-cover rounded-lg shrink-0"
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                 )}
@@ -425,11 +425,11 @@ export default function ListDetail() {
               </div>
             )}
 
-            {/* Manual image upload (fallback if no URL or scrape found no image) */}
+            {/* Manual image upload */}
             {!imageUrl && (
-              <div className="mb-4">
-                <label className="flex items-center gap-2 cursor-pointer font-body text-sm font-semibold px-4 py-2.5 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent transition-colors w-full justify-center">
-                  🖼️ {imageFile ? "Bild ändern" : "Bild manuell hochladen (optional)"}
+              <div className="mb-3">
+                <label className="flex items-center gap-2 cursor-pointer font-body text-xs font-semibold px-3 py-2 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-accent hover:text-accent transition-colors w-full justify-center">
+                  🖼️ {imageFile ? "Bild ändern" : "Bild hochladen (optional)"}
                   <input
                     type="file"
                     accept="image/*"
@@ -452,42 +452,42 @@ export default function ListDetail() {
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-1">{t("wish_title")} *</label>
+                <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("wish_title")} *</label>
                 <input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-body font-semibold text-foreground mb-1">{t("wish_desc")}</label>
+                <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("wish_desc")}</label>
                 <textarea
                   value={desc}
                   onChange={e => setDesc(e.target.value)}
                   rows={2}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-sm font-body font-semibold text-foreground mb-1">{t("wish_price")}</label>
+                  <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("wish_price")}</label>
                   <input
                     value={price}
                     onChange={e => setPrice(e.target.value)}
                     type="number"
                     step="0.01"
-                    className="w-full bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                    className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
                     placeholder="29.99"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-body font-semibold text-foreground mb-1">{t("wish_priority")}</label>
+                  <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("wish_priority")}</label>
                   <select
                     value={priority}
                     onChange={e => setPriority(e.target.value)}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                    className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
                   >
                     {PRIORITY_OPTIONS.map(p => (
                       <option key={p} value={p}>{t(`priority_${p}` as any)}</option>
@@ -497,14 +497,14 @@ export default function ListDetail() {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => { setShowAddModal(false); resetForm(); }} className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl hover:bg-background transition-colors">
+            <div className="flex gap-3 mt-4">
+              <button onClick={() => { setShowAddModal(false); resetForm(); }} className="flex-1 border border-border text-muted-foreground font-body py-2.5 rounded-xl hover:bg-background transition-colors text-sm">
                 {t("cancel")}
               </button>
               <button
                 onClick={addWish}
                 disabled={saving || !title.trim()}
-                className="flex-1 bg-accent text-primary-foreground font-body font-semibold py-3 rounded-xl hover:bg-[#ff5077] transition-colors disabled:opacity-60"
+                className="flex-1 bg-accent text-primary-foreground font-body font-semibold py-2.5 rounded-xl hover:bg-[#ff5077] transition-colors disabled:opacity-60 text-sm"
               >
                 {saving ? t("loading") : t("save")}
               </button>
