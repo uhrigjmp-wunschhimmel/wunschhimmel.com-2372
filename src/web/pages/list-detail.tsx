@@ -383,19 +383,20 @@ export default function ListDetail() {
 
       {/* Add wish modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-y-auto" style={{ maxHeight: "calc(100dvh - 60px)", padding: "20px 20px 16px" }}>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ zIndex: 10001 }}>
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-y-auto overflow-x-hidden" style={{ maxHeight: "calc(100dvh - 80px)", padding: "20px 20px 20px", boxSizing: "border-box" }}>
             <h2 className="font-display text-xl font-bold text-foreground mb-3">Wunsch hinzufügen 🎁</h2>
 
             {/* URL scraper */}
             <div className="mb-3">
               <label className="block text-xs font-body font-semibold text-foreground mb-1">{t("add_wish_url")}</label>
-              <div className="flex gap-2">
+              <div className="flex gap-2" style={{ minWidth: 0 }}>
                 <input
                   value={url}
                   onChange={e => setUrl(e.target.value)}
                   placeholder="https://..."
-                  className="flex-1 bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  className="bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  style={{ flex: "1 1 0", minWidth: 0, width: 0 }}
                 />
                 <button
                   onClick={scrapeUrl}
@@ -458,7 +459,7 @@ export default function ListDetail() {
                 <input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] transition-all" style={{ minWidth: 0 }}
                 />
               </div>
               <div>
