@@ -3,6 +3,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth";
+import { useLocation } from "wouter";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Product = {
@@ -180,12 +181,19 @@ function ProductCard({ product, onAddWish, trackMeta }: { product: Product; onAd
   const [imgError, setImgError] = useState(false);
   return (
     <div style={{ background:"#fff", borderRadius:16, overflow:"hidden", border:"1px solid #F0E8FF", boxShadow:"0 2px 12px rgba(45,27,105,0.08)", display:"flex", flexDirection:"column", minWidth:175, maxWidth:195, flexShrink:0 }}>
-      <div style={{ height:120, overflow:"hidden", background:"#FFF5F8", position:"relative" }}>
-        <img
-          src={imgError ? "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80" : product.imageUrl}
-          onError={() => setImgError(true)} alt={product.title}
-          style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-        {product.tags[0] && (
+      <div style={{ height:120, overflow:"hidden", position:"relative" }}>
+        {product.imageUrl === "" || (imgError && product.tags?.includes("auf-amazon-suchen")) ? (
+          <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#E47911,#FF9900)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:4 }}>
+            <span style={{ fontSize:28 }}>🔍</span>
+            <span style={{ fontSize:9, fontWeight:700, color:"#fff", letterSpacing:0.5, textAlign:"center", lineHeight:1.3 }}>Auf Amazon{"\n"}suchen</span>
+          </div>
+        ) : (
+          <img
+            src={imgError ? "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80" : product.imageUrl}
+            onError={() => setImgError(true)} alt={product.title}
+            style={{ width:"100%", height:"100%", objectFit:"cover", background:"#FFF5F8" }} />
+        )}
+        {product.tags[0] && product.imageUrl !== "" && (
           <div style={{ position:"absolute", top:7, left:7, background:"rgba(45,27,105,0.85)", color:"#fff", fontSize:9, fontWeight:700, padding:"3px 7px", borderRadius:999 }}>{product.tags[0]}</div>
         )}
       </div>
@@ -271,7 +279,18 @@ function QuickActions({ onMore, onRefine, disabled }: { onMore: () => void; onRe
 
 // ── Main Widget ───────────────────────────────────────────────────────────────
 export function WunschengelChat() {
+  const [location, navigate] = useLocation();
+  const { data: session } = authClient.useSession();
   const [open, setOpen] = useState(false);
+
+  // Route-basiertes Verhalten:
+  // "/" (Landing) → Teaser: sichtbar aber eingefroren, Badge "Nur für Mitglieder"
+  // "/sign-in", "/sign-up", "/forgot-password", "/reset-password" → komplett versteckt
+  // alle anderen (authentifiziert) → voll funktional
+  const isLanding = location === "/";
+  const isAuthPage = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password"].includes(location);
+  const isAuthenticated = !!session?.user;
+
   const [step, setStep] = useState<Step>("recipient");
   const [recipient, setRecipient] = useState<Recipient | null>(null);
   const [occasion, setOccasion] = useState<string | null>(null);
@@ -358,6 +377,9 @@ export function WunschengelChat() {
     msg.role === "assistant" && msg.parts.some(p => p.type === "tool-searchProducts" && (p as any).state === "output-available" && Array.isArray((p as any).output) && (p as any).output.length > 0)
   );
 
+  // Auf Auth-Seiten komplett ausblenden (nach allen Hooks)
+  if (isAuthPage) return null;
+
   return (
     <>
       <style>{`
@@ -370,15 +392,34 @@ export function WunschengelChat() {
       {pickerProduct && <WishlistPicker product={pickerProduct} onClose={() => setPickerProduct(null)} />}
 
       {/* Floating button */}
-      <button onClick={() => setOpen(o => !o)} aria-label="Wunschengel öffnen"
-        style={{ position:"fixed", bottom:100, right:24, zIndex:9000, width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, animation:open?"none":"wangel-bounce 2.2s ease-in-out infinite", transition:"transform 0.2s" }}
-        onMouseOver={e => (e.currentTarget.style.transform="scale(1.1)")}
-        onMouseOut={e => (e.currentTarget.style.transform="scale(1)")}>
-        {open ? "✕" : "🪄"}
-      </button>
+      {isLanding && !isAuthenticated ? (
+        // Teaser-Modus: eingefroren, ausgegraut, Badge
+        <div style={{ position:"fixed", bottom:28, right:24, zIndex:9000, display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+          {/* Badge */}
+          <div style={{ background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:999, whiteSpace:"nowrap", boxShadow:"0 2px 12px rgba(45,27,105,0.3)", animation:"wangel-bounce 2.2s ease-in-out infinite" }}>
+            Nur für Mitglieder ✨
+          </div>
+          <button
+            onClick={() => navigate("/sign-up")}
+            aria-label="Wunschengel — nur für Mitglieder"
+            style={{ width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, opacity:0.6, filter:"grayscale(30%)", transition:"transform 0.2s, opacity 0.2s" }}
+            onMouseOver={e => { e.currentTarget.style.opacity="0.85"; e.currentTarget.style.transform="scale(1.08)"; }}
+            onMouseOut={e => { e.currentTarget.style.opacity="0.6"; e.currentTarget.style.transform="scale(1)"; }}
+          >
+            🪄
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => setOpen(o => !o)} aria-label="Wunschengel öffnen"
+          style={{ position:"fixed", bottom:28, right:24, zIndex:9000, width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, animation:open?"none":"wangel-bounce 2.2s ease-in-out infinite", transition:"transform 0.2s" }}
+          onMouseOver={e => (e.currentTarget.style.transform="scale(1.1)")}
+          onMouseOut={e => (e.currentTarget.style.transform="scale(1)")}>
+          {open ? "✕" : "🪄"}
+        </button>
+      )}
 
-      {/* Chat window */}
-      {open && (
+      {/* Chat window — nur wenn authentifiziert oder nicht Landing */}
+      {open && !isLanding && (
         <div style={{ position:"fixed", bottom:170, right:24, zIndex:9000, width:"min(420px, calc(100vw - 32px))", height:"min(580px, calc(100vh - 190px))", background:"#fff", borderRadius:24, boxShadow:"0 16px 64px rgba(45,27,105,0.22), 0 2px 8px rgba(0,0,0,0.08)", display:"flex", flexDirection:"column", overflow:"hidden", animation:"wangel-slide 0.25s ease", fontFamily:"Plus Jakarta Sans, sans-serif" }}>
 
           {/* Header */}

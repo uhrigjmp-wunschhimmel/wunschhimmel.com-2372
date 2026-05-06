@@ -11,31 +11,10 @@ import type { LiveProduct } from "../live-search";
 
 const PARTNER_TAG = "wunschhimme00-21";
 
-// Kategorie → passendes Bild (kostenlos, stabil)
-const CATEGORY_IMAGES: Record<string, string> = {
-  spielzeug: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400&q=80",
-  buch: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80",
-  sport: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80",
-  küche: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80",
-  elektronik: "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=400&q=80",
-  schmuck: "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=400&q=80",
-  mode: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80",
-  garten: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80",
-  geschenk: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80",
-  kind: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80",
-  musik: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80",
-  kunst: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&q=80",
-  reise: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&q=80",
-  wellness: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400&q=80",
-  default: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80",
-};
-
-function getCategoryImage(keywords: string[], category: string): string {
-  const all = [...keywords, category].join(" ").toLowerCase();
-  for (const [key, url] of Object.entries(CATEGORY_IMAGES)) {
-    if (all.includes(key)) return url;
-  }
-  return CATEGORY_IMAGES.default;
+// Kein Kategorie-Bild mehr — Frontend rendert Amazon-Suchkarte mit eigenem Design
+// imageUrl leer lassen → ProductCard erkennt "auf-amazon-suchen" Tag und zeigt Amazon-Branding
+function getCategoryImage(_keywords: string[], _category: string): string {
+  return ""; // Absichtlich leer — Frontend rendert Amazon-spezifisches Layout
 }
 
 function buildSearchUrl(query: string, minPrice?: number, maxPrice?: number): string {
