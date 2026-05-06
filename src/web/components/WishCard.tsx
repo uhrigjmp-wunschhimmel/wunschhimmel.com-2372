@@ -1,10 +1,12 @@
-import { useState, useRef } from "react";
-import { useI18n } from "@/lib/i18n";
+import { useState } from "react";
+import { CATEGORIES } from "./AddWishSheet";
 
 interface WishCardProps {
   wish: any;
   isOwner?: boolean;
   shareToken?: string;
+  onClick?: (wish: any) => void;
+  /** Legacy support — kept for shared page quick reserve without modal */
   onDelete?: (id: string) => void;
   onReserved?: () => void;
   onImageUpdated?: () => void;
@@ -19,23 +21,12 @@ function withAffiliateTag(url: string): string {
     if (!AMAZON_RE.test(u.hostname)) return url;
     u.searchParams.set("tag", AFFILIATE_TAG);
     return u.toString();
-  } catch {
-    return url;
-  }
+  } catch { return url; }
 }
 
-// Stopwords rausfiltern, Schlagworte aus Titel extrahieren
-const STOPWORDS = new Set([
-  "der","die","das","ein","eine","für","mit","und","oder","auf","im","in","an","zu","von","bei",
-  "ist","als","zum","am","dem","den","des","sich","wie","nach","aus","set","box","pack","kit",
-]);
-
 function buildAmazonSearchUrl(title: string): string {
-  const words = title
-    .toLowerCase()
-    .replace(/[^\w\s]/g, " ")
-    .split(/\s+/)
-    .filter(w => w.length > 2 && !STOPWORDS.has(w));
+  const STOPWORDS = new Set(["der","die","das","ein","eine","für","mit","und","oder","auf","im","in","an","zu","von","bei","ist","als","zum","am","dem","den","des","sich","wie","nach","aus","set","box","pack","kit"]);
+  const words = title.toLowerCase().replace(/[^\w\s]/g, " ").split(/\s+/).filter(w => w.length > 2 && !STOPWORDS.has(w));
   const query = [...new Set(words)].slice(0, 5).join(" ");
   const url = new URL("https://www.amazon.de/s");
   url.searchParams.set("k", query);
@@ -43,196 +34,96 @@ function buildAmazonSearchUrl(title: string): string {
   return url.toString();
 }
 
-const priorityColors: Record<string, string> = {
-  high: "bg-accent text-primary-foreground",
-  medium: "bg-[#E8DEFF] text-foreground",
-  low: "bg-[#FFD6D6] text-foreground",
+const priorityColors: Record<string, { bg: string; text: string; label: string }> = {
+  high:   { bg: "#FF6B8A", text: "#fff",     label: "🔥 Hoch"    },
+  medium: { bg: "#E8DEFF", text: "#1A1A4E",  label: "⭐ Mittel"  },
+  low:    { bg: "#FFD6D6", text: "#1A1A4E",  label: "💤 Niedrig" },
 };
 
-export function WishCard({ wish, isOwner, shareToken, onDelete, onReserved, onImageUpdated }: WishCardProps) {
-  const { t } = useI18n();
-  const [reserveName, setReserveName] = useState("");
-  const [showReserveInput, setShowReserveInput] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
-  const imgInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = async (file: File) => {
-    setUploadingImage(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch(`/api/wishes/${wish.id}/image`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
-      });
-      if (res.ok) {
-        const { imageUrl } = await res.json() as { imageUrl: string };
-        setLocalImageUrl(imageUrl);
-        onImageUpdated?.();
-      }
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-
-  const displayImage = localImageUrl || wish.imageUrl;
-  const hasProductUrl = !!wish.productUrl;
-  const amazonSearchUrl = buildAmazonSearchUrl(wish.title || "");
-
-  const handleReserve = async () => {
-    if (!reserveName.trim() || !shareToken) return;
-    setLoading(true);
-    try {
-      await fetch(`/api/shared/${shareToken}/wishes/${wish.id}/reserve`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: reserveName }),
-      });
-      onReserved?.();
-    } finally {
-      setLoading(false);
-      setShowReserveInput(false);
-    }
-  };
+export function WishCard({ wish, isOwner, shareToken, onClick, onDelete, onReserved }: WishCardProps) {
+  const [localImage, setLocalImage] = useState<string | null>(null);
+  const catObj = CATEGORIES.find(c => c.id === wish.category);
+  const displayImage = localImage || wish.imageUrl;
+  const hasLink = !!wish.productUrl;
+  const pColor = priorityColors[wish.priority] || priorityColors.medium;
 
   return (
-    <div className="wish-card bg-white rounded-2xl overflow-hidden border border-border shadow-sm">
-      {/* Bild-Sektion */}
+    <div
+      className="wish-card bg-white rounded-2xl overflow-hidden border border-border shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+      onClick={() => onClick?.(wish)}
+    >
+      {/* Image */}
       {displayImage ? (
-        <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/30 relative group">
+        <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/20">
           <img
             src={displayImage}
             alt={wish.title}
             className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+            onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
           />
-          {isOwner && (
-            <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-              <span className="text-white text-xs font-semibold bg-black/50 px-3 py-1.5 rounded-full">
-                {uploadingImage ? "Lädt hoch…" : "🖼️ Bild ändern"}
-              </span>
-              <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
-                onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
-            </label>
-          )}
         </div>
       ) : (
-        /* Kein Bild — Platzhalter */
-        <div className="w-full relative group" style={{ background: "linear-gradient(135deg, #FFF0F5 0%, #EDE9FF 100%)" }}>
-          {/* Demo-Icon */}
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: isOwner ? 112 : 100,
-            gap: 4,
-          }}>
-            <span style={{ fontSize: 44, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(255,107,138,0.25))" }}>🎁</span>
-          </div>
-
-          {/* Owner: Bild hinzufügen overlay */}
-          {isOwner && (
-            <label className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 cursor-pointer"
-              style={{ background: "rgba(45,27,105,0.55)", borderRadius: 0 }}>
-              <span style={{ fontSize: 22 }}>🖼️</span>
-              <span style={{ color: "#fff", fontSize: 11, fontWeight: 600 }}>
-                {uploadingImage ? "Lädt hoch…" : "Bild hinzufügen"}
-              </span>
-              <input ref={imgInputRef} type="file" accept="image/*" className="hidden"
-                onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
-            </label>
-          )}
+        <div className="w-full h-28 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#FFF0F5,#EDE9FF)" }}>
+          <span style={{ fontSize: 48, filter: "drop-shadow(0 2px 6px rgba(255,107,138,0.2))" }}>🎁</span>
         </div>
       )}
 
       <div className="p-4">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-display font-bold text-foreground text-base leading-tight line-clamp-2">{wish.title}</h3>
+        {/* Badges */}
+        <div className="flex flex-wrap gap-1 mb-2">
           {wish.priority && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-body font-medium shrink-0 ${priorityColors[wish.priority] || priorityColors.medium}`}>
-              {t(`priority_${wish.priority}` as any)}
+            <span className="text-xs px-2 py-0.5 rounded-full font-body font-semibold" style={{ background: pColor.bg, color: pColor.text }}>
+              {pColor.label}
+            </span>
+          )}
+          {catObj && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-body bg-[#F0EBFF] text-foreground">
+              {catObj.emoji} {catObj.label}
+            </span>
+          )}
+          {wish.isReserved && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-body bg-green-100 text-green-700 font-semibold">
+              ✓ Reserviert
             </span>
           )}
         </div>
 
-        {wish.description && (
-          <p className="text-sm text-muted-foreground font-body mb-2 line-clamp-2">{wish.description}</p>
+        <h3 className="font-display font-bold text-foreground text-base leading-tight line-clamp-2 mb-1">{wish.title}</h3>
+
+        {wish.shop && (
+          <p className="font-body text-xs text-muted-foreground mb-1">🏪 {wish.shop}</p>
         )}
 
         {wish.price != null && (
-          <p className="text-lg font-bold text-accent font-body mb-2">
+          <p className="text-lg font-bold text-accent font-body mb-1">
             {new Intl.NumberFormat("de-DE", { style: "currency", currency: wish.currency || "EUR" }).format(wish.price)}
           </p>
         )}
 
-        <div className="flex items-center gap-2 mt-3">
-          {hasProductUrl ? (
-            /* Hat Link → Kaufen-Button */
+        {wish.notes && (
+          <p className="font-body text-xs text-muted-foreground line-clamp-1 mt-1 italic">📝 {wish.notes}</p>
+        )}
+
+        {/* Buy / Amazon button */}
+        <div className="mt-3" onClick={e => e.stopPropagation()}>
+          {hasLink ? (
             <a
               href={withAffiliateTag(wish.productUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 text-center text-sm bg-[#1A1A4E] text-primary-foreground px-3 py-2 rounded-full font-body font-semibold hover:bg-[#2d2d7e] transition-colors"
+              target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center text-sm font-body font-semibold py-2 rounded-full text-white hover:opacity-90 transition-opacity"
+              style={{ background: "#1A1A4E" }}
             >
-              {t("buy_btn")}
+              Zum Produkt →
             </a>
           ) : (
-            /* Kein Link → Amazon-Suche */
             <a
-              href={amazonSearchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 text-center text-sm px-3 py-2 rounded-full font-body font-semibold transition-colors"
-              style={{ background: "#FF9900", color: "#fff" }}
-              title={`Nach „${wish.title}" auf Amazon suchen`}
+              href={buildAmazonSearchUrl(wish.title)}
+              target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center text-sm font-body font-semibold py-2 rounded-full text-white hover:opacity-90 transition-opacity"
+              style={{ background: "#FF9900" }}
             >
               Auf Amazon suchen →
             </a>
-          )}
-
-          {/* Gast: Reservieren */}
-          {!isOwner && shareToken && (
-            wish.isReserved ? (
-              <span className="flex-1 text-center text-sm bg-[#E8DEFF] text-foreground px-3 py-2 rounded-full font-body font-medium">
-                ✓ {t("reserved")} ({wish.reservedByName})
-              </span>
-            ) : showReserveInput ? (
-              <div className="flex-1 flex gap-1">
-                <input
-                  value={reserveName}
-                  onChange={e => setReserveName(e.target.value)}
-                  placeholder={t("reserve_name")}
-                  className="flex-1 text-sm border border-border rounded-full px-3 py-1.5 outline-none focus:border-[#FF6B8A] font-body"
-                />
-                <button
-                  onClick={handleReserve}
-                  disabled={loading || !reserveName.trim()}
-                  className="text-sm bg-accent text-primary-foreground px-3 py-1.5 rounded-full font-body font-semibold disabled:opacity-50"
-                >
-                  ✓
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowReserveInput(true)}
-                className="flex-1 text-center text-sm border-2 border-[#FF6B8A] text-accent px-3 py-2 rounded-full font-body font-semibold hover:bg-accent hover:text-primary-foreground transition-colors"
-              >
-                {t("reserve_btn")}
-              </button>
-            )
-          )}
-
-          {isOwner && onDelete && (
-            <button
-              onClick={() => onDelete(wish.id)}
-              className="text-sm text-muted-foreground hover:text-red-500 transition-colors font-body px-2"
-            >
-              ✕
-            </button>
           )}
         </div>
       </div>

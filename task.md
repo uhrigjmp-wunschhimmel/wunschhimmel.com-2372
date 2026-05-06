@@ -1,33 +1,56 @@
-# Wunschhimmel Task Status
+# Wunschhimmel — Full UX Implementation
 
-## DONE
-- Token verified: af9920b2... works for api.awin.com (/accounts returns userId 3180131)
-- Publisher ID corrected: 2864125 (was 2864185, wrong!)
-- Dev server running on port 6976
+## Was implementiert wird
 
-## BLOCKING ISSUES
+### 1. DB Schema-Erweiterungen
+- `wishes`: + `category` (text), `shop` (text), `notes` (text) Felder
+- Migration SQL schreiben
 
-### Awin Product Search API
-- `product-search.api.awin.com` → DNS not found from bun/sandbox
-- From workerd (vite dev): returns "internal error" 
-- Root cause: Publisher account only has 3 joined programmes (stempel-fabrik, Fackelmann, House-of-Sneakers)
-- Likely needs: join more programmes AND/OR activate Product Search/Finder feature in Awin UI
+### 2. API-Erweiterungen
+- addWish / updateWish: neue Felder entgegennehmen
+- PATCH /api/wishes/:id — für Edit-Wish
 
-### Awin Product Feed API
-- `productdata.awin.com` → redirects to `legacydatafeeds.awin.com`
-- `legacydatafeeds.awin.com` → returns "we broke something" (Awin's server issue)
-- Feed API key may be separate from publisher API token
+### 3. Neues: AddWishSheet (Bottom Sheet Component)
+- Tab 1: Link-Import mit Auto-Scrape-on-paste
+- Tab 2: Manuelle Eingabe
+- Felder: url, title, image, price, shop, category, priority, notes
+- "Mehr Optionen" Accordion
+- Swipe-down to close
+- z-index > 10000
 
-## NEXT ACTIONS FOR USER
-1. Go to Awin dashboard → Toolbox → Create-a-Feed → find Feed API key (different from Publisher token)
-2. Join more relevant German affiliate programmes (Amazon, Tchibo, Jako-O, etc.)
-3. Check if "Product Search API" / "Product Finder" needs to be enabled in Awin account settings
+### 4. Neues: WishDetailModal
+- Vollansicht eines Wunsches
+- Tap auf Karte öffnet Modal (kein Seitenwechsel)
+- Edit-Modus direkt drin
+- Löschen mit Confirm
 
-## NEXT ACTIONS FOR CODE
-1. Update awin.ts to use datafeed download URL (once feed API key is known)
-2. OR implement alternative: Idealo/Google Shopping RSS feeds as fallback
-3. Fix _meta being on every product (low priority)
+### 5. Überarbeitetes WishCard
+- Tap → öffnet WishDetailModal (via callback)
+- Kein eigener Delete-Button mehr (im Modal)
+- Zeigt: shop badge, category badge, notes-indicator
 
-## DEV SERVER
-- Port: 6976, tmux: port_6976
-- Restart: tmux kill-session -t port_6976; cd /home/user/wunschhimmel && tmux new -d -s port_6976 "bun dev --port 6976"
+### 6. Reservierungs-Flow (shared.tsx)
+- Tap auf Karte → ReserveSheet (Bottom Sheet)
+- Name eingeben, Bestätigung
+- Reserviert-Status klar sichtbar
+- Anonym gegenüber Besitzer
+
+### 7. list-detail.tsx
+- FAB "+" Button fixed bottom-center (über Badge)
+- Öffnet AddWishSheet
+- Filter-Tabs: Alle / Kategorie-Filter
+- Wish-Karten öffnen WishDetailModal
+
+### 8. Kategorien
+- Vordefinierte Liste: Technik, Mode, Bücher, Sport, Zuhause, Reise, Essen, Spielzeug, Schönheit, Sonstiges
+- Emoji pro Kategorie
+
+## Reihenfolge
+1. Migration + Schema
+2. API-Route PATCH wishes
+3. AddWishSheet Component
+4. WishDetailModal Component  
+5. WishCard update
+6. list-detail.tsx update
+7. shared.tsx Reservierungs-Update
+8. Build + deliver
