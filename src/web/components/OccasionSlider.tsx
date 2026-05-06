@@ -233,7 +233,7 @@ export function OccasionSlider({ active, onSelect }: Props) {
     const idx = OCCASIONS.findIndex(o => o.id === active.id);
     const el = track.children[idx] as HTMLElement;
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      // el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
   }, [active.id]);
 

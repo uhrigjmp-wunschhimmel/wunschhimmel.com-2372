@@ -289,7 +289,7 @@ export function WunschengelChat() {
 
   const isLoading = status === "streaming" || status === "submitted";
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, step, open]);
+  // useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, step, open]);
 
   const handleAddWish = useCallback((p: Product) => setPickerProduct(p), []);
 

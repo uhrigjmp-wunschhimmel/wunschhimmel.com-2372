@@ -730,4 +730,6 @@ app.post("/track/click", async (c) => {
 
 app.get("/ping", (c) => c.json({ message: `Pong! ${Date.now()}` }));
 
+
+
 export default app;
