@@ -1,6 +1,6 @@
 import { Route, Switch } from "wouter";
 import { Provider } from "./components/provider";
-import { AgentFeedback, RunableBadge } from "@runablehq/website-runtime";
+import { AgentFeedback } from "@runablehq/website-runtime";
 import { I18nProvider } from "./lib/i18n";
 import { ThemeProvider } from "./lib/theme";
 import { Navbar } from "./components/Navbar";
@@ -48,7 +48,6 @@ function App() {
         <WunschengelChat />
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}
-        {<RunableBadge />}
         </ThemeProvider>
       </I18nProvider>
     </Provider>
