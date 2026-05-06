@@ -2,6 +2,7 @@
 // Parallel fetches from all partners → merge → score → dedupe → relax if needed
 
 import { searchAwin } from "./partners/awin";
+import { scrapeAmazon } from "./partners/amazon-scrape";
 import { generateAmazonSearchCards } from "./partners/amazon-search";
 import { expandKeywords, buildSearchTerms } from "./keyword-map";
 import fallbackProducts from "./products-fallback.json";
@@ -221,18 +222,29 @@ export async function liveSearch(params: SearchParams): Promise<{
     const [awinRes, amazonRes] = await Promise.allSettled([
       // Awin
       (awinToken && awinPublisherId)
-        ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, publisherId: awinPublisherId, apiToken: awinToken })
+        ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, publisherId: awinPublisherId, apiToken: awinToken, occasion: p.occasion, recipient: p.recipient })
         : Promise.resolve({ products: [], error: "not_configured" }),
-      // Amazon Search Cards — direkte Suchlinks mit Affiliate-Tag, kein API-Key nötig
-      Promise.resolve(generateAmazonSearchCards({
+      // Amazon: Scraper zuerst, Search Cards als Fallback
+      scrapeAmazon({
         keywords: kw,
-        occasion: p.occasion,
-        recipient: p.recipient,
-        ageGroup: p.ageGroup,
         minPrice: p.minPrice,
         maxPrice: p.maxPrice,
-        pageSize: 6,
-      })),
+        pageSize: 8,
+      }).then(r => {
+        // Wenn Scraper fehlschlägt → Search Cards als Fallback
+        if (r.products.length === 0) {
+          return generateAmazonSearchCards({
+            keywords: kw,
+            occasion: p.occasion,
+            recipient: p.recipient,
+            ageGroup: p.ageGroup,
+            minPrice: p.minPrice,
+            maxPrice: p.maxPrice,
+            pageSize: 4,
+          });
+        }
+        return r;
+      }),
     ]);
 
     const live: LiveProduct[] = [];
