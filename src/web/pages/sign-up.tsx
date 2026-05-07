@@ -10,10 +10,10 @@ const THEMES: { id: Theme; label: string; sub: string; bg: string; accent: strin
     id: "rose",
     label: "Rose",
     sub: "Warm & verspielt",
-    bg: "#FFF8F0",
-    accent: "#FF6B8A",
-    text: "#1A1A4E",
-    preview: "linear-gradient(135deg, #FFD6D6 0%, #FFF8F0 60%, #E8DEFF 100%)",
+    bg: "var(--background)",
+    accent: "var(--accent)",
+    text: "var(--primary)",
+    preview: "linear-gradient(135deg, var(--rose-soft) 0%, var(--background) 60%, var(--lavender) 100%)",
   },
   {
     id: "teal",
@@ -193,7 +193,7 @@ export default function SignUp() {
               type="submit"
               disabled={loading}
               className="w-full font-body font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 mt-2 flex items-center justify-center gap-2"
-              style={{ background: selectedTheme === "teal" ? "#2DD4BF" : "#FF6B8A", color: selectedTheme === "teal" ? "#0F1923" : "#fff" }}
+              style={{ background: selectedTheme === "teal" ? "#2DD4BF" : "var(--accent)", color: selectedTheme === "teal" ? "#0F1923" : "#fff" }}
             >
               {loading ? (
                 <>

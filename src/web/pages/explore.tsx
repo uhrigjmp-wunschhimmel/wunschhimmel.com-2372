@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
+import { IconCompass, IconArrowRight, IconSparkle } from "@/components/Icons";
 
 export default function Explore() {
   const { t } = useI18n();
@@ -14,40 +15,110 @@ export default function Explore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-16 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="font-display text-5xl font-bold text-foreground mb-3">
-            {t("explore_title")} <span className="text-accent">✦</span>
+    <div style={{ minHeight: "100vh", background: "var(--background)", paddingTop: 88, paddingBottom: 64 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+            <span className="section-pill">
+              <IconCompass size={13} color="currentColor" />
+              Entdecken
+            </span>
+          </div>
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif", fontWeight: 900,
+            fontSize: "clamp(28px, 5vw, 48px)", color: "var(--foreground)",
+            letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15,
+          }}>
+            {t("explore_title")}{" "}
+            <span style={{
+              background: "var(--grad-accent)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              ✦
+            </span>
           </h1>
-          <p className="font-body text-muted-foreground text-lg">{t("explore_sub")}</p>
+          <p style={{ fontSize: 16, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 480, margin: "0 auto" }}>
+            {t("explore_sub")}
+          </p>
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-muted-foreground font-body">{t("loading")}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+            {[1,2,3,4,5,6].map(i => (
+              <div key={i} className="skeleton" style={{ height: 180, borderRadius: 20 }} />
+            ))}
+          </div>
         ) : lists.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🌟</div>
-            <p className="font-body text-muted-foreground">{t("no_public")}</p>
+          <div style={{
+            textAlign: "center", padding: "80px 20px",
+            background: "var(--card)", borderRadius: 28,
+            border: "2px dashed var(--border)",
+          }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }}>🌟</div>
+            <p style={{ fontSize: 14, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {t("no_public")}
+            </p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
             {lists.map(list => (
               <button
                 key={list.id}
                 onClick={() => navigate(`/shared/${list.shareToken}`)}
-                className="wish-card bg-white rounded-2xl border border-border shadow-sm p-6 text-left hover:shadow-md transition-all"
+                className="list-card"
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  width: "100%", textAlign: "left",
+                }}
               >
-                <span className="text-4xl block mb-3">{list.emoji}</span>
-                <h3 className="font-display font-bold text-foreground text-xl mb-1">{list.title}</h3>
+                {/* Emoji + arrow */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 40, lineHeight: 1 }}>{list.emoji}</span>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                    width: 32, height: 32, borderRadius: "50%",
+                    background: "var(--muted)", color: "var(--muted-foreground)",
+                    transition: "background 0.15s, color 0.15s",
+                  }}>
+                    <IconArrowRight size={14} color="currentColor" />
+                  </span>
+                </div>
+
+                <h3 style={{
+                  fontFamily: "'Playfair Display', serif", fontWeight: 700,
+                  fontSize: 17, color: "var(--foreground)", lineHeight: 1.3,
+                  marginTop: 8,
+                }}>
+                  {list.title}
+                </h3>
+
                 {list.description && (
-                  <p className="font-body text-sm text-muted-foreground line-clamp-2 mb-3">{list.description}</p>
+                  <p style={{
+                    fontSize: 12, color: "var(--muted-foreground)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    lineHeight: 1.5, marginTop: 4,
+                    overflow: "hidden", display: "-webkit-box",
+                    WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                  }}>
+                    {list.description}
+                  </p>
                 )}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                  <span className="text-xs font-body text-muted-foreground">
+
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  paddingTop: 12, marginTop: "auto",
+                  borderTop: "1px solid var(--border)",
+                }}>
+                  <span style={{ fontSize: 11, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     {new Date(list.createdAt).toLocaleDateString("de-DE")}
                   </span>
-                  <span className="text-xs font-body text-accent font-semibold">
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, color: "var(--accent)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  }}>
                     Ansehen →
                   </span>
                 </div>

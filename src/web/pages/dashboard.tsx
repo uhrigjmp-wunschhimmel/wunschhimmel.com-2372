@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
+import { IconPlus, IconTrash, IconLock, IconUnlock, IconGift, IconSparkle } from "@/components/Icons";
 
 const EMOJIS = ["🎁", "🎂", "🎄", "🌟", "💝", "🛍️", "🌈", "🎮", "👟", "📚", "🎵", "🌸", "✈️", "💄", "🏠"];
 
@@ -33,11 +34,8 @@ export default function Dashboard() {
       const list = await api.createList({ title: newTitle, description: newDesc, emoji: newEmoji, isPublic: newPublic });
       setLists(prev => [list, ...prev]);
       setShowNewModal(false);
-      setNewTitle("");
-      setNewDesc("");
-      setNewEmoji("🎁");
-      setNewPublic(false);
-      toast.success("Liste erstellt!");
+      setNewTitle(""); setNewDesc(""); setNewEmoji("🎁"); setNewPublic(false);
+      toast.success("Liste erstellt! 🎉");
       navigate(`/list/${list.id}`);
     } catch (e: any) {
       toast.error(e.message);
@@ -66,144 +64,289 @@ export default function Dashboard() {
     }
   };
 
-  if (!session) {
-    navigate("/sign-in");
-    return null;
-  }
+  if (!session) { navigate("/sign-in"); return null; }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-16 px-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-          <div>
-            <p className="font-body text-muted-foreground text-sm mb-1">Willkommen zurück,</p>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground">
-              {session.user.name || "Freund"} ✨
-            </h1>
-          </div>
-          <button
-            onClick={() => setShowNewModal(true)}
-            className="bg-accent text-primary-foreground font-body font-semibold px-6 py-3 rounded-full hover:bg-[#ff5077] transition-all hover:scale-105 shadow-lg shadow-[#FF6B8A]/30 w-full sm:w-auto"
-          >
-            + {t("new_list")}
-          </button>
-        </div>
+    <div style={{ minHeight: "100vh", background: "var(--background)", paddingTop: 88, paddingBottom: 64 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
 
-        {/* Lists */}
-        {loading ? (
-          <div className="text-center py-20 text-muted-foreground font-body">{t("loading")}</div>
-        ) : lists.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🎁</div>
-            <p className="font-body text-muted-foreground text-lg">{t("no_lists")}</p>
+        {/* ── Header ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 36 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+            <div>
+              <p style={{ fontSize: 13, color: "var(--muted-foreground)", fontWeight: 500, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 4 }}>
+                Willkommen zurück ✨
+              </p>
+              <h1 style={{
+                fontFamily: "'Playfair Display', serif", fontWeight: 900,
+                fontSize: "clamp(26px, 4vw, 38px)",
+                color: "var(--foreground)", letterSpacing: "-0.03em", lineHeight: 1.15,
+              }}>
+                {session.user.name?.split(" ")[0] || "Freund"}s Wunschhimmel
+              </h1>
+            </div>
             <button
               onClick={() => setShowNewModal(true)}
-              className="mt-6 bg-accent text-primary-foreground font-body font-semibold px-6 py-3 rounded-full hover:bg-[#ff5077] transition-colors"
+              className="btn-primary"
+              style={{ gap: 8 }}
             >
-              + {t("new_list")}
+              <IconPlus size={16} color="currentColor" />
+              {t("new_list")}
+            </button>
+          </div>
+
+          {/* Stats bar */}
+          {!loading && lists.length > 0 && (
+            <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 12, color: "var(--muted-foreground)", fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {lists.length} {lists.length === 1 ? "Liste" : "Listen"}
+              </span>
+              <span style={{ fontSize: 12, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>·</span>
+              <span style={{ fontSize: 12, color: "var(--muted-foreground)", fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {lists.filter(l => l.isPublic).length} öffentlich
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* ── Content ── */}
+        {loading ? (
+          /* Skeleton */
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+            {[1,2,3].map(i => (
+              <div key={i} className="skeleton" style={{ height: 180, borderRadius: 20 }} />
+            ))}
+          </div>
+        ) : lists.length === 0 ? (
+          /* Empty state */
+          <div style={{
+            textAlign: "center", padding: "80px 20px",
+            background: "var(--card)", borderRadius: 28,
+            border: "2px dashed var(--border)",
+          }}>
+            <div style={{ fontSize: 64, marginBottom: 16, lineHeight: 1 }}>🎁</div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "var(--foreground)", marginBottom: 8 }}>
+              Deine erste Wunschliste
+            </h2>
+            <p style={{ fontSize: 14, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 24, maxWidth: 320, margin: "0 auto 24px" }}>
+              {t("no_lists")}
+            </p>
+            <button onClick={() => setShowNewModal(true)} className="btn-primary" style={{ margin: "0 auto" }}>
+              <IconPlus size={16} color="currentColor" />
+              Erste Liste erstellen
             </button>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
             {lists.map(list => (
               <div
                 key={list.id}
-                className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-md transition-all group cursor-pointer wish-card"
+                className="list-card"
                 onClick={() => navigate(`/list/${list.id}`)}
               >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-4xl">{list.emoji}</span>
-                    <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => togglePublic(list)}
-                        className={`text-xs px-2.5 py-1 rounded-full font-body font-medium transition-colors ${list.isPublic ? "bg-[#E8DEFF] text-foreground" : "bg-[#FFD6D6] text-foreground"}`}
-                      >
-                        {list.isPublic ? t("public_badge") : t("private_badge")}
-                      </button>
-                    </div>
-                  </div>
-                  <h3 className="font-display font-bold text-foreground text-xl mb-1">{list.title}</h3>
-                  {list.description && (
-                    <p className="font-body text-sm text-muted-foreground line-clamp-2">{list.description}</p>
-                  )}
-                  <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                    <span className="font-body text-xs text-muted-foreground">
-                      {new Date(list.createdAt).toLocaleDateString("de-DE")}
-                    </span>
+                {/* Top row */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                  <span style={{ fontSize: 38, lineHeight: 1 }}>{list.emoji}</span>
+                  <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
                     <button
-                      onClick={(e) => { e.stopPropagation(); deleteList(list.id); }}
-                      className="text-xs text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 font-body"
+                      onClick={() => togglePublic(list)}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: 4,
+                        fontSize: 11, fontWeight: 700,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        padding: "4px 10px", borderRadius: 999, border: "none",
+                        cursor: "pointer", transition: "all 0.15s",
+                        background: list.isPublic ? "var(--lavender)" : "var(--rose-soft)",
+                        color: list.isPublic ? "var(--primary)" : "#9F1239",
+                      }}
                     >
-                      {t("delete_list")}
+                      {list.isPublic
+                        ? <><IconUnlock size={11} color="currentColor" />{t("public_badge")}</>
+                        : <><IconLock size={11} color="currentColor" />{t("private_badge")}</>
+                      }
                     </button>
                   </div>
                 </div>
+
+                {/* Title */}
+                <h3 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 700, fontSize: 17, color: "var(--foreground)",
+                  lineHeight: 1.3, marginTop: 4,
+                }}>
+                  {list.title}
+                </h3>
+
+                {/* Description */}
+                {list.description && (
+                  <p style={{
+                    fontSize: 12, color: "var(--muted-foreground)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    lineHeight: 1.5, overflow: "hidden",
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                  }}>
+                    {list.description}
+                  </p>
+                )}
+
+                {/* Footer */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  paddingTop: 12, marginTop: "auto",
+                  borderTop: "1px solid var(--border)",
+                }}>
+                  <span style={{ fontSize: 11, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {new Date(list.createdAt).toLocaleDateString("de-DE")}
+                  </span>
+                  <button
+                    onClick={e => { e.stopPropagation(); deleteList(list.id); }}
+                    style={{
+                      background: "none", border: "none", cursor: "pointer",
+                      color: "var(--muted-foreground)", padding: "4px 6px",
+                      borderRadius: 8, transition: "color 0.15s, background 0.15s",
+                      opacity: 0, fontSize: 11,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    }}
+                    className="group-hover:opacity-100 delete-btn"
+                    onMouseOver={e => { (e.currentTarget as HTMLElement).style.color = "#E11D48"; (e.currentTarget as HTMLElement).style.background = "#FEF2F2"; (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                    onMouseOut={e => { (e.currentTarget as HTMLElement).style.color = "var(--muted-foreground)"; (e.currentTarget as HTMLElement).style.background = "none"; }}
+                  >
+                    <IconTrash size={13} color="currentColor" />
+                  </button>
+                </div>
               </div>
             ))}
+
+            {/* New list card */}
+            <button
+              onClick={() => setShowNewModal(true)}
+              style={{
+                background: "none",
+                border: "2px dashed var(--border)",
+                borderRadius: 20,
+                padding: 20,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                gap: 10, cursor: "pointer",
+                minHeight: 160,
+                transition: "border-color 0.2s, background 0.2s",
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,107,157,0.04)"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.background = "none"; }}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: "50%",
+                background: "var(--muted)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <IconPlus size={20} color="var(--muted-foreground)" />
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Neue Liste
+              </span>
+            </button>
           </div>
         )}
       </div>
 
-      {/* New list modal */}
+      {/* ── New list modal ── */}
       {showNewModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl max-h-[92vh] overflow-y-auto">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-6">Neue Liste ✨</h2>
-
-            {/* Emoji picker */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {EMOJIS.map(e => (
-                <button
-                  key={e}
-                  onClick={() => setNewEmoji(e)}
-                  className={`text-2xl p-2 rounded-xl transition-all ${newEmoji === e ? "bg-[#FFD6D6] scale-110" : "hover:bg-background"}`}
-                >
-                  {e}
-                </button>
-              ))}
+        <div
+          className="wh-modal-backdrop"
+          onClick={() => setShowNewModal(false)}
+        >
+          <div
+            className="wh-modal"
+            onClick={e => e.stopPropagation()}
+            style={{ padding: "32px 28px" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "var(--foreground)" }}>
+                Neue Liste erstellen ✨
+              </h2>
+              <button
+                onClick={() => setShowNewModal(false)}
+                className="btn-icon"
+                style={{ width: 36, height: 36 }}
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="space-y-3">
-              <input
-                value={newTitle}
-                onChange={e => setNewTitle(e.target.value)}
-                placeholder="Listenname *"
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-foreground outline-none focus:border-[#FF6B8A] transition-all"
-                autoFocus
-              />
-              <textarea
-                value={newDesc}
-                onChange={e => setNewDesc(e.target.value)}
-                placeholder="Beschreibung (optional)"
-                rows={2}
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 font-body text-foreground outline-none focus:border-[#FF6B8A] transition-all resize-none"
-              />
-              <label className="flex items-center gap-3 cursor-pointer">
+            {/* Emoji picker */}
+            <div style={{ marginBottom: 20 }}>
+              <label className="wh-label">Emoji</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {EMOJIS.map(e => (
+                  <button
+                    key={e}
+                    onClick={() => setNewEmoji(e)}
+                    style={{
+                      fontSize: 22, padding: "6px 8px", borderRadius: 12,
+                      border: `2px solid ${newEmoji === e ? "var(--accent)" : "transparent"}`,
+                      background: newEmoji === e ? "rgba(255,107,157,0.1)" : "var(--muted)",
+                      cursor: "pointer",
+                      transform: newEmoji === e ? "scale(1.15)" : "scale(1)",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label className="wh-label">Listenname *</label>
+                <input
+                  value={newTitle}
+                  onChange={e => setNewTitle(e.target.value)}
+                  placeholder="z. B. Weihnachten 2025"
+                  className="wh-input"
+                  autoFocus
+                  onKeyDown={e => { if (e.key === "Enter" && newTitle.trim()) createList(); }}
+                />
+              </div>
+              <div>
+                <label className="wh-label">Beschreibung (optional)</label>
+                <textarea
+                  value={newDesc}
+                  onChange={e => setNewDesc(e.target.value)}
+                  placeholder="Was ist das für eine Liste?"
+                  rows={2}
+                  className="wh-input"
+                  style={{ resize: "none" }}
+                />
+              </div>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                 <input
                   type="checkbox"
                   checked={newPublic}
                   onChange={e => setNewPublic(e.target.checked)}
-                  className="w-4 h-4 accent-[#FF6B8A]"
+                  style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer" }}
                 />
-                <span className="font-body text-sm text-foreground">Öffentlich (für alle sichtbar)</span>
+                <span style={{ fontSize: 13, color: "var(--foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+                  Öffentlich — für andere sichtbar
+                </span>
               </label>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button
                 onClick={() => setShowNewModal(false)}
-                className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl hover:bg-background transition-colors"
+                className="btn-secondary"
+                style={{ flex: 1 }}
               >
-                {t("cancel")}
+                Abbrechen
               </button>
               <button
                 onClick={createList}
                 disabled={creating || !newTitle.trim()}
-                className="flex-1 bg-accent text-primary-foreground font-body font-semibold py-3 rounded-xl hover:bg-[#ff5077] transition-colors disabled:opacity-60"
+                className="btn-primary"
+                style={{ flex: 1 }}
               >
-                {creating ? t("loading") : t("save")}
+                {creating ? "Erstelle…" : "Liste erstellen ✨"}
               </button>
             </div>
           </div>

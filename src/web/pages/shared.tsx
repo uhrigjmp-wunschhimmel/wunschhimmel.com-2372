@@ -13,7 +13,7 @@ export default function SharedList() {
   const params = useParams<{ token: string }>();
   const { theme } = useTheme();
   const isTeal = theme === "teal";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
+  const foreground = isTeal ? "#E8F5F3" : "var(--primary)";
   const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
   const border = isTeal ? "#1E3A4A" : "#EAD9D9";
   const cardBg = isTeal ? "#162230" : "#FFFFFF";
@@ -67,7 +67,7 @@ export default function SharedList() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="bg-[#1A1A4E] pt-20 pb-14 relative overflow-hidden">
+      <div className="bg-navy pt-20 pb-14 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-8 right-8 text-7xl text-white">✦</div>
           <div className="absolute bottom-4 left-12 text-5xl text-white">✦</div>
@@ -78,7 +78,7 @@ export default function SharedList() {
           {list.description && <p className="font-body text-white/70">{list.description}</p>}
           <div className="mt-5 flex items-center justify-center gap-6">
             <div className="text-center">
-              <div className="font-display text-3xl font-bold text-[#FFD6D6]">{total}</div>
+              <div className="font-display text-3xl font-bold text-[var(--rose-soft)]">{total}</div>
               <div className="font-body text-xs text-white/60">Wünsche</div>
             </div>
             <div className="w-px h-10 bg-white/20" />
@@ -88,19 +88,19 @@ export default function SharedList() {
             </div>
             <div className="w-px h-10 bg-white/20" />
             <div className="text-center">
-              <div className="font-display text-3xl font-bold text-[#FF6B8A]">{total - reserved}</div>
+              <div className="font-display text-3xl font-bold text-[var(--accent)]">{total - reserved}</div>
               <div className="font-body text-xs text-white/60">Noch frei</div>
             </div>
           </div>
         </div>
         <svg viewBox="0 0 1440 40" className="w-full absolute bottom-0" preserveAspectRatio="none" style={{ height: 30 }}>
-          <path fill="#FFF8F0" d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" />
+          <path fill="var(--background)" d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" />
         </svg>
       </div>
 
       {/* Info banner */}
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="bg-[#E8DEFF] rounded-2xl p-3 text-center">
+        <div className="bg-[var(--lavender)] rounded-2xl p-3 text-center">
           <p className="font-body text-sm text-foreground">
             🎁 Tippe auf einen Wunsch um ihn zu <strong>reservieren</strong> — damit kein Geschenk doppelt gekauft wird. Der Wunschende sieht nicht wer was reserviert hat.
           </p>
@@ -113,7 +113,7 @@ export default function SharedList() {
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             <button onClick={() => setFilterCategory("all")}
               className="shrink-0 px-4 py-1.5 rounded-full font-body text-sm font-semibold border transition-all"
-              style={{ background: filterCategory === "all" ? "#1A1A4E" : "white", color: filterCategory === "all" ? "white" : "#6B6B9A", borderColor: filterCategory === "all" ? "#1A1A4E" : "#EAD9D9" }}>
+              style={{ background: filterCategory === "all" ? "var(--primary)" : "white", color: filterCategory === "all" ? "white" : "#6B6B9A", borderColor: filterCategory === "all" ? "var(--primary)" : "#EAD9D9" }}>
               Alle ({total})
             </button>
             {usedCategories.map(cat => {
@@ -122,7 +122,7 @@ export default function SharedList() {
               return (
                 <button key={cat} onClick={() => setFilterCategory(cat)}
                   className="shrink-0 px-4 py-1.5 rounded-full font-body text-sm font-semibold border transition-all"
-                  style={{ background: filterCategory === cat ? "#FF6B8A" : "white", color: filterCategory === cat ? "white" : "#6B6B9A", borderColor: filterCategory === cat ? "#FF6B8A" : "#EAD9D9" }}>
+                  style={{ background: filterCategory === cat ? "var(--accent)" : "white", color: filterCategory === cat ? "white" : "#6B6B9A", borderColor: filterCategory === cat ? "var(--accent)" : "#EAD9D9" }}>
                   {catObj?.emoji} {catObj?.label || cat} ({count})
                 </button>
               );

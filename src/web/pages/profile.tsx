@@ -13,12 +13,12 @@ export default function Profile() {
   const { data: session } = authClient.useSession();
   const isTeal = theme === "teal";
 
-  const bg = isTeal ? "#0F1923" : "#FFF8F0";
+  const bg = isTeal ? "#0F1923" : "var(--background)";
   const cardBg = isTeal ? "#162230" : "#FFFFFF";
   const border = isTeal ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
+  const foreground = isTeal ? "#E8F5F3" : "var(--primary)";
   const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const accent = isTeal ? "#2DD4BF" : "#FF6B8A";
+  const accent = isTeal ? "#2DD4BF" : "var(--accent)";
 
   const [profile, setProfile] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -104,7 +104,7 @@ export default function Profile() {
             <label className="block text-xs font-body font-semibold uppercase tracking-wide mb-3" style={{ color: muted }}>Design</label>
             <div className="grid grid-cols-2 gap-3">
               {([
-                { id: "rose", label: "🌸 Rose", preview: "linear-gradient(135deg, #FFD6D6, #FFF8F0)" },
+                { id: "rose", label: "🌸 Rose", preview: "linear-gradient(135deg, var(--rose-soft), var(--background))" },
                 { id: "teal", label: "🌊 Teal", preview: "linear-gradient(135deg, #0F1923, #0e4a5a)" },
               ] as const).map(th => (
                 <button
@@ -113,7 +113,7 @@ export default function Profile() {
                   className="rounded-2xl p-3 text-sm font-body font-semibold transition-all border-2"
                   style={{
                     background: th.preview,
-                    color: th.id === "teal" ? "#2DD4BF" : "#1A1A4E",
+                    color: th.id === "teal" ? "#2DD4BF" : "var(--primary)",
                     borderColor: theme === th.id ? accent : "transparent",
                     transform: theme === th.id ? "scale(1.03)" : "scale(1)",
                   }}

@@ -11,7 +11,7 @@ export default function Feed() {
   const bg = isTeal ? "#0F1923" : "#FFF8F0";
   const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
   const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const accent = isTeal ? "#2DD4BF" : "#FF6B8A";
+  const accent = isTeal ? "#2DD4BF" : "var(--accent)";
 
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

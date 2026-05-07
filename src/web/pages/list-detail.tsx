@@ -18,12 +18,12 @@ export default function ListDetail() {
   const { data: session } = authClient.useSession();
   const { theme } = useTheme();
   const isTeal = theme === "teal";
-  const accent = isTeal ? "#2DD4BF" : "#FF6B8A";
+  const accent = isTeal ? "#2DD4BF" : "var(--accent)";
   const border = isTeal ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
+  const foreground = isTeal ? "#E8F5F3" : "var(--primary)";
   const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
   const cardBg = isTeal ? "#162230" : "#FFFFFF";
-  const inputBg = isTeal ? "#1A2D3E" : "#FFF8F0";
+  const inputBg = isTeal ? "#1A2D3E" : "var(--background)";
 
   const [list, setList] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -163,7 +163,7 @@ export default function ListDetail() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground leading-tight">{list.title}</h1>
-                <span className={`text-xs px-2.5 py-1 rounded-full font-body font-medium shrink-0 ${list.isPublic ? "bg-[#E8DEFF] text-foreground" : "bg-[#FFD6D6] text-foreground"}`}>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-body font-medium shrink-0 ${list.isPublic ? "bg-[var(--lavender)] text-foreground" : "bg-[var(--rose-soft)] text-foreground"}`}>
                   {list.isPublic ? t("public_badge") : t("private_badge")}
                 </span>
               </div>
@@ -187,7 +187,7 @@ export default function ListDetail() {
             </button>
             <button
               onClick={() => setShowShareModal(true)}
-              className="bg-[#1A1A4E] text-white font-body text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#2d2d7e] transition-colors min-h-[40px]"
+              className="bg-navy text-white font-body text-sm font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors min-h-[40px]"
             >
               📨 Teilen
             </button>
@@ -218,7 +218,7 @@ export default function ListDetail() {
             <button
               onClick={() => setFilterCategory("all")}
               className="shrink-0 px-4 py-1.5 rounded-full font-body text-sm font-semibold transition-all border"
-              style={{ background: filterCategory === "all" ? "#1A1A4E" : "white", color: filterCategory === "all" ? "white" : "#6B6B9A", borderColor: filterCategory === "all" ? "#1A1A4E" : "#EAD9D9" }}
+              style={{ background: filterCategory === "all" ? "var(--primary)" : "white", color: filterCategory === "all" ? "white" : "#6B6B9A", borderColor: filterCategory === "all" ? "var(--primary)" : "#EAD9D9" }}
             >
               Alle ({allWishes.length})
             </button>
@@ -230,7 +230,7 @@ export default function ListDetail() {
                   key={cat}
                   onClick={() => setFilterCategory(cat)}
                   className="shrink-0 px-4 py-1.5 rounded-full font-body text-sm font-semibold transition-all border"
-                  style={{ background: filterCategory === cat ? "#FF6B8A" : "white", color: filterCategory === cat ? "white" : "#6B6B9A", borderColor: filterCategory === cat ? "#FF6B8A" : "#EAD9D9" }}
+                  style={{ background: filterCategory === cat ? "var(--accent)" : "white", color: filterCategory === cat ? "white" : "#6B6B9A", borderColor: filterCategory === cat ? "var(--accent)" : "#EAD9D9" }}
                 >
                   {catObj?.emoji} {catObj?.label || cat} ({count})
                 </button>
@@ -293,8 +293,8 @@ export default function ListDetail() {
       {/* ── FAB: Add Wish ── */}
       <button
         onClick={() => setShowAddSheet(true)}
-        className="fixed bottom-20 right-5 w-14 h-14 rounded-full text-white shadow-lg shadow-[#FF6B8A]/40 flex items-center justify-center text-2xl transition-all hover:scale-110 active:scale-95"
-        style={{ background: "#FF6B8A", zIndex: 9999 }}
+        className="fixed bottom-20 right-5 w-14 h-14 rounded-full text-white shadow-lg shadow-[var(--accent)]/40 flex items-center justify-center text-2xl transition-all hover:scale-110 active:scale-95"
+        style={{ background: "var(--accent)", zIndex: 9999 }}
         title="Wunsch hinzufügen"
       >
         +
@@ -367,15 +367,15 @@ export default function ListDetail() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-md shadow-2xl overflow-y-auto" style={{ maxHeight: "calc(100dvh - 60px)" }}>
             <h2 className="font-display text-xl font-bold text-foreground mb-4">🔗 Liste teilen</h2>
-            <div className="bg-[#FFF8F0] rounded-xl p-3 border border-border mb-4 flex items-center gap-3">
+            <div className="bg-[var(--background)] rounded-xl p-3 border border-border mb-4 flex items-center gap-3">
               <span className="font-body text-xs text-muted-foreground flex-1 truncate">{window.location.origin}/shared/{list.shareToken}</span>
-              <button onClick={copyShareLink} className="text-xs bg-[#1A1A4E] text-white px-3 py-1.5 rounded-full font-body font-semibold shrink-0">Kopieren</button>
+              <button onClick={copyShareLink} className="text-xs bg-navy text-white px-3 py-1.5 rounded-full font-body font-semibold shrink-0">Kopieren</button>
             </div>
-            <div className="flex gap-1 mb-4 bg-[#FFF8F0] rounded-xl p-1 border border-border">
+            <div className="flex gap-1 mb-4 bg-[var(--background)] rounded-xl p-1 border border-border">
               {(["email","apps","qr"] as const).map(tab => (
                 <button key={tab} onClick={() => setShareTab(tab)}
                   className="flex-1 py-2 rounded-lg font-body text-xs font-semibold transition-all"
-                  style={{ background: shareTab === tab ? "#1A1A4E" : "transparent", color: shareTab === tab ? "#fff" : "#6B6B9A" }}>
+                  style={{ background: shareTab === tab ? "var(--primary)" : "transparent", color: shareTab === tab ? "#fff" : "#6B6B9A" }}>
                   {tab === "email" ? "📨 E-Mail" : tab === "apps" ? "💬 Apps" : "📷 QR"}
                 </button>
               ))}
@@ -384,12 +384,12 @@ export default function ListDetail() {
               <div className="space-y-3">
                 <input value={shareEmails} onChange={e => setShareEmails(e.target.value)}
                   placeholder="freund@email.de, familie@email.de"
-                  className="w-full bg-[#FFF8F0] border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A]" />
+                  className="w-full bg-[var(--background)] border border-border rounded-xl px-4 py-3 font-body text-sm text-foreground outline-none focus:border-[var(--accent)]" />
                 <textarea value={shareMessage} onChange={e => setShareMessage(e.target.value)} rows={2}
                   placeholder="Hey! Hier sind meine Wünsche..."
-                  className="w-full bg-[#FFF8F0] border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[#FF6B8A] resize-none" />
+                  className="w-full bg-[var(--background)] border border-border rounded-xl px-4 py-2.5 font-body text-sm text-foreground outline-none focus:border-[var(--accent)] resize-none" />
                 <div className="flex gap-3">
-                  <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-2.5 rounded-xl text-sm hover:bg-[#FFF8F0]">{t("cancel")}</button>
+                  <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-2.5 rounded-xl text-sm hover:bg-[var(--background)]">{t("cancel")}</button>
                   <button onClick={shareList} disabled={sharing || !shareEmails.trim()}
                     className="flex-1 bg-accent text-white font-body font-semibold py-2.5 rounded-xl text-sm disabled:opacity-60">
                     {sharing ? t("loading") : t("share_send")}
@@ -436,7 +436,7 @@ export default function ListDetail() {
                     const xml = new XMLSerializer().serializeToString(svg);
                     const img = new Image(); img.onload = () => { ctx.drawImage(img,0,0,400,400); const a = document.createElement("a"); a.download = `qr-${list.title}.png`; a.href = canvas.toDataURL(); a.click(); };
                     img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
-                  }} className="flex-1 bg-[#1A1A4E] text-white font-body font-semibold py-3 rounded-xl text-sm">⬇️ PNG</button>
+                  }} className="flex-1 bg-navy text-white font-body font-semibold py-3 rounded-xl text-sm">⬇️ PNG</button>
                   <button onClick={() => setShowShareModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-3 rounded-xl text-sm">Schließen</button>
                 </div>
               </div>
@@ -452,17 +452,17 @@ export default function ListDetail() {
             <h2 className="font-display text-xl font-bold text-foreground mb-4">✏️ {t("edit_list")}</h2>
             <div className="space-y-3">
               <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                className="w-full bg-[#FFF8F0] border border-border rounded-xl px-4 py-3 font-body text-foreground outline-none focus:border-[#FF6B8A]" />
+                className="w-full bg-[var(--background)] border border-border rounded-xl px-4 py-3 font-body text-foreground outline-none focus:border-[var(--accent)]" />
               <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={2}
-                className="w-full bg-[#FFF8F0] border border-border rounded-xl px-4 py-2.5 font-body text-foreground outline-none focus:border-[#FF6B8A] resize-none" />
+                className="w-full bg-[var(--background)] border border-border rounded-xl px-4 py-2.5 font-body text-foreground outline-none focus:border-[var(--accent)] resize-none" />
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={editPublic} onChange={e => setEditPublic(e.target.checked)} className="w-4 h-4 accent-[#FF6B8A]" />
+                <input type="checkbox" checked={editPublic} onChange={e => setEditPublic(e.target.checked)} className="w-4 h-4 accent-[var(--accent)]" />
                 <span className="font-body text-sm text-foreground">Öffentlich (für alle sichtbar)</span>
               </label>
             </div>
             <div className="flex gap-3 mt-5">
               <button onClick={() => setShowEditModal(false)} className="flex-1 border border-border text-muted-foreground font-body py-2.5 rounded-xl text-sm">{t("cancel")}</button>
-              <button onClick={saveEdit} className="flex-1 bg-accent text-white font-body font-semibold py-2.5 rounded-xl text-sm hover:bg-[#ff5077]">{t("save")}</button>
+              <button onClick={saveEdit} className="flex-1 bg-accent text-white font-body font-semibold py-2.5 rounded-xl text-sm hover:opacity-90">{t("save")}</button>
             </div>
           </div>
         </div>

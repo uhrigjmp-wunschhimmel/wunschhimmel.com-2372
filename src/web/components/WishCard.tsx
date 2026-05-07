@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { CATEGORIES } from "./AddWishSheet";
+import {
+  IconTag, IconFlame, IconCheck, IconExternalLink, IconSearch, IconBookmark
+} from "./Icons";
 
 interface WishCardProps {
   wish: any;
   isOwner?: boolean;
   shareToken?: string;
   onClick?: (wish: any) => void;
-  /** Legacy support — kept for shared page quick reserve without modal */
   onDelete?: (id: string) => void;
   onReserved?: () => void;
   onImageUpdated?: () => void;
@@ -34,95 +36,193 @@ function buildAmazonSearchUrl(title: string): string {
   return url.toString();
 }
 
-const priorityColors: Record<string, { bg: string; text: string; label: string }> = {
-  high:   { bg: "#FF6B8A", text: "#fff",     label: "🔥 Hoch"    },
-  medium: { bg: "#E8DEFF", text: "#1A1A4E",  label: "⭐ Mittel"  },
-  low:    { bg: "#FFD6D6", text: "#1A1A4E",  label: "💤 Niedrig" },
+const priorityConfig: Record<string, { badge: string; className: string; icon: React.ReactNode }> = {
+  high: {
+    badge: "Hoch",
+    className: "badge badge-high",
+    icon: <IconFlame size={10} color="currentColor" />,
+  },
+  medium: {
+    badge: "Mittel",
+    className: "badge badge-medium",
+    icon: <IconBookmark size={10} color="currentColor" />,
+  },
+  low: {
+    badge: "Niedrig",
+    className: "badge badge-low",
+    icon: null,
+  },
 };
 
 export function WishCard({ wish, isOwner, shareToken, onClick, onDelete, onReserved }: WishCardProps) {
-  const [localImage, setLocalImage] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
   const catObj = CATEGORIES.find(c => c.id === wish.category);
-  const displayImage = localImage || wish.imageUrl;
+  const displayImage = wish.imageUrl;
   const hasLink = !!wish.productUrl;
-  const pColor = priorityColors[wish.priority] || priorityColors.medium;
+  const pConf = priorityConfig[wish.priority] || priorityConfig.medium;
 
   return (
     <div
-      className="wish-card bg-white rounded-2xl overflow-hidden border border-border shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+      className="wish-card cursor-pointer group"
       onClick={() => onClick?.(wish)}
+      style={{ position: "relative" }}
     >
-      {/* Image */}
-      {displayImage ? (
-        <div className="w-full h-44 overflow-hidden bg-[#FFD6D6]/20">
+      {/* Image zone */}
+      {displayImage && !imgError ? (
+        <div style={{
+          width: "100%", height: 176, overflow: "hidden",
+          background: "linear-gradient(135deg,#FFF0F8,#F0EBFF)",
+          position: "relative",
+        }}>
           <img
             src={displayImage}
             alt={wish.title}
-            className="w-full h-full object-cover"
-            onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s ease" }}
+            onError={() => setImgError(true)}
+            className="group-hover:scale-105"
           />
+          {/* Gradient overlay bottom */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0, height: 48,
+            background: "linear-gradient(to top, rgba(26,10,60,0.12), transparent)",
+          }} />
         </div>
       ) : (
-        <div className="w-full h-28 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#FFF0F5,#EDE9FF)" }}>
-          <span style={{ fontSize: 48, filter: "drop-shadow(0 2px 6px rgba(255,107,138,0.2))" }}>🎁</span>
+        <div style={{
+          width: "100%", height: 120,
+          background: "linear-gradient(135deg,#FFF0F8 0%,#EDE0FF 50%,#FFF5F0 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          position: "relative", overflow: "hidden",
+        }}>
+          {/* Decorative pattern */}
+          <div style={{
+            position: "absolute", inset: 0,
+            backgroundImage: "radial-gradient(circle, rgba(255,107,157,0.12) 1px, transparent 1px)",
+            backgroundSize: "20px 20px",
+          }} />
+          <span style={{ fontSize: 44, filter: "drop-shadow(0 4px 12px rgba(45,27,105,0.15))", position: "relative", zIndex: 1 }}>
+            {catObj?.emoji || "🎁"}
+          </span>
         </div>
       )}
 
-      <div className="p-4">
-        {/* Badges */}
-        <div className="flex flex-wrap gap-1 mb-2">
+      <div style={{ padding: "14px 16px 16px" }}>
+        {/* Badges row */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
           {wish.priority && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-body font-semibold" style={{ background: pColor.bg, color: pColor.text }}>
-              {pColor.label}
+            <span className={pConf.className} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              {pConf.icon}
+              {pConf.badge}
             </span>
           )}
           {catObj && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-body bg-[#F0EBFF] text-foreground">
+            <span className="badge badge-category">
               {catObj.emoji} {catObj.label}
             </span>
           )}
           {wish.isReserved && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-body bg-green-100 text-green-700 font-semibold">
-              ✓ Reserviert
+            <span className="badge badge-reserved" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <IconCheck size={10} color="currentColor" />
+              Reserviert
             </span>
           )}
         </div>
 
-        <h3 className="font-display font-bold text-foreground text-base leading-tight line-clamp-2 mb-1">{wish.title}</h3>
+        {/* Title */}
+        <h3 style={{
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontWeight: 700,
+          fontSize: 14,
+          lineHeight: 1.4,
+          color: "var(--foreground)",
+          marginBottom: 6,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}>
+          {wish.title}
+        </h3>
 
+        {/* Shop */}
         {wish.shop && (
-          <p className="font-body text-xs text-muted-foreground mb-1">🏪 {wish.shop}</p>
+          <p style={{
+            fontSize: 11, color: "var(--muted-foreground)",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            marginBottom: 4, display: "flex", alignItems: "center", gap: 4,
+          }}>
+            <IconTag size={11} color="var(--muted-foreground)" />
+            {wish.shop}
+          </p>
         )}
 
+        {/* Price */}
         {wish.price != null && (
-          <p className="text-lg font-bold text-accent font-body mb-1">
+          <p style={{
+            fontSize: 18, fontWeight: 800, color: "var(--accent)",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            marginBottom: 4, letterSpacing: "-0.02em",
+          }}>
             {new Intl.NumberFormat("de-DE", { style: "currency", currency: wish.currency || "EUR" }).format(wish.price)}
           </p>
         )}
 
+        {/* Notes */}
         {wish.notes && (
-          <p className="font-body text-xs text-muted-foreground line-clamp-1 mt-1 italic">📝 {wish.notes}</p>
+          <p style={{
+            fontSize: 11, color: "var(--muted-foreground)", fontStyle: "italic",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            marginBottom: 8,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>
+            {wish.notes}
+          </p>
         )}
 
-        {/* Buy / Amazon button */}
-        <div className="mt-3" onClick={e => e.stopPropagation()}>
+        {/* CTA button */}
+        <div onClick={e => e.stopPropagation()} style={{ marginTop: 12 }}>
           {hasLink ? (
             <a
               href={withAffiliateTag(wish.productUrl)}
-              target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center text-sm font-body font-semibold py-2 rounded-full text-white hover:opacity-90 transition-opacity"
-              style={{ background: "#1A1A4E" }}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                width: "100%", padding: "10px 16px", borderRadius: 999,
+                background: "var(--grad-primary)", color: "#FFFFFF",
+                fontSize: 13, fontWeight: 700,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                textDecoration: "none",
+                transition: "opacity 0.15s, transform 0.15s",
+                boxShadow: "0 4px 12px rgba(45,27,105,0.25)",
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLElement).style.opacity = "0.9"; (e.currentTarget as HTMLElement).style.transform = "scale(1.02)"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             >
-              Zum Produkt →
+              <IconExternalLink size={13} color="currentColor" />
+              Zum Produkt
             </a>
           ) : (
             <a
               href={buildAmazonSearchUrl(wish.title)}
-              target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center text-sm font-body font-semibold py-2 rounded-full text-white hover:opacity-90 transition-opacity"
-              style={{ background: "#FF9900" }}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                width: "100%", padding: "10px 16px", borderRadius: 999,
+                background: "linear-gradient(135deg,#FF9900,#FFB347)",
+                color: "#FFFFFF",
+                fontSize: 13, fontWeight: 700,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                textDecoration: "none",
+                transition: "opacity 0.15s, transform 0.15s",
+                boxShadow: "0 4px 12px rgba(255,153,0,0.3)",
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLElement).style.opacity = "0.9"; (e.currentTarget as HTMLElement).style.transform = "scale(1.02)"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             >
-              Auf Amazon suchen →
+              <IconSearch size={13} color="currentColor" />
+              Bei Amazon suchen
             </a>
           )}
         </div>

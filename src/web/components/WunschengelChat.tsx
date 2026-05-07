@@ -91,7 +91,7 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
       <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:20, width:"min(380px, calc(100vw - 48px))", boxShadow:"0 16px 64px rgba(45,27,105,0.3)", overflow:"hidden", animation:"wangel-slide 0.2s ease" }}>
         <div style={{ padding:"14px 18px 12px", borderBottom:"1px solid #F0E8FF", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
-            <div style={{ fontWeight:700, fontSize:13, color:"#2D1B69" }}>🎁 Zur Wunschliste hinzufügen</div>
+            <div style={{ fontWeight:700, fontSize:13, color:"var(--primary)" }}>🎁 Zur Wunschliste hinzufügen</div>
             <div style={{ fontSize:11, color:"#A89BBD", marginTop:1 }}>{product.title}</div>
           </div>
           <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#A89BBD", padding:4 }}>✕</button>
@@ -100,7 +100,7 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
           {!session ? (
             <div style={{ textAlign:"center" }}>
               <div style={{ fontSize:12, color:"#7B6B8D", marginBottom:12 }}>Du bist nicht angemeldet. Produkt lokal speichern?</div>
-              <button onClick={saveGuest} style={{ background:"linear-gradient(135deg,#FF6B8A,#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"9px 20px", fontSize:12, fontWeight:700, cursor:"pointer", width:"100%" }}>Lokal speichern</button>
+              <button onClick={saveGuest} style={{ background:"linear-gradient(135deg,var(--accent),#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"9px 20px", fontSize:12, fontWeight:700, cursor:"pointer", width:"100%" }}>Lokal speichern</button>
             </div>
           ) : loading ? (
             <div style={{ textAlign:"center", color:"#A89BBD", fontSize:12, padding:"12px 0" }}>Lade Wunschlisten…</div>
@@ -109,7 +109,7 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
               {wishlists.length > 0 && (
                 <div style={{ display:"flex", gap:6, marginBottom:12 }}>
                   {(["pick","new"] as const).map(m => (
-                    <button key={m} onClick={() => setMode(m)} style={{ flex:1, padding:"6px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:mode===m?"linear-gradient(135deg,#2D1B69,#4A2C8C)":"#F5F0FF", color:mode===m?"#fff":"#6D28D9" }}>
+                    <button key={m} onClick={() => setMode(m)} style={{ flex:1, padding:"6px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:mode===m?"linear-gradient(135deg,var(--primary),#4A2C8C)":"#F5F0FF", color:mode===m?"#fff":"#6D28D9" }}>
                       {m === "pick" ? "Vorhandene Liste" : "Neue Liste"}
                     </button>
                   ))}
@@ -123,7 +123,7 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
                       onMouseOver={e => { e.currentTarget.style.background="#EDE9FE"; e.currentTarget.style.borderColor="#C4B5FD"; }}
                       onMouseOut={e => { e.currentTarget.style.background="#F8F5FF"; e.currentTarget.style.borderColor="#E0D4FF"; }}>
                       <span style={{ fontSize:18 }}>{list.emoji||"🎁"}</span>
-                      <span style={{ fontSize:12, fontWeight:600, color:"#2D1B69" }}>{list.title}</span>
+                      <span style={{ fontSize:12, fontWeight:600, color:"var(--primary)" }}>{list.title}</span>
                     </button>
                   ))}
                 </div>
@@ -133,10 +133,10 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
                   {wishlists.length === 0 && <div style={{ fontSize:12, color:"#7B6B8D", marginBottom:4 }}>Du hast noch keine Wunschliste. Erstelle jetzt eine:</div>}
                   <input autoFocus value={newListName} onChange={e => setNewListName(e.target.value)} onKeyDown={e => { if (e.key==="Enter") createAndAdd(); }}
                     placeholder="Name der Liste, z.B. Geburtstag 2025"
-                    style={{ border:"1.5px solid #E0D4FF", borderRadius:10, padding:"9px 12px", fontSize:12, color:"#2D1B69", outline:"none", fontFamily:"inherit" }}
-                    onFocus={e => (e.currentTarget.style.borderColor="#FF6B8A")} onBlur={e => (e.currentTarget.style.borderColor="#E0D4FF")} />
+                    style={{ border:"1.5px solid #E0D4FF", borderRadius:10, padding:"9px 12px", fontSize:12, color:"var(--primary)", outline:"none", fontFamily:"inherit" }}
+                    onFocus={e => (e.currentTarget.style.borderColor="var(--accent)")} onBlur={e => (e.currentTarget.style.borderColor="#E0D4FF")} />
                   <button onClick={createAndAdd} disabled={!newListName.trim()||creating}
-                    style={{ background:!newListName.trim()||creating?"#E0D4FF":"linear-gradient(135deg,#FF6B8A,#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"9px 0", fontSize:12, fontWeight:700, cursor:!newListName.trim()||creating?"default":"pointer" }}>
+                    style={{ background:!newListName.trim()||creating?"#E0D4FF":"linear-gradient(135deg,var(--accent),#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"9px 0", fontSize:12, fontWeight:700, cursor:!newListName.trim()||creating?"default":"pointer" }}>
                     {creating ? "Erstelle…" : "Liste erstellen & hinzufügen"}
                   </button>
                 </div>
@@ -200,14 +200,14 @@ function ProductCard({ product, onAddWish, trackMeta }: { product: Product; onAd
       </div>
       <div style={{ padding:"10px 12px", flex:1, display:"flex", flexDirection:"column", gap:4 }}>
         <div style={{ fontSize:10, color:"#A89BBD", fontWeight:600, textTransform:"uppercase", letterSpacing:0.3 }}>{product.category}</div>
-        <div style={{ fontSize:13, fontWeight:700, color:"#2D1B69", lineHeight:1.3 }}>{product.title}</div>
+        <div style={{ fontSize:13, fontWeight:700, color:"var(--primary)", lineHeight:1.3 }}>{product.title}</div>
         <div style={{ fontSize:11, color:"#7B6B8D", lineHeight:1.4, flex:1 }}>{product.description.slice(0, 70)}{product.description.length > 70 ? "…" : ""}</div>
-        <div style={{ fontSize:15, fontWeight:800, color:"#FF6B8A", marginTop:4 }}>
+        <div style={{ fontSize:15, fontWeight:800, color:"var(--accent)", marginTop:4 }}>
           {product.price != null ? `€ ${product.price.toFixed(2)}` : <span style={{ fontSize:11, color:"#9CA3AF" }}>Preis beim Händler</span>}
         </div>
       </div>
       <div style={{ padding:"0 12px 12px", display:"flex", flexDirection:"column", gap:6 }}>
-        <button onClick={() => onAddWish(product)} style={{ background:"linear-gradient(135deg,#FF6B8A,#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:700, cursor:"pointer", width:"100%" }}>
+        <button onClick={() => onAddWish(product)} style={{ background:"linear-gradient(135deg,var(--accent),#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:700, cursor:"pointer", width:"100%" }}>
           🎁 Zur Wunschliste
         </button>
         <a href={product.affiliateUrl} target="_blank" rel="noopener noreferrer"
@@ -251,7 +251,7 @@ function MessagePart({ part, hasProducts, onAddWish, trackMeta }: { part: UIMess
 // ── Chip ──────────────────────────────────────────────────────────────────────
 function Chip({ label, selected, onClick }: { label: string; selected?: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} style={{ background:selected?"linear-gradient(135deg,#FF6B8A,#FF8FA3)":"#F5F0FF", color:selected?"#fff":"#6D28D9", border:selected?"none":"1px solid #C4B5FD", borderRadius:999, padding:"6px 14px", fontSize:12, fontWeight:600, cursor:"pointer", transition:"all 0.15s", whiteSpace:"nowrap" }}>
+    <button onClick={onClick} style={{ background:selected?"linear-gradient(135deg,var(--accent),#FF8FA3)":"#F5F0FF", color:selected?"#fff":"#6D28D9", border:selected?"none":"1px solid #C4B5FD", borderRadius:999, padding:"6px 14px", fontSize:12, fontWeight:600, cursor:"pointer", transition:"all 0.15s", whiteSpace:"nowrap" }}>
       {label}
     </button>
   );
@@ -268,7 +268,7 @@ function QuickActions({ onMore, onRefine, disabled }: { onMore: () => void; onRe
         🔄 Weitere Ideen
       </button>
       <button onClick={onRefine} disabled={disabled}
-        style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:disabled?"#FFF0F3":"#FFF0F3", color:disabled?"#FFADC0":"#FF6B8A", border:"1.5px solid", borderColor:disabled?"#FFD6E0":"#FFB3C3", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:700, cursor:disabled?"default":"pointer", transition:"all 0.15s" }}
+        style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:disabled?"#FFF0F3":"#FFF0F3", color:disabled?"#FFADC0":"var(--accent)", border:"1.5px solid", borderColor:disabled?"#FFD6E0":"#FFB3C3", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:700, cursor:disabled?"default":"pointer", transition:"all 0.15s" }}
         onMouseOver={e => { if (!disabled) { e.currentTarget.style.background="#FFE4EA"; e.currentTarget.style.borderColor="#FF8FA3"; }}}
         onMouseOut={e => { if (!disabled) { e.currentTarget.style.background="#FFF0F3"; e.currentTarget.style.borderColor="#FFB3C3"; }}}>
         ✨ Ideen verfeinern
@@ -396,13 +396,13 @@ export function WunschengelChat() {
         // Teaser-Modus: eingefroren, ausgegraut, Badge
         <div style={{ position:"fixed", bottom:28, right:24, zIndex:9000, display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
           {/* Badge */}
-          <div style={{ background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:999, whiteSpace:"nowrap", boxShadow:"0 2px 12px rgba(45,27,105,0.3)", animation:"wangel-bounce 2.2s ease-in-out infinite" }}>
+          <div style={{ background:"linear-gradient(135deg,var(--primary),var(--accent))", color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:999, whiteSpace:"nowrap", boxShadow:"0 2px 12px rgba(45,27,105,0.3)", animation:"wangel-bounce 2.2s ease-in-out infinite" }}>
             Nur für Mitglieder ✨
           </div>
           <button
             onClick={() => navigate("/sign-up")}
             aria-label="Wunschengel — nur für Mitglieder"
-            style={{ width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, opacity:0.6, filter:"grayscale(30%)", transition:"transform 0.2s, opacity 0.2s" }}
+            style={{ width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,var(--primary),var(--accent))", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, opacity:0.6, filter:"grayscale(30%)", transition:"transform 0.2s, opacity 0.2s" }}
             onMouseOver={e => { e.currentTarget.style.opacity="0.85"; e.currentTarget.style.transform="scale(1.08)"; }}
             onMouseOut={e => { e.currentTarget.style.opacity="0.6"; e.currentTarget.style.transform="scale(1)"; }}
           >
@@ -411,7 +411,7 @@ export function WunschengelChat() {
         </div>
       ) : (
         <button onClick={() => setOpen(o => !o)} aria-label="Wunschengel öffnen"
-          style={{ position:"fixed", bottom:28, right:24, zIndex:9000, width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, animation:open?"none":"wangel-bounce 2.2s ease-in-out infinite", transition:"transform 0.2s" }}
+          style={{ position:"fixed", bottom:28, right:24, zIndex:9000, width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,var(--primary),var(--accent))", border:"3px solid #fff", cursor:"pointer", boxShadow:"0 4px 24px rgba(45,27,105,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, animation:open?"none":"wangel-bounce 2.2s ease-in-out infinite", transition:"transform 0.2s" }}
           onMouseOver={e => (e.currentTarget.style.transform="scale(1.1)")}
           onMouseOut={e => (e.currentTarget.style.transform="scale(1)")}>
           {open ? "✕" : "🪄"}
@@ -423,7 +423,7 @@ export function WunschengelChat() {
         <div style={{ position:"fixed", bottom:170, right:24, zIndex:9000, width:"min(420px, calc(100vw - 32px))", height:"min(580px, calc(100vh - 190px))", background:"#fff", borderRadius:24, boxShadow:"0 16px 64px rgba(45,27,105,0.22), 0 2px 8px rgba(0,0,0,0.08)", display:"flex", flexDirection:"column", overflow:"hidden", animation:"wangel-slide 0.25s ease", fontFamily:"Plus Jakarta Sans, sans-serif" }}>
 
           {/* Header */}
-          <div style={{ background:"linear-gradient(135deg,#2D1B69 0%,#4A2C8C 100%)", padding:"14px 18px", display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
+          <div style={{ background:"linear-gradient(135deg,var(--primary) 0%,#4A2C8C 100%)", padding:"14px 18px", display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
             <div style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>🪄</div>
             <div style={{ flex:1 }}>
               <div style={{ color:"#fff", fontWeight:700, fontSize:14 }}>Wunschengel</div>
@@ -441,7 +441,7 @@ export function WunschengelChat() {
             {/* Step 1: Recipient */}
             {step === "recipient" && (
               <div>
-                <div style={{ fontSize:13, color:"#2D1B69", fontWeight:600, marginBottom:12, lineHeight:1.5 }}>
+                <div style={{ fontSize:13, color:"var(--primary)", fontWeight:600, marginBottom:12, lineHeight:1.5 }}>
                   Hallo! Ich bin dein Wunschengel ✨<br />
                   <span style={{ fontWeight:400, color:"#7B6B8D" }}>Für wen suchst du heute eine Idee?</span>
                 </div>
@@ -462,7 +462,7 @@ export function WunschengelChat() {
             {/* Step 2: Occasion */}
             {step === "occasion" && recipient && (
               <div>
-                <div style={{ fontSize:13, color:"#2D1B69", marginBottom:12 }}>
+                <div style={{ fontSize:13, color:"var(--primary)", marginBottom:12 }}>
                   Welcher Anlass ist es für <strong>{recipient.avatar} {recipient.label}</strong>?
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
@@ -474,7 +474,7 @@ export function WunschengelChat() {
             {/* Step 2b: Age (only for Kind) */}
             {step === "age" && (
               <div>
-                <div style={{ fontSize:13, color:"#2D1B69", marginBottom:4 }}>
+                <div style={{ fontSize:13, color:"var(--primary)", marginBottom:4 }}>
                   {recipient?.avatar} {recipient?.label} · {occasion}
                 </div>
                 <div style={{ fontSize:13, color:"#7B6B8D", marginBottom:12 }}>
@@ -489,7 +489,7 @@ export function WunschengelChat() {
             {/* Step 3: Interests + Budget */}
             {step === "budget" && (
               <div>
-                <div style={{ fontSize:13, color:"#2D1B69", marginBottom:4 }}>
+                <div style={{ fontSize:13, color:"var(--primary)", marginBottom:4 }}>
                   {recipient?.avatar} {recipient?.label}{ageGroup ? ` · ${ageGroup}` : ""} · {occasion}
                 </div>
                 <div style={{ fontSize:13, color:"#7B6B8D", marginBottom:10 }}>
@@ -497,10 +497,10 @@ export function WunschengelChat() {
                 </div>
                 <input value={interests} onChange={e => setInterests(e.target.value)}
                   placeholder="z.B. Yoga, Kochen, Gaming…"
-                  style={{ width:"100%", border:"1.5px solid #E0D4FF", borderRadius:10, padding:"8px 12px", fontSize:12, color:"#2D1B69", outline:"none", marginBottom:12, boxSizing:"border-box", fontFamily:"inherit" }}
-                  onFocus={e => (e.currentTarget.style.borderColor="#FF6B8A")}
+                  style={{ width:"100%", border:"1.5px solid #E0D4FF", borderRadius:10, padding:"8px 12px", fontSize:12, color:"var(--primary)", outline:"none", marginBottom:12, boxSizing:"border-box", fontFamily:"inherit" }}
+                  onFocus={e => (e.currentTarget.style.borderColor="var(--accent)")}
                   onBlur={e => (e.currentTarget.style.borderColor="#E0D4FF")} />
-                <div style={{ fontSize:13, color:"#2D1B69", fontWeight:600, marginBottom:8 }}>Was ist dein Budget?</div>
+                <div style={{ fontSize:13, color:"var(--primary)", fontWeight:600, marginBottom:8 }}>Was ist dein Budget?</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                   {BUDGET_OPTIONS.map(b => <Chip key={b} label={b} selected={budget===b} onClick={() => pickBudget(b)} />)}
                 </div>
@@ -521,9 +521,9 @@ export function WunschengelChat() {
                 {displayMessages.map(msg => (
                   <div key={msg.id} style={{ display:"flex", justifyContent:msg.role==="user"?"flex-end":"flex-start", gap:8, alignItems:"flex-start" }}>
                     {msg.role === "assistant" && (
-                      <div style={{ width:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, flexShrink:0, marginTop:2 }}>🪄</div>
+                      <div style={{ width:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,var(--primary),var(--accent))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, flexShrink:0, marginTop:2 }}>🪄</div>
                     )}
-                    <div style={{ maxWidth:msg.role==="assistant"?"100%":"88%", background:msg.role==="user"?"linear-gradient(135deg,#FF6B8A,#FF8FA3)":"transparent", color:msg.role==="user"?"#fff":"#2D1B69", borderRadius:msg.role==="user"?"16px 16px 4px 16px":0, padding:msg.role==="user"?"9px 13px":0, fontSize:13, lineHeight:1.5 }}>
+                    <div style={{ maxWidth:msg.role==="assistant"?"100%":"88%", background:msg.role==="user"?"linear-gradient(135deg,var(--accent),#FF8FA3)":"transparent", color:msg.role==="user"?"#fff":"var(--primary)", borderRadius:msg.role==="user"?"16px 16px 4px 16px":0, padding:msg.role==="user"?"9px 13px":0, fontSize:13, lineHeight:1.5 }}>
                       {(() => {
                         const hasProducts = msg.role === "assistant" && msg.parts.some(
                           p => p.type === "tool-searchProducts" && (p as any).state === "output-available" && Array.isArray((p as any).output) && (p as any).output.length > 0
@@ -538,7 +538,7 @@ export function WunschengelChat() {
                 {/* Loading dots */}
                 {isLoading && (
                   <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                    <div style={{ width:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,#2D1B69,#FF6B8A)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13 }}>🪄</div>
+                    <div style={{ width:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,var(--primary),var(--accent))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13 }}>🪄</div>
                     <div style={{ background:"#F8F5FF", borderRadius:"16px 16px 16px 4px", padding:"9px 14px", display:"flex", gap:4, alignItems:"center" }}>
                       {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:"50%", background:"#C4B5FD", animation:`wangel-bounce 0.9s ease ${i*0.15}s infinite` }} />)}
                     </div>
@@ -553,16 +553,16 @@ export function WunschengelChat() {
                 {/* Refine input */}
                 {refineMode && (
                   <div style={{ display:"flex", flexDirection:"column", gap:8, background:"#FFF8FC", border:"1.5px solid #FFD6E0", borderRadius:14, padding:"10px 12px" }}>
-                    <div style={{ fontSize:12, color:"#FF6B8A", fontWeight:700 }}>✨ Ideen verfeinern</div>
+                    <div style={{ fontSize:12, color:"var(--accent)", fontWeight:700 }}>✨ Ideen verfeinern</div>
                     <div style={{ display:"flex", gap:6 }}>
                       <input autoFocus value={refineInput} onChange={e => setRefineInput(e.target.value)}
                         onKeyDown={e => { if (e.key==="Enter") doRefine(refineInput); if (e.key==="Escape") { setRefineMode(false); setRefineInput(""); } }}
                         placeholder="z.B. eher sportlich, unter 40€, für draußen…"
-                        style={{ flex:1, border:"1.5px solid #FFB3C3", borderRadius:9, padding:"7px 10px", fontSize:12, color:"#2D1B69", outline:"none", fontFamily:"inherit" }}
-                        onFocus={e => (e.currentTarget.style.borderColor="#FF6B8A")}
+                        style={{ flex:1, border:"1.5px solid #FFB3C3", borderRadius:9, padding:"7px 10px", fontSize:12, color:"var(--primary)", outline:"none", fontFamily:"inherit" }}
+                        onFocus={e => (e.currentTarget.style.borderColor="var(--accent)")}
                         onBlur={e => (e.currentTarget.style.borderColor="#FFB3C3")} />
                       <button onClick={() => doRefine(refineInput)} disabled={!refineInput.trim()}
-                        style={{ width:32, height:32, borderRadius:"50%", background:!refineInput.trim()?"#FFD6E0":"linear-gradient(135deg,#FF6B8A,#FF8FA3)", border:"none", cursor:!refineInput.trim()?"default":"pointer", fontSize:14, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✨</button>
+                        style={{ width:32, height:32, borderRadius:"50%", background:!refineInput.trim()?"#FFD6E0":"linear-gradient(135deg,var(--accent),#FF8FA3)", border:"none", cursor:!refineInput.trim()?"default":"pointer", fontSize:14, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✨</button>
                       <button onClick={() => { setRefineMode(false); setRefineInput(""); }}
                         style={{ width:32, height:32, borderRadius:"50%", background:"#F5F0FF", border:"none", cursor:"pointer", fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#6D28D9" }}>✕</button>
                     </div>
@@ -581,12 +581,12 @@ export function WunschengelChat() {
                 onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); if (refineInput.trim()) { sendMessage({ text: refineInput }); setRefineInput(""); } } }}
                 placeholder="Frage stellen oder verfeinern…"
                 disabled={isLoading}
-                style={{ flex:1, border:"1.5px solid #E0D4FF", borderRadius:10, padding:"8px 12px", fontSize:13, outline:"none", color:"#2D1B69", background:isLoading?"#F8F5FF":"#fff", fontFamily:"inherit" }}
-                onFocus={e => (e.currentTarget.style.borderColor="#FF6B8A")}
+                style={{ flex:1, border:"1.5px solid #E0D4FF", borderRadius:10, padding:"8px 12px", fontSize:13, outline:"none", color:"var(--primary)", background:isLoading?"#F8F5FF":"#fff", fontFamily:"inherit" }}
+                onFocus={e => (e.currentTarget.style.borderColor="var(--accent)")}
                 onBlur={e => (e.currentTarget.style.borderColor="#E0D4FF")} />
               <button onClick={() => { if (refineInput.trim() && !isLoading) { sendMessage({ text: refineInput }); setRefineInput(""); } }}
                 disabled={isLoading || !refineInput.trim()}
-                style={{ width:36, height:36, borderRadius:"50%", background:isLoading||!refineInput.trim()?"#E0D4FF":"linear-gradient(135deg,#FF6B8A,#FF8FA3)", border:"none", cursor:isLoading||!refineInput.trim()?"default":"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✨</button>
+                style={{ width:36, height:36, borderRadius:"50%", background:isLoading||!refineInput.trim()?"#E0D4FF":"linear-gradient(135deg,var(--accent),#FF8FA3)", border:"none", cursor:isLoading||!refineInput.trim()?"default":"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✨</button>
             </div>
           )}
         </div>

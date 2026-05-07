@@ -116,7 +116,7 @@ export default function SignIn() {
   return (
     <div className="min-h-screen blob-bg flex items-center justify-center pt-20 px-4">
       <div className="w-full max-w-md">
-        <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10" style={{ animation: "fadeUp 0.35s ease" }}>
+        <div className="glass-card p-8 md:p-10" style={{ animation: "fadeUp 0.35s ease" }}>
           <style>{`
             @keyframes fadeUp {
               from { opacity: 0; transform: translateY(16px); }
@@ -205,7 +205,7 @@ export default function SignIn() {
               type="submit"
               disabled={loading}
               style={{ position: "relative", overflow: "hidden" }}
-              className="w-full bg-accent text-accent-foreground font-body font-semibold py-3.5 rounded-xl hover:opacity-90 transition-all disabled:opacity-70 mt-2 flex items-center justify-center gap-2"
+              className="w-full btn-primary w-full transition-all disabled:opacity-70 mt-2 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
