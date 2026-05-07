@@ -27,11 +27,14 @@ export const searchProducts = tool({
       limit: 6,
       locale: "de",
       // Injected from Cloudflare Workers env
+      // Tradedoubler — primäre Live-Quelle (echte Such-API, live Preise)
+      tdToken: (env as any).TRADEDOUBLER_TOKEN,
+      tdFeedIds: (env as any).TRADEDOUBLER_FEED_IDS
+        ? ((env as any).TRADEDOUBLER_FEED_IDS as string).split(",").map((s: string) => s.trim())
+        : [],
+      // Awin — Fallback (Feed-API instabil)
       awinToken: (env as any).AWIN_API_TOKEN,
       awinPublisherId: (env as any).AWIN_PUBLISHER_ID ?? "2864125",
-      amazonAccessKey: (env as any).AMAZON_ACCESS_KEY,
-      amazonSecretKey: (env as any).AMAZON_SECRET_KEY,
-      amazonPartnerTag: (env as any).AMAZON_PARTNER_TAG ?? "wunschhimme00-21",
     });
 
     return results.map(p => ({

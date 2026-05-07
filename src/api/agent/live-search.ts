@@ -3,6 +3,7 @@
 
 import { searchAwin } from "./partners/awin";
 import { scrapeAmazon } from "./partners/amazon-scrape";
+import { searchTradedoubler } from "./partners/tradedoubler";
 import { expandKeywords, buildSearchTerms } from "./keyword-map";
 import fallbackProducts from "./products-fallback.json";
 
@@ -51,6 +52,9 @@ export type SearchParams = {
   // Injected from env
   awinToken?: string;
   awinPublisherId?: string;
+  // Tradedoubler — echte Live-Such-API
+  tdToken?: string;
+  tdFeedIds?: string[];   // Feed-IDs der joined Programmes
   // Amazon läuft jetzt per Scraper — keine Keys nötig
 };
 
@@ -195,6 +199,7 @@ export async function liveSearch(params: SearchParams): Promise<{
     excludeIds = [],
     locale = "de",
     awinToken, awinPublisherId,
+    tdToken, tdFeedIds,
   } = params;
 
   const meta: SearchMeta = {
@@ -218,21 +223,30 @@ export async function liveSearch(params: SearchParams): Promise<{
   meta.queryKeywords = allKeywords;
 
   async function fetchLive(p: SearchParams, kw: string[]): Promise<LiveProduct[]> {
-    const [awinRes, amazonRes] = await Promise.allSettled([
-      // Awin
-      (awinToken && awinPublisherId)
-        ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, publisherId: awinPublisherId, apiToken: awinToken, occasion: p.occasion, recipient: p.recipient })
+    const [tdRes, awinRes, amazonRes] = await Promise.allSettled([
+      // Tradedoubler — primäre Live-Quelle (echte Such-API)
+      (tdToken && tdFeedIds && tdFeedIds.length > 0)
+        ? searchTradedoubler({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, token: tdToken, feedIds: tdFeedIds })
         : Promise.resolve({ products: [], error: "not_configured" }),
-      // Amazon: Scraper (kein Fallback auf Suchkarten — lieber Fallback-Produkte)
-      scrapeAmazon({
-        keywords: kw,
-        minPrice: p.minPrice,
-        maxPrice: p.maxPrice,
-        pageSize: 8,
-      }),
+      // Awin — Fallback (Feed-API instabil, bleibt drin für Kompatibilität)
+      (awinToken && awinPublisherId)
+        ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 8, publisherId: awinPublisherId, apiToken: awinToken, occasion: p.occasion, recipient: p.recipient })
+        : Promise.resolve({ products: [], error: "not_configured" }),
+      // Amazon: Scraper
+      scrapeAmazon({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, pageSize: 6 }),
     ]);
 
     const live: LiveProduct[] = [];
+
+    if (tdRes.status === "fulfilled") {
+      const r = tdRes.value;
+      if (r.error && r.error !== "not_configured") meta.partnerErrors["tradedoubler"] = r.error;
+      if (r.products.length > 0) {
+        meta.partnersResponded.push("tradedoubler");
+        meta.totalFoundByPartner["tradedoubler"] = r.totalFound ?? r.products.length;
+        live.push(...r.products);
+      }
+    }
 
     if (awinRes.status === "fulfilled") {
       const r = awinRes.value;
