@@ -15,5 +15,14 @@ export default defineConfig({
 	server: {
 		allowedHosts: true,
 		hmr: { overlay: false, }
+	},
+	build: {
+		rollupOptions: {
+			output: {
+				assetFileNames: "assets/[name]-v2-[hash][extname]",
+				chunkFileNames: "assets/[name]-v2-[hash].js",
+				entryFileNames: "assets/[name]-v2-[hash].js",
+			}
+		}
 	}
 });
