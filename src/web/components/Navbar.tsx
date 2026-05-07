@@ -15,23 +15,29 @@ function WunschhimmelIcon({ size = 32 }: { size?: number }) {
       style={{ borderRadius: 14, flexShrink: 0 }}>
       {/* Hintergrund */}
       <rect width="100" height="100" rx="22" fill="#2D1B69" />
-      {/* Regenbogen — von außen nach innen, damit innere Streifen sichtbar bleiben */}
-      {/* Streifen 1 außen — Rosa */}
-      <path d="M12 68 Q50 8 88 68" stroke="#FF6B9D" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Streifen 2 — Coral */}
-      <path d="M18 68 Q50 16 82 68" stroke="#FF9F6B" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Streifen 3 — Gold */}
-      <path d="M24 68 Q50 24 76 68" stroke="#FFB347" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Streifen 4 — Lavender */}
-      <path d="M30 68 Q50 32 70 68" stroke="#A78BFA" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Streifen 5 innen — Mint */}
-      <path d="M36 68 Q50 40 64 68" stroke="#34D399" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Abdeckung unten — schneidet Regenbogen-Enden ab für saubere Linie */}
-      <rect x="0" y="68" width="100" height="32" fill="#2D1B69" />
-      {/* Sterne */}
-      <text x="26" y="86" fontSize="12" fill="#FFB347" textAnchor="middle">✦</text>
-      <text x="50" y="89" fontSize="14" fill="#FFB347" textAnchor="middle">✦</text>
-      <text x="74" y="86" fontSize="12" fill="#FFB347" textAnchor="middle">✦</text>
+
+      {/* Regenbogen — 5 Streifen, außen nach innen */}
+      <path d="M12 66 Q50 8 88 66" stroke="#FF6B9D" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+      <path d="M17 66 Q50 15 83 66" stroke="#FF9F6B" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+      <path d="M23 66 Q50 23 77 66" stroke="#FFB347" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+      <path d="M29 66 Q50 31 71 66" stroke="#A78BFA" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+      <path d="M35 66 Q50 39 65 66" stroke="#34D399" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+
+      {/* Abdeckung unten */}
+      <rect x="0" y="66" width="100" height="34" fill="#2D1B69" />
+
+      {/* Viele kleine Sterne verteilt */}
+      {/* 4-Zack Stern als Pfad */}
+      <path d="M18 78 L19.2 81 L22 82 L19.2 83 L18 86 L16.8 83 L14 82 L16.8 81 Z" fill="#FFB347"/>
+      <path d="M50 74 L51.5 78 L55 79 L51.5 80 L50 84 L48.5 80 L45 79 L48.5 78 Z" fill="#FFD580"/>
+      <path d="M82 78 L83.2 81 L86 82 L83.2 83 L82 86 L80.8 83 L78 82 L80.8 81 Z" fill="#FFB347"/>
+      {/* 3 kleine runde Punkte */}
+      <circle cx="33" cy="83" r="1.8" fill="#FFB347" opacity="0.7"/>
+      <circle cx="67" cy="83" r="1.8" fill="#FFB347" opacity="0.7"/>
+      <circle cx="50" cy="89" r="1.5" fill="#FFD580" opacity="0.6"/>
+      {/* Winzige Sternchen links/rechts oben */}
+      <path d="M8 30 L8.8 32.5 L11 33 L8.8 33.5 L8 36 L7.2 33.5 L5 33 L7.2 32.5 Z" fill="#FFB347" opacity="0.5"/>
+      <path d="M92 25 L92.7 27 L94.5 27.5 L92.7 28 L92 30 L91.3 28 L89.5 27.5 L91.3 27 Z" fill="#A78BFA" opacity="0.5"/>
     </svg>
   );
 }
