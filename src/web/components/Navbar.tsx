@@ -91,7 +91,7 @@ export function Navbar() {
             style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: "4px 0" }}
           >
             <img
-              src="/logo-icon.png"
+              src="/logo-icon.png?v=3"
               alt="Wunschhimmel"
               style={{ width: 32, height: 32, borderRadius: 10, objectFit: "cover", border: `1.5px solid ${isTeal ? "rgba(45,212,191,0.3)" : "rgba(255,107,157,0.3)"}` }}
             />
