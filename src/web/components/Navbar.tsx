@@ -15,21 +15,23 @@ function WunschhimmelIcon({ size = 32 }: { size?: number }) {
       style={{ borderRadius: 14, flexShrink: 0 }}>
       {/* Hintergrund */}
       <rect width="100" height="100" rx="22" fill="#2D1B69" />
-      {/* Regenbogen — 5 Streifen, flat, kein Glow */}
-      {/* Streifen 1 — Rosa */}
-      <path d="M18 64 Q50 14 82 64" stroke="#FF6B9D" strokeWidth="7" fill="none" strokeLinecap="round"/>
-      {/* Streifen 2 — Coral/Orange */}
-      <path d="M22 66 Q50 20 78 66" stroke="#FF9F6B" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      {/* Regenbogen — von außen nach innen, damit innere Streifen sichtbar bleiben */}
+      {/* Streifen 1 außen — Rosa */}
+      <path d="M12 68 Q50 8 88 68" stroke="#FF6B9D" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      {/* Streifen 2 — Coral */}
+      <path d="M18 68 Q50 16 82 68" stroke="#FF9F6B" strokeWidth="8" fill="none" strokeLinecap="round"/>
       {/* Streifen 3 — Gold */}
-      <path d="M26 68 Q50 26 74 68" stroke="#FFB347" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      <path d="M24 68 Q50 24 76 68" stroke="#FFB347" strokeWidth="8" fill="none" strokeLinecap="round"/>
       {/* Streifen 4 — Lavender */}
-      <path d="M30 70 Q50 32 70 70" stroke="#A78BFA" strokeWidth="5.5" fill="none" strokeLinecap="round"/>
-      {/* Streifen 5 — Mint */}
-      <path d="M34 72 Q50 38 66 72" stroke="#34D399" strokeWidth="5" fill="none" strokeLinecap="round"/>
-      {/* Sterne darunter */}
-      <text x="28" y="90" fontSize="13" fill="#FFB347" textAnchor="middle">✦</text>
-      <text x="50" y="92" fontSize="14" fill="#FFB347" textAnchor="middle">✦</text>
-      <text x="72" y="90" fontSize="13" fill="#FFB347" textAnchor="middle">✦</text>
+      <path d="M30 68 Q50 32 70 68" stroke="#A78BFA" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      {/* Streifen 5 innen — Mint */}
+      <path d="M36 68 Q50 40 64 68" stroke="#34D399" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      {/* Abdeckung unten — schneidet Regenbogen-Enden ab für saubere Linie */}
+      <rect x="0" y="68" width="100" height="32" fill="#2D1B69" />
+      {/* Sterne */}
+      <text x="26" y="86" fontSize="12" fill="#FFB347" textAnchor="middle">✦</text>
+      <text x="50" y="89" fontSize="14" fill="#FFB347" textAnchor="middle">✦</text>
+      <text x="74" y="86" fontSize="12" fill="#FFB347" textAnchor="middle">✦</text>
     </svg>
   );
 }
