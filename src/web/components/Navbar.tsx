@@ -8,6 +8,32 @@ import {
   IconSun, IconMoon, IconGlobe, IconSettings, IconGift
 } from "./Icons";
 
+// Inline SVG — kein Datei-Cache-Problem, immer aktuell
+function WunschhimmelIcon({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ borderRadius: 14, flexShrink: 0 }}>
+      {/* Hintergrund */}
+      <rect width="100" height="100" rx="22" fill="#2D1B69" />
+      {/* Regenbogen — 5 Streifen, flat, kein Glow */}
+      {/* Streifen 1 — Rosa */}
+      <path d="M18 64 Q50 14 82 64" stroke="#FF6B9D" strokeWidth="7" fill="none" strokeLinecap="round"/>
+      {/* Streifen 2 — Coral/Orange */}
+      <path d="M22 66 Q50 20 78 66" stroke="#FF9F6B" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      {/* Streifen 3 — Gold */}
+      <path d="M26 68 Q50 26 74 68" stroke="#FFB347" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      {/* Streifen 4 — Lavender */}
+      <path d="M30 70 Q50 32 70 70" stroke="#A78BFA" strokeWidth="5.5" fill="none" strokeLinecap="round"/>
+      {/* Streifen 5 — Mint */}
+      <path d="M34 72 Q50 38 66 72" stroke="#34D399" strokeWidth="5" fill="none" strokeLinecap="round"/>
+      {/* Sterne darunter */}
+      <text x="28" y="90" fontSize="13" fill="#FFB347" textAnchor="middle">✦</text>
+      <text x="50" y="92" fontSize="14" fill="#FFB347" textAnchor="middle">✦</text>
+      <text x="72" y="90" fontSize="13" fill="#FFB347" textAnchor="middle">✦</text>
+    </svg>
+  );
+}
+
 export function Navbar() {
   const { t, lang, setLang } = useI18n();
   const { theme, setTheme } = useTheme();
@@ -90,11 +116,7 @@ export function Navbar() {
             onClick={() => go("/")}
             style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: "4px 0" }}
           >
-            <img
-              src="/logo-icon.png?v=3"
-              alt="Wunschhimmel"
-              style={{ width: 32, height: 32, borderRadius: 10, objectFit: "cover", border: `1.5px solid ${isTeal ? "rgba(45,212,191,0.3)" : "rgba(255,107,157,0.3)"}` }}
-            />
+            <WunschhimmelIcon size={32} />
             <span style={{
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700, fontSize: 17,
