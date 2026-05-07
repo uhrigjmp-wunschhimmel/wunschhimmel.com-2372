@@ -8,36 +8,36 @@ import {
   IconSun, IconMoon, IconGlobe, IconSettings, IconGift
 } from "./Icons";
 
-// Inline SVG — kein Datei-Cache-Problem, immer aktuell
+// Inline SVG Logo — Konzept 1 "Festlich-verspielt"
+// Heller Hintergrund, pastelliger Regenbogen, goldene Sternchen — genau wie im CI
 function WunschhimmelIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
-      style={{ borderRadius: 14, flexShrink: 0 }}>
-      {/* Hintergrund */}
-      <rect width="100" height="100" rx="22" fill="#2D1B69" />
+      style={{ borderRadius: 12, flexShrink: 0 }}>
+      {/* Heller cremiger Hintergrund */}
+      <rect width="100" height="100" rx="18" fill="#FFF8F0" />
 
-      {/* Regenbogen — 5 Streifen, außen nach innen */}
-      <path d="M12 66 Q50 8 88 66" stroke="#FF6B9D" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
-      <path d="M17 66 Q50 15 83 66" stroke="#FF9F6B" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
-      <path d="M23 66 Q50 23 77 66" stroke="#FFB347" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
-      <path d="M29 66 Q50 31 71 66" stroke="#A78BFA" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
-      <path d="M35 66 Q50 39 65 66" stroke="#34D399" strokeWidth="7.5" fill="none" strokeLinecap="round"/>
+      {/* Regenbogen — pastell, von außen nach innen */}
+      <path d="M10 62 Q50 10 90 62" stroke="#FF6B9D" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      <path d="M16 62 Q50 18 84 62" stroke="#FF9F6B" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      <path d="M22 62 Q50 26 78 62" stroke="#FFCA3A" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      <path d="M28 62 Q50 34 72 62" stroke="#A78BFA" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      <path d="M34 62 Q50 42 66 62" stroke="#6BCB77" strokeWidth="8" fill="none" strokeLinecap="round"/>
 
-      {/* Abdeckung unten */}
-      <rect x="0" y="66" width="100" height="34" fill="#2D1B69" />
+      {/* Abdeckung unten — saubere Basis */}
+      <rect x="0" y="62" width="100" height="38" fill="#FFF8F0" />
 
-      {/* Viele kleine Sterne verteilt */}
-      {/* 4-Zack Stern als Pfad */}
-      <path d="M18 78 L19.2 81 L22 82 L19.2 83 L18 86 L16.8 83 L14 82 L16.8 81 Z" fill="#FFB347"/>
-      <path d="M50 74 L51.5 78 L55 79 L51.5 80 L50 84 L48.5 80 L45 79 L48.5 78 Z" fill="#FFD580"/>
-      <path d="M82 78 L83.2 81 L86 82 L83.2 83 L82 86 L80.8 83 L78 82 L80.8 81 Z" fill="#FFB347"/>
-      {/* 3 kleine runde Punkte */}
-      <circle cx="33" cy="83" r="1.8" fill="#FFB347" opacity="0.7"/>
-      <circle cx="67" cy="83" r="1.8" fill="#FFB347" opacity="0.7"/>
-      <circle cx="50" cy="89" r="1.5" fill="#FFD580" opacity="0.6"/>
-      {/* Winzige Sternchen links/rechts oben */}
-      <path d="M8 30 L8.8 32.5 L11 33 L8.8 33.5 L8 36 L7.2 33.5 L5 33 L7.2 32.5 Z" fill="#FFB347" opacity="0.5"/>
-      <path d="M92 25 L92.7 27 L94.5 27.5 L92.7 28 L92 30 L91.3 28 L89.5 27.5 L91.3 27 Z" fill="#A78BFA" opacity="0.5"/>
+      {/* Kleine Sternchen verteilt */}
+      <path d="M20 74 L21 77 L24 74 L21 71 Z" fill="#FFCA3A" opacity="0.9"/>
+      <path d="M50 70 L51.5 74.5 L56 74.5 L52.5 77 L54 82 L50 79 L46 82 L47.5 77 L44 74.5 L48.5 74.5 Z" fill="#FFCA3A"/>
+      <path d="M80 74 L81 77 L84 74 L81 71 Z" fill="#FFCA3A" opacity="0.9"/>
+      <circle cx="35" cy="78" r="2" fill="#FFCA3A" opacity="0.6"/>
+      <circle cx="65" cy="78" r="2" fill="#FFCA3A" opacity="0.6"/>
+      <circle cx="50" cy="86" r="1.5" fill="#FFCA3A" opacity="0.5"/>
+      {/* Winzige Sternchen oben */}
+      <circle cx="12" cy="25" r="1.5" fill="#FF6B9D" opacity="0.4"/>
+      <circle cx="88" cy="30" r="1.5" fill="#A78BFA" opacity="0.4"/>
+      <circle cx="50" cy="5" r="1.5" fill="#FFCA3A" opacity="0.5"/>
     </svg>
   );
 }
@@ -71,8 +71,8 @@ export function Navbar() {
   const signOut = async () => { await authClient.signOut(); go("/"); };
 
   const navBg = scrolled
-    ? isTeal ? "rgba(15,25,35,0.98)" : "rgba(45,27,105,0.98)"
-    : isTeal ? "rgba(15,25,35,0.92)" : "rgba(45,27,105,0.92)";
+    ? isTeal ? "rgba(15,25,35,0.98)" : "rgba(255,248,240,0.98)"
+    : isTeal ? "rgba(15,25,35,0.92)" : "rgba(255,248,240,0.95)";
 
   return (
     <>
@@ -87,23 +87,29 @@ export function Navbar() {
         }
         .nav-pill-btn {
           display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-          color: rgba(255,255,255,0.75); border-radius: 999px;
+          background: rgba(26,26,78,0.06); border: 1px solid rgba(26,26,78,0.12);
+          color: #1A1A4E; border-radius: 999px;
           padding: 6px 14px; font-size: 13px; font-weight: 600;
           cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
           transition: background 0.15s, color 0.15s;
           white-space: nowrap;
         }
-        .nav-pill-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+        [data-theme="teal"] .nav-pill-btn {
+          background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75);
+        }
+        .nav-pill-btn:hover { background: rgba(255,107,157,0.1); color: #FF6B9D; border-color: rgba(255,107,157,0.2); }
+        [data-theme="teal"] .nav-pill-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
         .nav-text-btn {
           background: none; border: none; cursor: pointer;
-          color: rgba(255,255,255,0.72); font-size: 13.5px; font-weight: 500;
+          color: #4A4A7A; font-size: 13.5px; font-weight: 500;
           font-family: 'Plus Jakarta Sans', sans-serif;
           padding: 6px 8px; border-radius: 8px;
           transition: color 0.15s, background 0.15s;
           display: flex; align-items: center; gap: 6px;
         }
-        .nav-text-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        [data-theme="teal"] .nav-text-btn { color: rgba(255,255,255,0.72); }
+        .nav-text-btn:hover { color: #FF6B9D; background: rgba(255,107,157,0.06); }
+        [data-theme="teal"] .nav-text-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
       `}</style>
 
       <nav
@@ -113,7 +119,7 @@ export function Navbar() {
           background: navBg,
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: `1px solid ${isTeal ? "rgba(45,212,191,0.1)" : "rgba(255,107,157,0.12)"}`,
+          borderBottom: `1px solid ${isTeal ? "rgba(45,212,191,0.1)" : "rgba(26,26,78,0.08)"}`,
           transition: "background 0.3s",
         }}
       >
@@ -128,7 +134,7 @@ export function Navbar() {
             <span style={{
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700, fontSize: 17,
-              color: isTeal ? "#2DD4BF" : "#FFD6E7",
+              color: isTeal ? "#2DD4BF" : "#1A1A4E",
               letterSpacing: "-0.02em",
             }}>
               Wunschhimmel
@@ -269,8 +275,8 @@ export function Navbar() {
           style={{
             display: menuOpen ? "flex" : "none",
             flexDirection: "column",
-            background: isTeal ? "#0F1923" : "#2D1B69",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
+            background: isTeal ? "#0F1923" : "#FFF8F0",
+            borderTop: `1px solid ${isTeal ? "rgba(255,255,255,0.08)" : "rgba(26,26,78,0.08)"}`,
             padding: "8px 0 20px",
             animation: "wh-slide-down 0.2s ease",
           }}
@@ -332,7 +338,7 @@ function MobileItem({ icon, label, onClick, muted }: { icon?: React.ReactNode; l
       style={{
         background: "none", border: "none", textAlign: "left",
         padding: "12px 20px", fontSize: 14, fontWeight: 600,
-        color: muted ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.82)",
+        color: muted ? "rgba(26,26,78,0.35)" : "#1A1A4E",
         cursor: "pointer", width: "100%",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
         display: "flex", alignItems: "center", gap: 12,
