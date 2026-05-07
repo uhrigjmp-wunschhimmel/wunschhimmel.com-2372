@@ -3,7 +3,6 @@
 
 import { searchAwin } from "./partners/awin";
 import { scrapeAmazon } from "./partners/amazon-scrape";
-import { generateAmazonSearchCards } from "./partners/amazon-search";
 import { expandKeywords, buildSearchTerms } from "./keyword-map";
 import fallbackProducts from "./products-fallback.json";
 
@@ -224,26 +223,12 @@ export async function liveSearch(params: SearchParams): Promise<{
       (awinToken && awinPublisherId)
         ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, publisherId: awinPublisherId, apiToken: awinToken, occasion: p.occasion, recipient: p.recipient })
         : Promise.resolve({ products: [], error: "not_configured" }),
-      // Amazon: Scraper zuerst, Search Cards als Fallback
+      // Amazon: Scraper (kein Fallback auf Suchkarten — lieber Fallback-Produkte)
       scrapeAmazon({
         keywords: kw,
         minPrice: p.minPrice,
         maxPrice: p.maxPrice,
         pageSize: 8,
-      }).then(r => {
-        // Wenn Scraper fehlschlägt → Search Cards als Fallback
-        if (r.products.length === 0) {
-          return generateAmazonSearchCards({
-            keywords: kw,
-            occasion: p.occasion,
-            recipient: p.recipient,
-            ageGroup: p.ageGroup,
-            minPrice: p.minPrice,
-            maxPrice: p.maxPrice,
-            pageSize: 4,
-          });
-        }
-        return r;
       }),
     ]);
 

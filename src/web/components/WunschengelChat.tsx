@@ -179,44 +179,41 @@ function trackClick(product: Product, meta: { recipient?: string | null; occasio
 
 function ProductCard({ product, onAddWish, trackMeta }: { product: Product; onAddWish: (p: Product) => void; trackMeta: { recipient?: string | null; occasion?: string | null; budget?: string | null } }) {
   const [imgError, setImgError] = useState(false);
+  const isAmazon = product.tags?.includes("auf-amazon-suchen");
+  // Kein Fallback-Bild — wenn kein Bild, Karte nicht anzeigen (wird in ProductsRow gefiltert)
+  const hasImage = product.imageUrl && product.imageUrl !== "" && !imgError;
   return (
-    <div style={{ background:"#fff", borderRadius:16, overflow:"hidden", border:"1px solid #F0E8FF", boxShadow:"0 2px 12px rgba(45,27,105,0.08)", display:"flex", flexDirection:"column", minWidth:175, maxWidth:195, flexShrink:0 }}>
-      <div style={{ height:120, overflow:"hidden", position:"relative" }}>
-        {product.imageUrl === "" || (imgError && product.tags?.includes("auf-amazon-suchen")) ? (
-          <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#E47911,#FF9900)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:4 }}>
-            <span style={{ fontSize:28 }}>🔍</span>
-            <span style={{ fontSize:9, fontWeight:700, color:"#fff", letterSpacing:0.5, textAlign:"center", lineHeight:1.3 }}>Auf Amazon{"\n"}suchen</span>
-          </div>
-        ) : (
+    <div style={{ background:"#fff", borderRadius:16, overflow:"hidden", border:"1px solid #F0E8FF", boxShadow:"0 2px 12px rgba(45,27,105,0.08)", display:"flex", flexDirection:"column", width:210, flexShrink:0 }}>
+      <div style={{ height:150, overflow:"hidden", position:"relative", background:"#F5F0FF" }}>
+        {hasImage ? (
           <img
-            src={imgError ? "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80" : product.imageUrl}
-            onError={() => setImgError(true)} alt={product.title}
-            style={{ width:"100%", height:"100%", objectFit:"cover", background:"#FFF5F8" }} />
+            src={product.imageUrl}
+            onError={() => setImgError(true)}
+            alt={product.title}
+            style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+        ) : (
+          <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:36 }}>🎁</div>
         )}
-        {product.tags[0] && product.imageUrl !== "" && (
-          <div style={{ position:"absolute", top:7, left:7, background:"rgba(45,27,105,0.85)", color:"#fff", fontSize:9, fontWeight:700, padding:"3px 7px", borderRadius:999 }}>{product.tags[0]}</div>
+        {product.tags[0] && hasImage && !isAmazon && (
+          <div style={{ position:"absolute", top:8, left:8, background:"rgba(45,27,105,0.85)", color:"#fff", fontSize:9, fontWeight:700, padding:"3px 8px", borderRadius:999 }}>{product.tags[0]}</div>
         )}
       </div>
-      <div style={{ padding:"8px 10px", flex:1, display:"flex", flexDirection:"column", gap:3 }}>
-        <div style={{ fontSize:10, color:"#A89BBD", fontWeight:600 }}>{product.category}</div>
-        <div style={{ fontSize:12, fontWeight:700, color:"#2D1B69", lineHeight:1.3 }}>{product.title}</div>
-        <div style={{ fontSize:11, color:"#7B6B8D", lineHeight:1.4, flex:1 }}>{product.description.slice(0, 60)}…</div>
-        <div style={{ fontSize:13, fontWeight:800, color:"#FF6B8A", marginTop:2, display:"flex", alignItems:"center", gap:4 }}>
-          {product.price != null
-            ? `€ ${product.price.toFixed(2)}`
-            : product.tags?.includes("auf-amazon-suchen")
-              ? <span style={{ fontSize:10, fontWeight:700, color:"#E47911", background:"#FFF3E0", padding:"2px 6px", borderRadius:4 }}>amazon.de suchen →</span>
-              : "Preis beim Händler"}
+      <div style={{ padding:"10px 12px", flex:1, display:"flex", flexDirection:"column", gap:4 }}>
+        <div style={{ fontSize:10, color:"#A89BBD", fontWeight:600, textTransform:"uppercase", letterSpacing:0.3 }}>{product.category}</div>
+        <div style={{ fontSize:13, fontWeight:700, color:"#2D1B69", lineHeight:1.3 }}>{product.title}</div>
+        <div style={{ fontSize:11, color:"#7B6B8D", lineHeight:1.4, flex:1 }}>{product.description.slice(0, 70)}{product.description.length > 70 ? "…" : ""}</div>
+        <div style={{ fontSize:15, fontWeight:800, color:"#FF6B8A", marginTop:4 }}>
+          {product.price != null ? `€ ${product.price.toFixed(2)}` : <span style={{ fontSize:11, color:"#9CA3AF" }}>Preis beim Händler</span>}
         </div>
       </div>
-      <div style={{ padding:"0 10px 10px", display:"flex", flexDirection:"column", gap:5 }}>
-        <button onClick={() => onAddWish(product)} style={{ background:"linear-gradient(135deg,#FF6B8A,#FF8FA3)", color:"#fff", border:"none", borderRadius:8, padding:"6px 0", fontSize:11, fontWeight:700, cursor:"pointer", width:"100%" }}>
+      <div style={{ padding:"0 12px 12px", display:"flex", flexDirection:"column", gap:6 }}>
+        <button onClick={() => onAddWish(product)} style={{ background:"linear-gradient(135deg,#FF6B8A,#FF8FA3)", color:"#fff", border:"none", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:700, cursor:"pointer", width:"100%" }}>
           🎁 Zur Wunschliste
         </button>
         <a href={product.affiliateUrl} target="_blank" rel="noopener noreferrer"
           onClick={() => trackClick(product, trackMeta)}
-          style={{ display:"block", textAlign:"center", background: product.tags?.includes("auf-amazon-suchen") ? "#FFF3E0" : "#F5F0FF", color: product.tags?.includes("auf-amazon-suchen") ? "#E47911" : "#6D28D9", borderRadius:8, padding:"6px 0", fontSize:11, fontWeight:600, textDecoration:"none" }}>
-          {product.tags?.includes("auf-amazon-suchen") ? "Auf Amazon suchen ↗" : "Zum Shop ↗"}
+          style={{ display:"block", textAlign:"center", background:"#F5F0FF", color:"#6D28D9", borderRadius:10, padding:"8px 0", fontSize:12, fontWeight:600, textDecoration:"none" }}>
+          Zum Shop ↗
         </a>
       </div>
     </div>
@@ -224,9 +221,12 @@ function ProductCard({ product, onAddWish, trackMeta }: { product: Product; onAd
 }
 
 function ProductsRow({ products, onAddWish, trackMeta }: { products: Product[]; onAddWish: (p: Product) => void; trackMeta: { recipient?: string | null; occasion?: string | null; budget?: string | null } }) {
+  // Amazon-Suchkarten (kein echtes Produkt, kein Bild) komplett rausfiltern
+  const real = products.filter(p => !p.tags?.includes("auf-amazon-suchen"));
+  if (real.length === 0) return null;
   return (
-    <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
-      {products.map(p => <ProductCard key={p.id} product={p} onAddWish={onAddWish} trackMeta={trackMeta} />)}
+    <div style={{ display:"flex", gap:10, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
+      {real.map(p => <ProductCard key={p.id} product={p} onAddWish={onAddWish} trackMeta={trackMeta} />)}
     </div>
   );
 }
