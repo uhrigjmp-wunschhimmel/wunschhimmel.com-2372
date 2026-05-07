@@ -165,7 +165,7 @@ export function Navbar() {
               </>
             ) : null}
 
-            <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)", margin: "0 4px" }} />
+            <div style={{ width: 1, height: 20, background: isTeal ? "rgba(255,255,255,0.12)" : "rgba(26,26,78,0.1)", margin: "0 4px" }} />
 
             {/* Theme toggle */}
             <button

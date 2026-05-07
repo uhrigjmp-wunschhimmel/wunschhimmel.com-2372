@@ -590,10 +590,10 @@
 ══════════════════════════════════════════════════════════════════════════ */
 
 .wh-nav {
-  background: rgba(45,27,105,0.97);
+  background: rgba(255,248,240,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,107,157,0.12);
+  border-bottom: 1px solid rgba(26,26,78,0.08);
 }
 [data-theme="teal"] .wh-nav {
   background: rgba(15,25,35,0.97);
@@ -601,7 +601,7 @@
 }
 
 .nav-link {
-  color: rgba(255,255,255,0.75);
+  color: #4A4A7A;
   font-size: 14px;
   font-weight: 500;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -613,8 +613,11 @@
   transition: color 0.15s;
   text-decoration: none;
 }
-.nav-link:hover { color: #FFFFFF; }
-.nav-link.active { color: #FFFFFF; font-weight: 700; }
+[data-theme="teal"] .nav-link { color: rgba(255,255,255,0.75); }
+.nav-link:hover { color: #FF6B9D; }
+[data-theme="teal"] .nav-link:hover { color: #FFFFFF; }
+.nav-link.active { color: #1A1A4E; font-weight: 700; }
+[data-theme="teal"] .nav-link.active { color: #FFFFFF; font-weight: 700; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    ICON SYSTEM
