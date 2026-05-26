@@ -1,0 +1,122 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   WUNSCHHIMMEL — Design Tokens
+   CI: Festlich-verspielt · Stand: Mai 2026
+   Quelle: wunschhimmel-design-system.md
+═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── ROSE-PALETTE ──────────────────────────────────────────────────────── */
+  --color-rose-50:  #FFF0F5;   /* Page-BG, Hover-Fill */
+  --color-rose-100: #FFD6E7;   /* Karten-BG, Badges */
+  --color-rose-200: #FFB3D1;   /* Border, Divider */
+  --color-rose-300: #FF85B3;   /* Dekorativ */
+  --color-rose-400: #F25990;   /* ★ Primär-CTA, Hover-Akzente */
+  --color-rose-500: #D93B72;   /* Hover-Zustand Buttons */
+  --color-rose-600: #B02558;   /* Pressed */
+  --color-rose-700: #8A1A43;   /* Text auf hellem BG */
+  --color-rose-800: #641230;
+  --color-rose-900: #3E0A1E;
+
+  /* ── NAVY-PALETTE ──────────────────────────────────────────────────────── */
+  --color-navy-50:  #EEF2F8;
+  --color-navy-100: #C8D5EC;
+  --color-navy-200: #96ADDA;
+  --color-navy-300: #6485C5;
+  --color-navy-400: #3A5DA8;
+  --color-navy-500: #243D7A;
+  --color-navy-600: #1A2E65;   /* Headings */
+  --color-navy-700: #122050;   /* ★ Primär-BG, Navigation */
+  --color-navy-800: #0C163A;   /* Tiefstes Navy */
+  --color-navy-900: #060D24;
+
+  /* ── AKZENTFARBEN ──────────────────────────────────────────────────────── */
+  --color-gold:          #FFBF3A;   /* Sterne, Premium-Badges */
+  --color-gold-light:    #FFD700;   /* Stern-Primär */
+  --color-peach-200:     #FFC9AD;
+  --color-mint-300:      #7DD6C4;
+  --color-mint-400:      #4DC2AE;
+  --color-lavender-300:  #B7A8F0;
+
+  /* ── SEMANTISCHE FARBEN ────────────────────────────────────────────────── */
+  --color-success: #2CA96E;
+  --color-error:   #E83B3B;
+  --color-warning: #F5A500;
+  --color-info:    #4A90D9;
+
+  /* ── HINTERGRUNDTÖNE ───────────────────────────────────────────────────── */
+  --color-bg-page:  #FDF8FC;   /* Elfenbein-Rosa, Seiten-BG */
+  --color-bg-light: #FFF5FA;   /* Sektions-BG */
+  --color-bg-white: #FFFFFF;
+  --color-border:   #F0D5E5;   /* Standard-Border */
+
+  /* ── TEXT-FARBEN ───────────────────────────────────────────────────────── */
+  --color-text-dark:  #1A0A14;
+  --color-text-mid:   #5A3A4A;   /* Body-Text, 1.7 Zeilenhöhe */
+  --color-text-muted: #9A7085;   /* Meta, Captions */
+
+  /* ── TYPOGRAFIE ────────────────────────────────────────────────────────── */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+
+  /* Scale: H1=42px, H2=30px, H3=22px, H4=16px, Body=15px, Small=12px, Caption=11px */
+  --text-h1:      42px;
+  --text-h2:      30px;
+  --text-h3:      22px;
+  --text-h4:      16px;
+  --text-body:    15px;
+  --text-small:   12px;
+  --text-caption: 11px;
+
+  --leading-body: 1.7;
+  --leading-heading: 1.2;
+
+  /* ── ECKENRADIEN ───────────────────────────────────────────────────────── */
+  --radius-sm:   8px;    /* Tags, kleine Elemente */
+  --radius-md:   14px;   /* Inputs, Cards klein */
+  --radius-lg:   20px;   /* Cards, Modals */
+  --radius-xl:   24px;   /* große Container */
+  --radius-pill: 50px;   /* Buttons, Badges */
+
+  /* ── SCHATTEN ──────────────────────────────────────────────────────────── */
+  --shadow-soft:   0 4px 16px rgba(210, 59, 114, 0.12);   /* Karten, Hover */
+  --shadow-medium: 0 8px 32px rgba(18, 32, 80, 0.12);     /* Modals, Dropdowns */
+  --shadow-gold:   0 4px 16px rgba(245, 165, 0, 0.20);    /* Premium-Elemente */
+
+  /* ── FARBVERLÄUFE ──────────────────────────────────────────────────────── */
+  --grad-night:      linear-gradient(135deg, #122050, #F25990);
+  --grad-sunset:     linear-gradient(135deg, #F25990, #FFBF3A);
+  --grad-candy:      linear-gradient(135deg, #FFD6E7, #FFC9AD);
+  --grad-morning:    linear-gradient(135deg, #B7A8F0, #4DC2AE);
+  --grad-starnight:  linear-gradient(160deg, #1A2E65, #243D7A, #3A5DA8);
+  --grad-dreamcloud: linear-gradient(135deg, #FFE4D6, #EDE8FF);
+
+  /* ── LOGO-VERLÄUFE (Regenbogenbogen, 6 Stops) ──────────────────────────── */
+  /* Außen (Bogen 1) */
+  --logo-rainbow-outer: #F25990, #FF8C42, #FFD600, #4DC9A0, #4A90D9, #9B59E8;
+  /* Mitte (Bogen 2) */
+  --logo-rainbow-mid:   #FF85B3, #FFB347, #FFE44D, #7DDFC4, #74B3F0, #BC8AF5;
+  /* Innen (Bogen 3) */
+  --logo-rainbow-inner: #FFB3D4, #FFD0A0, #FFF0A0, #B0EEE0, #B0D8FF, #DCC8FF;
+
+  /* ── ERGÄNZUNGEN ───────────────────────────────────────────────────────── */
+  --color-rose-400:    #F25990;
+  --color-navy-700:    #122050;
+  --color-gold:        #FFBF3A;
+  --color-gold-light:  #FFD700;
+  --color-mint-300:    #7DD6C4;
+  --color-mint-400:    #4DC2AE;
+  --color-lavender-300: #B7A8F0;
+  --font-display:      'Playfair Display', Georgia, serif;
+  --font-body:         'Plus Jakarta Sans', sans-serif;
+  --radius-pill:       50px;
+  --shadow-rose:       0 4px 16px rgba(242, 89, 144, 0.25);
+}
+
+/* Logo Regenbogen
+   Bogen 1 außen:   #F25990 → #FF8C42 → #FFD600 → #4DC9A0 → #4A90D9 → #9B59E8
+   Bogen 2 mitte:   #FF85B3 → #FFB347 → #FFE44D → #7DDFC4 → #74B3F0 → #BC8AF5
+   Bogen 3 innen:   #FFB3D4 → #FFD0A0 → #FFF0A0 → #B0EEE0 → #B0D8FF → #DCC8FF
+   Sterne primär:   #FFD700
+   Sterne sekundär: #FFBF3A
+*/

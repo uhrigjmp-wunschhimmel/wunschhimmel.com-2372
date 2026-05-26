@@ -174,6 +174,12 @@ export default function ListDetail() {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2">
             <button
+              onClick={() => setShowAddSheet(true)}
+              className="bg-accent text-white font-body text-sm font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors min-h-[40px] flex items-center gap-1.5"
+            >
+              ＋ Wunsch
+            </button>
+            <button
               onClick={() => { setEditTitle(list.title); setEditDesc(list.description || ""); setEditPublic(list.isPublic); setShowEditModal(true); }}
               className="border border-border text-foreground font-body text-sm px-4 py-2 rounded-full hover:bg-white transition-colors min-h-[40px]"
             >
@@ -289,16 +295,6 @@ export default function ListDetail() {
           )}
         </div>
       </div>
-
-      {/* ── FAB: Add Wish ── */}
-      <button
-        onClick={() => setShowAddSheet(true)}
-        className="fixed bottom-20 right-5 w-14 h-14 rounded-full text-white shadow-lg shadow-[var(--accent)]/40 flex items-center justify-center text-2xl transition-all hover:scale-110 active:scale-95"
-        style={{ background: "var(--accent)", zIndex: 9999 }}
-        title="Wunsch hinzufügen"
-      >
-        +
-      </button>
 
       {/* ── Add Wish Bottom Sheet ── */}
       <AddWishSheet

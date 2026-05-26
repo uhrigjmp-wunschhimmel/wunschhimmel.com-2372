@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --rose-50: #FFF0F5;
+    --rose-100: #FFD6E7;
+    --rose-200: #FFB3D1;
+    --rose-300: #FF85B3;
+    --rose-400: #F25990;
+    --rose-500: #D93B72;
+    --rose-600: #B02558;
+    --rose-700: #8A1A43;
+    --rose-800: #641230;
+    --rose-900: #3E0A1E;
+
+    --navy-50: #EEF2F8;
+    --navy-100: #C8D5EC;
+    --navy-200: #96ADDA;
+    --navy-300: #6485C5;
+    --navy-400: #3A5DA8;
+    --navy-500: #243D7A;
+    --navy-600: #1A2E65;
+    --navy-700: #122050;
+    --navy-800: #0C163A;
+    --navy-900: #060D24;
+
+    --gold-50: #FFF8E8;
+    --gold-100: #FFEABC;
+    --gold-200: #FFD57A;
+    --gold-300: #FFBF3A;
+    --gold-400: #F5A500;
+    --gold-500: #D48900;
+    --gold-600: #A86800;
+
+    --peach-100: #FFE4D6;
+    --peach-200: #FFC9AD;
+    --peach-300: #FFAB82;
+    --peach-400: #F5865A;
+
+    --mint-100: #D6F5EE;
+    --mint-200: #AEEADB;
+    --mint-300: #7DD6C4;
+    --mint-400: #4DC2AE;
+
+    --lavender-100: #EDE8FF;
+    --lavender-200: #D4CAF8;
+    --lavender-300: #B7A8F0;
+    --lavender-400: #9480E6;
+
+    --white: #FFFFFF;
+    --off-white: #FDF8FC;
+    --light-bg: #FFF5FA;
+    --text-dark: #1A0A14;
+    --text-mid: #5A3A4A;
+    --text-muted: #9A7085;
+    --border-light: #F0D5E5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+    background: var(--off-white);
+    color: var(--text-dark);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  .nav {
+    background: var(--navy-700);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--rose-400);
+  }
+  .nav-tab {
+    padding: 14px 16px;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { color: rgba(255,255,255,0.9); }
+  .nav-tab.active { color: #fff; border-bottom-color: var(--rose-300); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 32px 28px; }
+  .section.active { display: block; }
+
+  /* HEADINGS */
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy-700);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 16px;
+  }
+  .subsection-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 17px;
+    color: var(--navy-600);
+    margin: 28px 0 14px;
+    font-weight: 600;
+  }
+
+  /* COLOR SYSTEM */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .color-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    background: white;
+  }
+  .color-swatch { height: 64px; }
+  .color-info { padding: 10px 12px; }
+  .color-name { font-weight: 700; font-size: 12px; color: var(--text-dark); }
+  .color-hex { font-family: monospace; font-size: 11px; color: var(--text-muted); }
+  .color-role { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  
+  .palette-row { display: flex; gap: 4px; margin-bottom: 12px; border-radius: 10px; overflow: hidden; }
+  .palette-swatch { flex: 1; height: 40px; display: flex; align-items: flex-end; padding: 2px 4px; }
+  .palette-swatch span { font-size: 9px; font-weight: 700; }
+
+  /* TYPOGRAPHY */
+  .type-specimen {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .type-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+  .type-h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; font-weight: 700; color: var(--navy-700); line-height: 1.15; }
+  .type-h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 30px; font-weight: 700; color: var(--navy-600); line-height: 1.2; }
+  .type-h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 600; color: var(--navy-600); line-height: 1.25; }
+  .type-h4 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--navy-700); letter-spacing: 0.02em; }
+  .type-body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-mid); line-height: 1.7; }
+  .type-small { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 400; color: var(--text-muted); line-height: 1.6; }
+  .type-caption { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--rose-500); }
+
+  /* COMPONENTS */
+  .component-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .component-card {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .comp-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 14px; }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose-400), var(--rose-600));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(210, 59, 114, 0.3);
+    transition: all 0.2s;
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--navy-600);
+    border: 2px solid var(--navy-300);
+    border-radius: 50px;
+    padding: 11px 24px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .btn-ghost {
+    background: var(--rose-50);
+    color: var(--rose-600);
+    border: 1px solid var(--rose-200);
+    border-radius: 50px;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-disabled {
+    background: var(--border-light);
+    color: var(--text-muted);
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.7;
+  }
+
+  /* INPUT */
+  .input-field {
+    width: 100%;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: var(--rose-400); }
+  .input-error { border-color: #E83B3B !important; }
+  .input-success { border-color: #2CA96E !important; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; }
+  .badge-primary { background: var(--rose-100); color: var(--rose-700); }
+  .badge-navy { background: var(--navy-100); color: var(--navy-700); }
+  .badge-gold { background: var(--gold-100); color: var(--gold-600); }
+  .badge-mint { background: var(--mint-100); color: #1A7A6A; }
+  .badge-success { background: #D4F7E7; color: #1A7A4A; }
+  .badge-error { background: #FDDEDE; color: #8A1A1A; }
+  .badge-info { background: var(--lavender-100); color: #4A2DA0; }
+
+  /* CARDS */
+  .wish-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    position: relative;
+  }
+  .wish-card-img {
+    height: 100px;
+    background: linear-gradient(135deg, var(--rose-100), var(--peach-100));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+  .wish-card-body { padding: 14px 16px; }
+  .wish-card-title { font-family: 'Playfair Display', Georgia, serif; font-size: 15px; font-weight: 600; color: var(--navy-700); margin-bottom: 4px; }
+  .wish-card-price { color: var(--rose-500); font-weight: 700; font-size: 14px; }
+  .wish-card-reserved {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--mint-400); color: white;
+    border-radius: 50px; padding: 3px 10px; font-size: 10px; font-weight: 700;
+  }
+
+  /* ICONS PREVIEW */
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+  .icon-item {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px 8px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .icon-item:hover { background: var(--rose-50); border-color: var(--rose-200); }
+  .icon-emoji { font-size: 24px; margin-bottom: 6px; }
+  .icon-name { font-size: 9px; color: var(--text-muted); line-height: 1.3; }
+
+  /* SOCIAL TEMPLATES */
+  .social-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .social-template {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .social-template:hover { transform: scale(1.02); }
+  .social-preview { height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; text-align: center; }
+  .social-label { background: white; padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+  /* STATUS STATES */
+  .state-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .state-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  /* DIVIDERS */
+  .wave-divider { width: 100%; height: 40px; overflow: hidden; }
+  .scallop-divider { display: flex; align-items: center; gap: 4px; margin: 16px 0; }
+  .scallop { width: 16px; height: 8px; border-radius: 8px 8px 0 0; }
+
+  /* RISK TABLE */
+  .risk-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); margin-bottom: 16px; }
+  .risk-table th { background: var(--navy-700); color: white; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; }
+  .risk-table td { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.5; }
+  .risk-table tr:last-child td { border-bottom: none; }
+  .risk-high { color: #C0180A; font-weight: 700; }
+  .risk-mid { color: #B56000; font-weight: 700; }
+  .risk-low { color: #1A7A4A; font-weight: 700; }
+
+  /* GRADIENT SAMPLES */
+  .grad-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .grad-card { border-radius: 12px; height: 70px; display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 12px; }
+  .grad-name { font-size: 10px; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+
+  /* HERO PREVIEW */
+  .hero-preview {
+    background: linear-gradient(160deg, var(--navy-800) 0%, var(--navy-600) 50%, var(--rose-700) 100%);
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .hero-preview::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(255,133,179,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-preview::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,191,58,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-eyebrow { color: var(--rose-200); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; }
+  .hero-title { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; font-weight: 700; color: white; line-height: 1.2; margin-bottom: 12px; }
+  .hero-sub { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 24px; }
+  .hero-btn { background: var(--rose-400); color: white; border: none; border-radius: 50px; padding: 13px 32px; font-weight: 700; font-size: 15px; cursor: pointer; }
+
+  /* SMALL UTILITIES */
+  .flex { display: flex; }
+  .gap8 { gap: 8px; }
+  .gap12 { gap: 12px; }
+  .gap16 { gap: 16px; }
+  .wrap { flex-wrap: wrap; }
+  .mt8 { margin-top: 8px; }
+  .mt12 { margin-top: 12px; }
+  .mb8 { margin-bottom: 8px; }
+  .mb12 { margin-bottom: 12px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb20 { margin-bottom: 20px; }
+  .info-box { background: var(--lavender-100); border-left: 3px solid var(--lavender-400); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #3A2080; margin-bottom: 12px; line-height: 1.5; }
+  .warn-box { background: var(--gold-50); border-left: 3px solid var(--gold-400); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #7A4A00; margin-bottom: 12px; line-height: 1.5; }
+  .ok-box { background: #D4F7E7; border-left: 3px solid #2CA96E; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #0D5A34; margin-bottom: 12px; line-height: 1.5; }
+
+  /* LOGO MARK */
+  .logo-mark { display: inline-flex; align-items: center; gap: 10px; }
+  .logo-star { font-size: 26px; }
+  .logo-text { font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 700; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* EMAIL HEADERS */
+  .email-header { border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .email-preview { padding: 20px 24px; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="show('brand')">A · Markenanalyse</div>
+  <div class="nav-tab" onclick="show('system')">B · Design-System</div>
+  <div class="nav-tab" onclick="show('website')">C · Website</div>
+  <div class="nav-tab" onclick="show('social')">D · Social Media</div>
+  <div class="nav-tab" onclick="show('assets')">E · Assets & Use Cases</div>
+  <div class="nav-tab" onclick="show('copyright')">F · Copyright-Risiken</div>
+  <div class="nav-tab" onclick="show('recs')">G · Empfehlungen</div>
+</div>
+
+<!-- ===== A: BRAND ANALYSIS ===== -->
+<div id="brand" class="section active">
+  <div class="section-title">✦ A · Markenanalyse „Konzept 1: Festlich-verspielt"</div>
+  <div class="section-sub">Extraktion der visuellen DNA aus dem Wunschhimmel-Referenzdesign</div>
+
+  <div class="subsection-title">Markenstimmung & Tonalität</div>
+  <div class="info-box">
+    <strong>Kernidentität:</strong> Wunschhimmel verbindet die Magie von Wünschen (Sternenhimmel, Licht, Träumen) mit der Festlichkeit von Geburtstagsmomenten – warm, einladend, nie kitschig. Die Tonalität ist: <em>verspielt-festlich, zart aber selbstbewusst, jung aber nicht infantil</em>. Zielgruppe 12–25 bedeutet: Instagram-native Ästhetik, pastelbasiert, mit einem Hauch Luxuseleganz (Serifentype, Goldakzente).
+  </div>
+
+  <div class="subsection-title">Farbwelt – extrahierte Primärfarben</div>
+  <div class="color-grid">
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--rose-400)"></div>
+      <div class="color-info">
+        <div class="color-name">Rose Primär</div>
+        <div class="color-hex">#F25990</div>
+        <div class="color-role">Hauptakzent, CTAs</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--navy-700)"></div>
+      <div class="color-info">
+        <div class="color-name">Navy Tief</div>
+        <div class="color-hex">#122050</div>
+        <div class="color-role">Primärhintergrund</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--gold-300)"></div>
+      <div class="color-info">
+        <div class="color-name">Festgold</div>
+        <div class="color-hex">#FFBF3A</div>
+        <div class="color-role">Highlights, Sterne</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--rose-100)"></div>
+      <div class="color-info">
+        <div class="color-name">Blütenrosa</div>
+        <div class="color-hex">#FFD6E7</div>
+        <div class="color-role">Hintergründe, Karten</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--peach-200)"></div>
+      <div class="color-info">
+        <div class="color-name">Pfirsich</div>
+        <div class="color-hex">#FFC9AD</div>
+        <div class="color-role">Sekundärakzent</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--mint-300)"></div>
+      <div class="color-info">
+        <div class="color-name">Mintfrisch</div>
+        <div class="color-hex">#7DD6C4</div>
+        <div class="color-role">Erfolgsstatus, Teal-Theme</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--lavender-300)"></div>
+      <div class="color-info">
+        <div class="color-name">Lavendel</div>
+        <div class="color-hex">#B7A8F0</div>
+        <div class="color-role">Info, Highlights</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:var(--off-white)"></div>
+      <div class="color-info">
+        <div class="color-name">Elfenbein</div>
+        <div class="color-hex">#FDF8FC</div>
+        <div class="color-role">Page-Hintergrund</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title">Volle Farbpalette mit Abstufungen</div>
+  <div>
+    <div style="margin-bottom:8px"><span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--rose-600);letter-spacing:0.1em">Rose-Palette</span></div>
+    <div class="palette-row">
+      <div class="palette-swatch" style="background:var(--rose-50)"><span style="color:var(--rose-400)">50</span></div>
+      <div class="palette-swatch" style="background:var(--rose-100)"><span style="color:var(--rose-500)">100</span></div>
+      <div class="palette-swatch" style="background:var(--rose-200)"><span style="color:var(--rose-700)">200</span></div>
+      <div class="palette-swatch" style="background:var(--rose-300)"><span style="color:white">300</span></div>
+      <div class="palette-swatch" style="background:var(--rose-400)"><span style="color:white">400</span></div>
+      <div class="palette-swatch" style="background:var(--rose-500)"><span style="color:white">500</span></div>
+      <div class="palette-swatch" style="background:var(--rose-600)"><span style="color:white">600</span></div>
+      <div class="palette-swatch" style="background:var(--rose-700)"><span style="color:white">700</span></div>
+      <div class="palette-swatch" style="background:var(--rose-800)"><span style="color:white">800</span></div>
+      <div class="palette-swatch" style="background:var(--rose-900)"><span style="color:white">900</span></div>
+    </div>
+    <div style="margin:12px 0 8px"><span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--navy-600);letter-spacing:0.1em">Navy-Palette</span></div>
+    <div class="palette-row">
+      <div class="palette-swatch" style="background:var(--navy-50)"><span style="color:var(--navy-400)">50</span></div>
+      <div class="palette-swatch" style="background:var(--navy-100)"><span style="color:var(--navy-600)">100</span></div>
+      <div class="palette-swatch" style="background:var(--navy-200)"><span style="color:white">200</span></div>
+      <div class="palette-swatch" style="background:var(--navy-300)"><span style="color:white">300</span></div>
+      <div class="palette-swatch" style="background:var(--navy-400)"><span style="color:white">400</span></div>
+      <div class="palette-swatch" style="background:var(--navy-500)"><span style="color:white">500</span></div>
+      <div class="palette-swatch" style="background:var(--navy-600)"><span style="color:white">600</span></div>
+      <div class="palette-swatch" style="background:var(--navy-700)"><span style="color:white">700</span></div>
+      <div class="palette-swatch" style="background:var(--navy-800)"><span style="color:white">800</span></div>
+      <div class="palette-swatch" style="background:var(--navy-900)"><span style="color:white">900</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-title">Formensprache</div>
+  <div class="flex gap12 wrap mb16">
+    <div style="background:white;border:1px solid var(--border-light);border-radius:8px;padding:14px 20px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--navy-700)">Eckenradien</strong><br>Klein: 8px · Mittel: 14–16px · Groß: 20–24px · Pill: 50px
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:8px;padding:14px 20px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--navy-700)">Schatten</strong><br>Sanft: 0 4px 16px rgba(210,59,114,0.12)<br>Mittel: 0 8px 32px rgba(18,32,80,0.12)
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:8px;padding:14px 20px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--navy-700)">Dekoelemente</strong><br>Wellenlinie · Jakobsmuschel-Bogen · Konfetti-Punkte · 5- und 6-zackige Sterne · Schleifenband · Herz
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:8px;padding:14px 20px;font-size:13px;color:var(--text-mid)">
+      <strong style="color:var(--navy-700)">Illustrationsstil</strong><br>Flach mit weichen Kanten · Pastell-Fill · Keine harten Outlines · Line-Art als Sekundärstil
+    </div>
+  </div>
+</div>
+
+<!-- ===== B: DESIGN SYSTEM ===== -->
+<div id="system" class="section">
+  <div class="section-title">✦ B · Design-System</div>
+  <div class="section-sub">Vollständige Systemdefinition für Entwickler, Designer und Content-Team</div>
+
+  <div class="subsection-title">Typografie-Hierarchie</div>
+  <div class="type-specimen">
+    <div class="type-label">H1 – Page Title · Playfair Display 700 · 42px · Navy-700</div>
+    <div class="type-h1">Deine Wünsche, ihr Geschenk</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">H2 – Section Title · Playfair Display 700 · 30px · Navy-600</div>
+    <div class="type-h2">Wunschliste erstellen</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">H3 – Subsection · Playfair Display 600 · 22px · Navy-600</div>
+    <div class="type-h3">Wunsch hinzufügen</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">H4 / UI-Heading · Plus Jakarta Sans 700 · 16px · Navy-700</div>
+    <div class="type-h4">Wunsch reserviert ✓</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Body · Plus Jakarta Sans 400 · 15px · Text-Mid · 1.7 Zeilenhöhe</div>
+    <div class="type-body">Teile deine Wunschliste ganz einfach mit Familie und Freunden. Sie sehen, was du dir wünschst – und können Geschenke direkt reservieren, ohne dass du es weißt.</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Caption / Tag · Plus Jakarta Sans 700 · 11px · Rose-500 · Uppercase</div>
+    <div class="type-caption">Neu · Beliebt · Geburtstag</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Small / Muted · Plus Jakarta Sans 400 · 12px · Text-Muted</div>
+    <div class="type-small">Zuletzt aktualisiert am 19. Juli 2025 · 4 Wünsche · 2 reserviert</div>
+  </div>
+
+  <div class="subsection-title">Farbverläufe (systemdefiniert)</div>
+  <div class="grad-row">
+    <div class="grad-card" style="background:linear-gradient(135deg,#122050,#F25990)"><div class="grad-name">Festlich-Nacht</div></div>
+    <div class="grad-card" style="background:linear-gradient(135deg,#F25990,#FFBF3A)"><div class="grad-name">Sonnenuntergang</div></div>
+    <div class="grad-card" style="background:linear-gradient(135deg,#FFD6E7,#FFC9AD)"><div class="grad-name">Zuckerwatte</div></div>
+    <div class="grad-card" style="background:linear-gradient(135deg,#B7A8F0,#4DC2AE)"><div class="grad-name">Morgenhimmel</div></div>
+    <div class="grad-card" style="background:linear-gradient(160deg,#1A2E65,#243D7A,#3A5DA8)"><div class="grad-name">Sternenhimmel</div></div>
+    <div class="grad-card" style="background:linear-gradient(135deg,#FFE4D6,#EDE8FF)"><div class="grad-name">Traumwolke</div></div>
+  </div>
+
+  <div class="subsection-title">UI-Zustände</div>
+  <div class="component-grid">
+    <div class="component-card">
+      <div class="comp-label">Buttons</div>
+      <div class="flex" style="flex-direction:column;gap:8px">
+        <div class="btn-primary">Wunsch hinzufügen ✦</div>
+        <div class="btn-secondary">Teilen →</div>
+        <div class="btn-ghost">Mehr ansehen</div>
+        <div class="btn-disabled">Nicht verfügbar</div>
+      </div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">Input-Felder</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="input-field" placeholder="Was wünschst du dir?" value="">
+        <input class="input-field input-error" placeholder="Pflichtfeld" value="">
+        <input class="input-field input-success" value="wunschhimmel.com/marlene">
+        <div style="font-size:10px;color:#C0180A;margin-top:-4px">⚠ Dieses Feld ist erforderlich</div>
+      </div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">Badges & Labels</div>
+      <div class="flex gap8 wrap">
+        <span class="badge badge-primary">Neu</span>
+        <span class="badge badge-gold">★ Top-Wunsch</span>
+        <span class="badge badge-mint">Reserviert</span>
+        <span class="badge badge-navy">Geteilt</span>
+        <span class="badge badge-success">Erfüllt ✓</span>
+        <span class="badge badge-error">Ausverkauft</span>
+        <span class="badge badge-info">Info</span>
+        <span class="badge badge-primary">Geburtstag 🎂</span>
+        <span class="badge" style="background:var(--peach-100);color:#8A3A1A">Weihnachten 🎁</span>
+      </div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">Status-Indikatoren</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+        <div><span class="state-dot" style="background:#2CA96E;display:inline-block"></span><span style="color:var(--text-mid)">Aktiv · Wunsch verfügbar</span></div>
+        <div><span class="state-dot" style="background:var(--gold-400);display:inline-block"></span><span style="color:var(--text-mid)">Ausstehend · Reservierung läuft</span></div>
+        <div><span class="state-dot" style="background:var(--rose-400);display:inline-block"></span><span style="color:var(--text-mid)">Reserviert · Jemand hat sich gemeldet</span></div>
+        <div><span class="state-dot" style="background:#9A7085;display:inline-block"></span><span style="color:var(--text-muted)">Deaktiviert · Nicht sichtbar</span></div>
+        <div><span class="state-dot" style="background:#E83B3B;display:inline-block"></span><span style="color:var(--text-mid)">Fehler · Link konnte nicht geladen werden</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title">Wish-Karte (Core-Komponente)</div>
+  <div class="flex gap12 wrap mb16">
+    <div class="wish-card" style="width:160px">
+      <div class="wish-card-img">👟</div>
+      <div class="wish-card-reserved">Reserviert</div>
+      <div class="wish-card-body">
+        <div class="wish-card-title">Nike Air Max</div>
+        <div class="wish-card-price">€ 149,00</div>
+      </div>
+    </div>
+    <div class="wish-card" style="width:160px">
+      <div class="wish-card-img" style="background:linear-gradient(135deg,var(--lavender-100),var(--mint-100))">🎧</div>
+      <div class="wish-card-body">
+        <div class="wish-card-title">Sony WH-1000XM5</div>
+        <div class="wish-card-price">€ 279,00</div>
+        <div style="margin-top:6px"><span class="badge badge-gold" style="font-size:10px">★ Top-Wunsch</span></div>
+      </div>
+    </div>
+    <div class="wish-card" style="width:160px">
+      <div class="wish-card-img" style="background:linear-gradient(135deg,var(--peach-100),var(--gold-50))">📚</div>
+      <div class="wish-card-body">
+        <div class="wish-card-title">Buchpaket Fantasy</div>
+        <div class="wish-card-price">€ 45,00</div>
+        <div style="margin-top:6px"><span class="badge badge-success" style="font-size:10px">Erfüllt ✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title">Dekorative Motive & Divider</div>
+  <div class="flex gap12 wrap">
+    <div style="background:white;border:1px solid var(--border-light);border-radius:10px;padding:14px 18px;font-size:22px;letter-spacing:4px">✦ ✧ ⋆ ✩ ★</div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:10px;padding:14px 18px;font-size:22px;letter-spacing:4px">🎀 🎁 🎂 🌸 🌙</div>
+    <div style="flex:1;min-width:180px;background:white;border:1px solid var(--border-light);border-radius:10px;padding:14px 18px">
+      <div class="scallop-divider">
+        <div class="scallop" style="background:var(--rose-200)"></div>
+        <div class="scallop" style="background:var(--rose-300)"></div>
+        <div class="scallop" style="background:var(--rose-400)"></div>
+        <div class="scallop" style="background:var(--rose-300)"></div>
+        <div class="scallop" style="background:var(--rose-200)"></div>
+        <div class="scallop" style="background:var(--rose-100)"></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-left:8px">Jakobsmuschel-Divider</div>
+      </div>
+      <div style="border-top:2px dashed var(--rose-200);margin:8px 0;position:relative">
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:white;padding:0 6px;font-size:14px">✦</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== C: WEBSITE ===== -->
+<div id="website" class="section">
+  <div class="section-title">✦ C · Website-Anpassungen</div>
+  <div class="section-sub">Navigation, Hero, Komponenten, Footer – konkrete Umsetzungsregeln</div>
+
+  <div class="hero-preview">
+    <div class="hero-eyebrow">✦ Wünsche einfach teilen</div>
+    <div class="hero-title">Dein Wunschhimmel<br>wartet auf dich ✨</div>
+    <div class="hero-sub">Erstelle deine persönliche Wunschliste und teile sie mit allen die du liebst</div>
+    <button class="hero-btn">Wunschliste erstellen ✦</button>
+  </div>
+
+  <div class="subsection-title">Navigation</div>
+  <div style="background:var(--navy-700);border-radius:12px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;margin-bottom:16px">
+    <div class="logo-mark">
+      <span class="logo-star" style="color:var(--gold-300)">✦</span>
+      <span class="logo-text" style="color:white">Wunschhimmel</span>
+    </div>
+    <div class="flex gap16" style="align-items:center">
+      <span style="color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer">Entdecken</span>
+      <span style="color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer">So funktioniert's</span>
+      <div style="background:var(--rose-400);color:white;border-radius:50px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer">Anmelden</div>
+    </div>
+  </div>
+
+  <div class="subsection-title">4 Header-/Banner-Varianten</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="border-radius:12px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,var(--navy-800),var(--navy-600),var(--rose-700));padding:32px 28px;color:white;text-align:center">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;margin-bottom:6px">Variante 1 · Festlich-Nacht</div>
+        <div style="font-size:12px;opacity:0.7">Navy-Gradient · Weiße Typografie · Empfohlen für Hero</div>
+      </div>
+    </div>
+    <div style="border-radius:12px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,var(--rose-50),var(--peach-100),var(--lavender-100));padding:32px 28px;text-align:center">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;color:var(--navy-700);margin-bottom:6px">Variante 2 · Zuckerwatte-Hell</div>
+        <div style="font-size:12px;color:var(--text-muted)">Pastell-Gradient · Navy-Typografie · Für Sektionen</div>
+      </div>
+    </div>
+    <div style="border-radius:12px;overflow:hidden">
+      <div style="background:var(--rose-400);padding:32px 28px;color:white;text-align:center">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;margin-bottom:6px">Variante 3 · Rose Pur</div>
+        <div style="font-size:12px;opacity:0.85">Monochrom Rose · Für Kampagnen-CTAs</div>
+      </div>
+    </div>
+    <div style="border-radius:12px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,var(--navy-900),#2A1040);padding:32px 28px;color:white;text-align:center;position:relative">
+        <div style="position:absolute;top:10px;left:20px;font-size:18px;opacity:0.4">✦ ✧ ⋆</div>
+        <div style="position:absolute;top:14px;right:20px;font-size:16px;opacity:0.3">★ ✩ ✦</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;margin-bottom:6px">Variante 4 · Mitternachtsstern</div>
+        <div style="font-size:12px;opacity:0.7">Tiefstes Navy + Sternendekor · Für Premium-Momente</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title">3 E-Mail-Header</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="email-header" style="border:1px solid var(--border-light)">
+      <div style="background:linear-gradient(135deg,var(--navy-700),var(--rose-600));padding:24px 28px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:28px;color:var(--gold-300)">✦</span>
+        <div>
+          <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:700;color:white">Wunschhimmel</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.65)">Deine persönliche Wunschliste</div>
+        </div>
+      </div>
+      <div style="padding:8px 16px;background:var(--off-white);font-size:10px;color:var(--text-muted)">E-Mail-Header 1 · Festlich-Nacht mit Logo</div>
+    </div>
+    <div class="email-header" style="border:1px solid var(--border-light)">
+      <div style="background:linear-gradient(135deg,var(--rose-100),var(--peach-100));padding:24px 28px;text-align:center">
+        <span style="font-size:32px;color:var(--rose-500)">✦</span>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy-700);margin-top:4px">Jemand hat deinen Wunsch reserviert!</div>
+      </div>
+      <div style="padding:8px 16px;background:var(--off-white);font-size:10px;color:var(--text-muted)">E-Mail-Header 2 · Event-Notification (Pastell)</div>
+    </div>
+    <div class="email-header" style="border:1px solid var(--border-light)">
+      <div style="background:var(--navy-700);padding:20px 28px;display:flex;align-items:center;justify-content:space-between">
+        <div class="logo-mark">
+          <span style="font-size:22px;color:var(--gold-300)">✦</span>
+          <span style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700;color:white">Wunschhimmel</span>
+        </div>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5)">wunschhimmel.com</span>
+      </div>
+      <div style="padding:8px 16px;background:var(--off-white);font-size:10px;color:var(--text-muted)">E-Mail-Header 3 · Minimales Navy (Transaktions-E-Mails)</div>
+    </div>
+  </div>
+
+  <div class="subsection-title">3 Briefpapier / Dokumentlayouts</div>
+  <div class="two-col">
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;overflow:hidden">
+      <div style="background:var(--navy-700);height:8px"></div>
+      <div style="padding:16px 18px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px">
+        <span style="color:var(--gold-300);font-size:18px">✦</span>
+        <span style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:var(--navy-700)">Wunschhimmel</span>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="height:8px;background:var(--rose-50);border-radius:4px;margin-bottom:6px;width:80%"></div>
+        <div style="height:6px;background:var(--rose-50);border-radius:4px;margin-bottom:6px;width:60%"></div>
+        <div style="height:6px;background:var(--rose-50);border-radius:4px;width:70%"></div>
+      </div>
+      <div style="padding:8px 18px;font-size:9px;color:var(--text-muted);border-top:1px solid var(--border-light)">Layout 1 · Klassisch mit Navy-Balken</div>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,var(--rose-100),var(--peach-100));padding:20px 18px;text-align:center">
+        <span style="font-size:24px;color:var(--rose-500)">✦</span>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:var(--navy-700)">Wunschhimmel</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="height:8px;background:var(--rose-50);border-radius:4px;margin-bottom:6px;width:80%"></div>
+        <div style="height:6px;background:var(--rose-50);border-radius:4px;width:55%"></div>
+      </div>
+      <div style="padding:8px 18px;font-size:9px;color:var(--text-muted);border-top:1px solid var(--border-light)">Layout 2 · Festlich-Pastell zentriert</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== D: SOCIAL MEDIA ===== -->
+<div id="social" class="section">
+  <div class="section-title">✦ D · Social-Media-System</div>
+  <div class="section-sub">Templates, Formate und Maßangaben für alle relevanten Plattformen</div>
+
+  <div class="subsection-title">6 Post-Templates (Vorschau)</div>
+  <div class="social-grid">
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(135deg,var(--navy-800),var(--rose-600))">
+        <div style="font-size:28px;margin-bottom:8px">✦</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:white;line-height:1.3">„Meine Wunschliste ist live!"</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:6px">wunschhimmel.com</div>
+      </div>
+      <div class="social-label">Post 1 · Announcement · IG/TikTok 1:1</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(135deg,var(--rose-50),var(--peach-100))">
+        <div style="font-size:24px;margin-bottom:6px">🎁</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:13px;font-weight:700;color:var(--navy-700);line-height:1.3">Geburtstag kommt –<br>bist du vorbereitet?</div>
+        <div style="margin-top:8px"><span class="badge badge-primary" style="font-size:9px">Wunschliste erstellen →</span></div>
+      </div>
+      <div class="social-label">Post 2 · Seasonal · Hell-Pastell</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(160deg,#1A2E65,#3A5DA8)">
+        <div style="font-size:20px;opacity:0.4;margin-bottom:6px">✦ ✧ ⋆ ✩ ★</div>
+        <div style="font-size:28px;font-weight:700;color:white;font-family:'Playfair Display',Georgia,serif">127 ★</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7)">Wünsche erfüllt diese Woche</div>
+      </div>
+      <div class="social-label">Post 3 · Social Proof · Sternenhimmel</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(135deg,var(--lavender-100),var(--mint-100))">
+        <div style="font-size:26px;margin-bottom:8px">💝</div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy-700);text-align:center;line-height:1.4">"Das beste Geschenk war<br>die Überraschung 💫"</div>
+        <div style="font-size:9px;color:var(--text-muted);margin-top:6px">— Lisa, 19 Jahre</div>
+      </div>
+      <div class="social-label">Post 4 · Testimonial · Pastell</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(135deg,var(--gold-50),var(--peach-100))">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700;color:var(--navy-700);margin-bottom:6px">So einfach</div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--text-mid);text-align:left">
+          <div>1. Link einfügen ✓</div>
+          <div>2. Mit Freunden teilen ✓</div>
+          <div>3. Wünsche erfüllen ✓</div>
+        </div>
+      </div>
+      <div class="social-label">Post 5 · How-it-works · Gold-Pastell</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(135deg,var(--rose-400),var(--rose-700))">
+        <div style="font-size:14px;font-weight:700;color:white;font-family:'Playfair Display',Georgia,serif;margin-bottom:8px">Neue Funktion ✦</div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px 12px;font-size:11px;color:white">🎉 Social Feed · Feiern was andere feiern!</div>
+      </div>
+      <div class="social-label">Post 6 · Feature-Launch · Rose Bold</div>
+    </div>
+  </div>
+
+  <div class="subsection-title">6 Story-Templates (9:16)</div>
+  <div class="social-grid">
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(180deg,var(--navy-800),var(--navy-600),var(--rose-700));height:180px">
+        <div style="font-size:22px;margin-bottom:8px">✦</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:white">Story 1</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6)">Festlich-Nacht · 9:16</div>
+        <div style="position:absolute;bottom:16px;width:80%;height:28px;background:var(--rose-400);border-radius:50px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white">Swipe up ↑</div>
+      </div>
+      <div class="social-label">Story 1 · CTA · Festlich</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(180deg,var(--rose-50),var(--peach-100),var(--lavender-100));height:180px;justify-content:flex-start;padding-top:20px">
+        <div style="font-size:30px;margin-bottom:6px">🎂</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:var(--navy-700);text-align:center">Bald ist dein<br>Geburtstag!</div>
+        <div style="margin-top:10px"><span class="badge badge-primary" style="font-size:9px">Liste erstellen</span></div>
+      </div>
+      <div class="social-label">Story 2 · Seasonal · Hell</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:var(--navy-700);height:180px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--rose-300);margin-bottom:8px">Highlight</div>
+        <div style="font-size:32px;font-weight:700;color:white;font-family:'Playfair Display',Georgia,serif">3 ✦</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Wünsche reserviert heute</div>
+      </div>
+      <div class="social-label">Story 3 · Stats · Navy</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(180deg,var(--lavender-100),var(--rose-50));height:180px">
+        <div style="font-size:28px;margin-bottom:8px">💌</div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy-700);text-align:center;line-height:1.4">Poll-Story<br>Was wünschst du dir?</div>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          <div style="background:var(--rose-200);border-radius:8px;padding:4px 10px;font-size:9px;color:var(--rose-700);font-weight:700">Kleidung</div>
+          <div style="background:var(--navy-100);border-radius:8px;padding:4px 10px;font-size:9px;color:var(--navy-700);font-weight:700">Tech</div>
+        </div>
+      </div>
+      <div class="social-label">Story 4 · Interactive Poll</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(180deg,var(--gold-50),var(--peach-100));height:180px">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;color:var(--navy-700);margin-bottom:10px">Tutorial-Story</div>
+        <div style="display:flex;flex-direction:column;gap:4px;width:90%">
+          <div style="background:white;border-radius:8px;padding:4px 8px;font-size:9px;color:var(--text-mid);display:flex;align-items:center;gap:6px"><span>1</span> Link kopieren</div>
+          <div style="background:white;border-radius:8px;padding:4px 8px;font-size:9px;color:var(--text-mid);display:flex;align-items:center;gap:6px"><span>2</span> Wunsch anlegen</div>
+          <div style="background:var(--rose-400);border-radius:8px;padding:4px 8px;font-size:9px;color:white;display:flex;align-items:center;gap:6px"><span>3</span> Teilen → Done!</div>
+        </div>
+      </div>
+      <div class="social-label">Story 5 · Tutorial · Steps</div>
+    </div>
+    <div class="social-template">
+      <div class="social-preview" style="background:linear-gradient(180deg,#1A0A14,var(--rose-800));height:180px">
+        <div style="font-size:20px;opacity:0.5;margin-bottom:6px">✦ ✧ ★</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:white;text-align:center">Wunschhimmel<br>Community</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:8px">10.000+ Wünsche erfüllt</div>
+      </div>
+      <div class="social-label">Story 6 · Community · Premium</div>
+    </div>
+  </div>
+
+  <div class="subsection-title">6 Highlight-Cover / Badges</div>
+  <div class="flex gap8 wrap">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--rose-400),var(--rose-600));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white;box-shadow:0 2px 8px rgba(210,59,114,0.3)">🎁</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--navy-600),var(--navy-800));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white">🌙</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold-200),var(--gold-400));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white">★</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--mint-200),var(--mint-400));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white">✓</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--lavender-200),var(--lavender-400));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white">💜</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--peach-200),var(--peach-400));display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid white">🎂</div>
+  </div>
+  <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Formate: 3:3 für Instagram-Highlights · Ableitbar für TikTok-Avatar-Rahmen</div>
+
+  <div class="subsection-title">Plattform-Formatübersicht</div>
+  <div class="component-grid">
+    <div class="component-card">
+      <div class="comp-label">Instagram</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:1.7">Feed Post: 1080×1080px (1:1)<br>Landscape: 1080×566px<br>Story/Reel: 1080×1920px<br>Profilbild: 320×320px</div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">TikTok</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:1.7">Video: 1080×1920px (9:16)<br>Thumbnail: 1080×1920px<br>Profilbild: 200×200px</div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">Pinterest</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:1.7">Standard Pin: 1000×1500px (2:3)<br>Square Pin: 1000×1000px<br>Infografik: 1000×2100px</div>
+    </div>
+    <div class="component-card">
+      <div class="comp-label">YouTube</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:1.7">Thumbnail: 1280×720px<br>Banner: 2560×1440px<br>Profilbild: 800×800px</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== E: ASSETS ===== -->
+<div id="assets" class="section">
+  <div class="section-title">✦ E · Asset-Liste & Use Cases</div>
+  <div class="section-sub">Icons, modulare UI-Elemente, Prompt-Bausteine</div>
+
+  <div class="subsection-title">Icon-Ideen (15 Website-Funktionen)</div>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon-emoji">⭐</div><div class="icon-name">Wunsch hinzufügen</div></div>
+    <div class="icon-item"><div class="icon-emoji">🔗</div><div class="icon-name">Link scrapen</div></div>
+    <div class="icon-item"><div class="icon-emoji">💌</div><div class="icon-name">Teilen via E-Mail</div></div>
+    <div class="icon-item"><div class="icon-emoji">🔒</div><div class="icon-name">Reservieren</div></div>
+    <div class="icon-item"><div class="icon-emoji">🎁</div><div class="icon-name">Geschenk markieren</div></div>
+    <div class="icon-item"><div class="icon-emoji">📸</div><div class="icon-name">Foto hochladen</div></div>
+    <div class="icon-item"><div class="icon-emoji">❤️</div><div class="icon-name">Liken / Reagieren</div></div>
+    <div class="icon-item"><div class="icon-emoji">🔔</div><div class="icon-name">Benachrichtigung</div></div>
+    <div class="icon-item"><div class="icon-emoji">🎉</div><div class="icon-name">Feed / Feiern</div></div>
+    <div class="icon-item"><div class="icon-emoji">✏️</div><div class="icon-name">Bearbeiten</div></div>
+    <div class="icon-item"><div class="icon-emoji">👁️</div><div class="icon-name">Sichtbarkeit</div></div>
+    <div class="icon-item"><div class="icon-emoji">🛒</div><div class="icon-name">Zum Shop</div></div>
+    <div class="icon-item"><div class="icon-emoji">👤</div><div class="icon-name">Profil</div></div>
+    <div class="icon-item"><div class="icon-emoji">✦</div><div class="icon-name">Premium / Top</div></div>
+    <div class="icon-item"><div class="icon-emoji">🌙</div><div class="icon-name">Dark Mode</div></div>
+  </div>
+  <div class="warn-box mt12">Icon-Stilregel: Alle Icons im Line-Art-Stil (1.5–2px Stroke, Rose-500 aktiv / Navy-300 inaktiv, Eckenradius 2–3px). Keine Filled-Icons auf weißem Hintergrund. Auf farbigem Hintergrund: weiße Outline.</div>
+
+  <div class="subsection-title">10 modulare UI-Elemente</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">1. Wunsch-Karte</span>
+      <span style="font-size:11px;color:var(--text-muted)">Bild + Titel + Preis + Reserve-Button + Badge</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">2. Liste-Header</span>
+      <span style="font-size:11px;color:var(--text-muted)">Name + Anlass-Badge + Teilen-CTA + Fortschrittsbalken</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">3. Feed-Post</span>
+      <span style="font-size:11px;color:var(--text-muted)">Avatar + Text + Foto + Like/Comment-Leiste</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">4. Fortschrittsbalken</span>
+      <span style="font-size:11px;color:var(--text-muted)">X von Y Wünschen reserviert · Rose-Gradient</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">5. Link-Scraper-Input</span>
+      <span style="font-size:11px;color:var(--text-muted)">URL-Feld + Auto-Fill-Preview + Bestätigen-Button</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">6. Reservierungs-Modal</span>
+      <span style="font-size:11px;color:var(--text-muted)">Bestätigung + Name-Eingabe (optional) + Schließen</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">7. Theme-Toggle</span>
+      <span style="font-size:11px;color:var(--text-muted)">Rose ↔ Teal · Pill-Toggle mit Farbvorschau</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">8. Einladungs-Banner</span>
+      <span style="font-size:11px;color:var(--text-muted)">„X hat dich zu ihrer Liste eingeladen" + Öffnen-CTA</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">9. Leerer Zustand</span>
+      <span style="font-size:11px;color:var(--text-muted)">Illustration + Motivationstext + Primär-CTA</span>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:13px;color:var(--navy-700)">10. Toast-Notification</span>
+      <span style="font-size:11px;color:var(--text-muted)">Floating · Rose für Erfolg · Navy für Info · 4s Auto-Close</span>
+    </div>
+  </div>
+
+  <div class="subsection-title">Prompt-Bausteine für generative Assets</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="background:var(--navy-50);border:1px solid var(--navy-100);border-radius:10px;padding:12px 16px;font-size:11px;font-family:monospace;color:var(--navy-700);line-height:1.6">
+      <strong>Illustration (Midjourney/DALL·E):</strong><br>
+      „Flat pastel illustration of a birthday wishlist, soft rose pink and deep navy color palette, gold star accents, cute gift boxes and ribbons, scallop wave decorations, white background, Playfair Display typography aesthetic, festive but not childish, target audience 15-25, minimal vector style"
+    </div>
+    <div style="background:var(--navy-50);border:1px solid var(--navy-100);border-radius:10px;padding:12px 16px;font-size:11px;font-family:monospace;color:var(--navy-700);line-height:1.6">
+      <strong>Icon-Set (Midjourney/Figma AI):</strong><br>
+      „Line art icon set, 1.5px stroke, rose #F25990 on white, rounded corners 2px, 24x24px grid, wishlist app icons: gift, star, heart, link, bell, share, lock, camera, celebration, edit — flat vector, no shadows"
+    </div>
+    <div style="background:var(--navy-50);border:1px solid var(--navy-100);border-radius:10px;padding:12px 16px;font-size:11px;font-family:monospace;color:var(--navy-700);line-height:1.6">
+      <strong>Pattern / Hintergrundtextur:</strong><br>
+      „Seamless repeat pattern, tiny gold stars ✦ and rose pink confetti dots on deep navy #122050 background, festive subtle texture, luxury stationery aesthetic, vector illustration"
+    </div>
+  </div>
+</div>
+
+<!-- ===== F: COPYRIGHT ===== -->
+<div id="copyright" class="section">
+  <div class="section-title">✦ F · Copyright- & Markenrisiken</div>
+  <div class="section-sub">Rechtliche Risikoanalyse aller designrelevanten Elemente</div>
+
+  <table class="risk-table">
+    <tr>
+      <th>Element</th>
+      <th>Risiko</th>
+      <th>Problem</th>
+      <th>Lösung</th>
+    </tr>
+    <tr>
+      <td><strong>Playfair Display</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>Open Font License (OFL) – frei nutzbar auch kommerziell</td>
+      <td>✓ Direkt nutzbar via Google Fonts</td>
+    </tr>
+    <tr>
+      <td><strong>Plus Jakarta Sans</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>OFL – frei nutzbar</td>
+      <td>✓ Direkt nutzbar via Google Fonts</td>
+    </tr>
+    <tr>
+      <td><strong>Farbverlauf rose-navy</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>Farbkombinationen sind generell nicht schutzfähig. Ähnlich zu einigen Beauty-Brands, aber kein direktes Risiko.</td>
+      <td>✓ Spezifische Hex-Töne wie definiert verwenden. Nicht mit direkten Konkurrenten-Farben identisch.</td>
+    </tr>
+    <tr>
+      <td><strong>Stern-Symbol ✦ als Logo-Element</strong></td>
+      <td><span class="risk-mid">MITTEL</span></td>
+      <td>Unicode-Zeichen frei. Aber Sterne in Kombination mit Schrift könnten ähnlichen Marken zu nahe kommen (z.B. Wish, Amazon Stars, Twinkl).</td>
+      <td>Eigenes SVG-Sterndesign entwerfen (nicht von bekannten Marken kopiert). Markenschutz für eigenes Logodesign anstreben.</td>
+    </tr>
+    <tr>
+      <td><strong>Emoji in UI (🎁🎂🌸)</strong></td>
+      <td><span class="risk-mid">MITTEL</span></td>
+      <td>Apple/Google Emoji sind urheberrechtlich geschützt. Nutzung in UI-Mockups und Screenshots für eigene App als Design-Element ist gängige Praxis, aber für kommerzielle Vermarktung von Designs (z.B. Poster, Merchandise) risikoreich.</td>
+      <td>Eigene Emoji/Illustrations-Icons im Markenstil entwerfen (kein 1:1-Kopieren des Apple-Stils). Für App-intern unbedenklich.</td>
+    </tr>
+    <tr>
+      <td><strong>Jakobsmuschel/Scallop-Muster</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>Klassisches Dekorativmuster, nicht schutzfähig. Bekannt aus vielen Designkontexten (Chanel, Pinterest-Deko), aber kein Markenschutz auf geometrische Grundformen.</td>
+      <td>✓ Eigene SVG-Variante erstellen. Spezifische Kombination mit Wunschhimmel-Farbwelt ist originell.</td>
+    </tr>
+    <tr>
+      <td><strong>Wellenlinien als Divider</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>Geometrische Grundform, nicht geschützt. Sehr verbreitet.</td>
+      <td>✓ Eigene SVG-Pfade erstellen (nicht von Canva-Templates o.ä. kopieren)</td>
+    </tr>
+    <tr>
+      <td><strong>Social-Media-Logos (IG, TikTok etc.)</strong></td>
+      <td><span class="risk-high">HOCH</span></td>
+      <td>Instagram, TikTok, Pinterest, YouTube – alle Logos sind eingetragene Marken mit strengen Brand Guidelines. Nicht nachbauen, verändern oder in eigenem Kontext platzieren.</td>
+      <td>Ausschließlich offizielle Brand Assets der Plattformen gemäß deren Brand Guidelines verwenden. Keine eigenen Versionen der Plattform-Icons erstellen. Verlinkung auf offizielle Ressourcen.</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon Affiliate Links / Logo</strong></td>
+      <td><span class="risk-mid">MITTEL</span></td>
+      <td>Amazon-Logo ist geschützt. Affiliate-Programm erfordert korrekte Kennzeichnung.</td>
+      <td>Amazon Associates Brand Guidelines beachten. Pflicht-Disclosure „Als Amazon-Partner verdiene ich an qualifizierten Käufen" anzeigen. Kein Amazon-Logo ohne Genehmigung verwenden.</td>
+    </tr>
+    <tr>
+      <td><strong>Produktbilder in UI-Demos</strong></td>
+      <td><span class="risk-high">HOCH</span></td>
+      <td>Screenshots echter Produkte (Nike, Sony etc.) in Mockups oder Marketing-Material ohne Lizenz problematisch.</td>
+      <td>Nur selbst erstellte Placeholder-Bilder oder lizenzfreie Bilder (Unsplash CC0) für Mockups und Demos verwenden.</td>
+    </tr>
+    <tr>
+      <td><strong>KI-generierte Illustrationen</strong></td>
+      <td><span class="risk-mid">MITTEL</span></td>
+      <td>Urheberrechtslage bei KI-generierten Assets in DE noch nicht final geklärt. Kein klassischer Urheberrechtsschutz für KI-Output (Stand 2025).</td>
+      <td>Für kritische Assets eigene menschliche Kreation bevorzugen. Bei KI-Assets: Prompts und Tools dokumentieren. Nicht 1:1 von geschützten Stilen ableiten.</td>
+    </tr>
+    <tr>
+      <td><strong>„Festlich-verspielt" CI-Konzept</strong></td>
+      <td><span class="risk-low">NIEDRIG</span></td>
+      <td>Design-Konzept-Beschreibungen sind nicht schutzfähig. Spezifische Umsetzung (Logo, Farbsystem, Schriftpaarung in Kombination) kann als Gesamtwerk Markenidentität bilden.</td>
+      <td>✓ Als eigenständige Marke registrieren (Wortmarke + Bildmarke beim DPMA). Gesamtes visuelles System dokumentieren.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===== G: RECOMMENDATIONS ===== -->
+<div id="recs" class="section">
+  <div class="section-title">✦ G · Empfehlungen zur rechtssicheren Umsetzung</div>
+  <div class="section-sub">Priorisierte Aktionsliste für Designer, Entwickler und Rechtsabteilung</div>
+
+  <div class="subsection-title">Sofort-Maßnahmen (Prio 1)</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+    <div class="ok-box">✓ <strong>Schriftarten:</strong> Playfair Display + Plus Jakarta Sans via Google Fonts einbinden. Lizenz (OFL) ist auch für kommerzielle Nutzung freigegeben. CSS: <code>@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap')</code></div>
+    <div class="warn-box">⚠ <strong>Social-Media-Icons:</strong> Niemals plattformeigene Logos nachbauen oder neu gestalten. Nur von offiziellen Quellen laden: <em>instagram.com/brand</em>, <em>tiktok.com/legal/brand-guidelines</em>, <em>brand.pinterest.com</em>. Keine Icon-Sets aus Drittquellen ohne Lizenzprüfung.</div>
+    <div class="warn-box">⚠ <strong>Amazon Affiliate:</strong> Pflicht-Disclosure auf jeder Seite mit Affiliate-Links. Text: „Als Amazon-Partner verdiene ich an qualifizierten Einkäufen." Im Footer und ggf. im Impressum verankern.</div>
+    <div style="background:#FDDEDE;border-left:3px solid #E83B3B;border-radius:8px;padding:12px 16px;font-size:12px;color:#5A0A0A;line-height:1.5">🚨 <strong>Produktbilder:</strong> In Mockups, Marketing und Social Media ausschließlich selbst erstellte oder CC0-lizenzierte Placeholder-Bilder verwenden. Keine echten Produktfotos ohne Lizenz.</div>
+  </div>
+
+  <div class="subsection-title">Mittelfristig (Prio 2)</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+    <div class="info-box">📌 <strong>Markenanmeldung:</strong> Wortmarke „Wunschhimmel" beim DPMA anmelden (Klasse 42: Software as a Service, Klasse 35: Online-Marktplatz). Kosten: ~300€ für 2 Klassen. Gibt exklusives Recht auf Markenname in DE.</div>
+    <div class="info-box">📌 <strong>Eigenes Icon-Set erstellen:</strong> Die definierten 15+ Icons als eigene SVG-Dateien in Figma/Inkscape entwerfen. Nicht von Feather Icons, Heroicons etc. kopieren – eigene Linienführung entwickeln. Dann als eigenem Asset-Set dokumentieren.</div>
+    <div class="info-box">📌 <strong>KI-Assets kennzeichnen:</strong> Intern dokumentieren, welche Assets KI-generiert sind (Tool, Datum, Prompt). Bei kommerzieller Nutzung (Anzeigen, Merchandise) auf menschlich erstellte Varianten setzen.</div>
+    <div class="info-box">📌 <strong>Design-System-Datei:</strong> Alle definierten Farben, Abstände, Typografie-Regeln und Komponenten in einer Figma-Bibliothek oder einer <code>design-tokens.json</code> zentralisieren. Als Single Source of Truth für alle Beteiligten.</div>
+  </div>
+
+  <div class="subsection-title">CSS-Variablen für direkten Einsatz im Code</div>
+  <div style="background:var(--navy-900);border-radius:12px;padding:16px 20px;font-family:monospace;font-size:11px;color:rgba(255,255,255,0.85);line-height:1.8;overflow-x:auto">
+    <span style="color:var(--rose-300)">:root {</span><br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Rose-Palette */</span><br>
+    &nbsp;&nbsp;--color-rose-50: #FFF0F5;<br>
+    &nbsp;&nbsp;--color-rose-100: #FFD6E7;<br>
+    &nbsp;&nbsp;--color-rose-400: #F25990; <span style="color:rgba(255,255,255,0.4)">/* Primary CTA */</span><br>
+    &nbsp;&nbsp;--color-rose-500: #D93B72; <span style="color:rgba(255,255,255,0.4)">/* Hover */</span><br>
+    &nbsp;&nbsp;--color-rose-700: #8A1A43; <span style="color:rgba(255,255,255,0.4)">/* Deep */</span><br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Navy-Palette */</span><br>
+    &nbsp;&nbsp;--color-navy-50: #EEF2F8;<br>
+    &nbsp;&nbsp;--color-navy-600: #1A2E65; <span style="color:rgba(255,255,255,0.4)">/* Text */</span><br>
+    &nbsp;&nbsp;--color-navy-700: #122050; <span style="color:rgba(255,255,255,0.4)">/* Backgrounds */</span><br>
+    &nbsp;&nbsp;--color-navy-800: #0C163A; <span style="color:rgba(255,255,255,0.4)">/* Deep BG */</span><br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Accent */</span><br>
+    &nbsp;&nbsp;--color-gold: #FFBF3A;<br>
+    &nbsp;&nbsp;--color-mint: #4DC2AE;<br>
+    &nbsp;&nbsp;--color-lavender: #B7A8F0;<br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Semantic */</span><br>
+    &nbsp;&nbsp;--color-success: #2CA96E;<br>
+    &nbsp;&nbsp;--color-error: #E83B3B;<br>
+    &nbsp;&nbsp;--color-warning: #F5A500;<br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Typography */</span><br>
+    &nbsp;&nbsp;--font-display: 'Playfair Display', Georgia, serif;<br>
+    &nbsp;&nbsp;--font-body: 'Plus Jakarta Sans', sans-serif;<br>
+    &nbsp;&nbsp;<span style="color:var(--gold-200)">/* Radii */</span><br>
+    &nbsp;&nbsp;--radius-sm: 8px;<br>
+    &nbsp;&nbsp;--radius-md: 14px;<br>
+    &nbsp;&nbsp;--radius-lg: 20px;<br>
+    &nbsp;&nbsp;--radius-pill: 50px;<br>
+    <span style="color:var(--rose-300)">}</span>
+  </div>
+
+  <div class="subsection-title">Quick-Reference Cheat Sheet</div>
+  <div class="two-col">
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--rose-500);letter-spacing:0.1em;margin-bottom:10px">✓ Immer nutzen</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:2">
+        Playfair Display + Plus Jakarta Sans<br>
+        #F25990 für primäre Aktionen<br>
+        #122050 für Backgrounds & Nav<br>
+        Eckenradius ≥ 12px bei Karten<br>
+        Pill-Buttons (border-radius: 50px)<br>
+        Wellige Divider zwischen Sektionen<br>
+        ✦ ★ als Dekor-Akzente (nie als Logo)
+      </div>
+    </div>
+    <div style="background:white;border:1px solid var(--border-light);border-radius:12px;padding:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#C0180A;letter-spacing:0.1em;margin-bottom:10px">✗ Niemals</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:2">
+        Plattform-Logos nachbauen (IG, TikTok)<br>
+        Echte Produktfotos ohne Lizenz<br>
+        System-Fonts (Arial, Roboto, Inter)<br>
+        Harte eckige Ecken (0px Radius)<br>
+        Neon-Farben oder stark gesättigte Töne<br>
+        Fremde Icon-Sets ohne Lizenz<br>
+        Amazon-Logo ohne Guidelines
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
