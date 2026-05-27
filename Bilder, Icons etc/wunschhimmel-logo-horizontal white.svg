@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 110" width="580" height="110">
+  <defs>
+    <linearGradient id="g1h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F25990"/><stop offset="20%" stop-color="#FF8C42"/>
+      <stop offset="40%" stop-color="#FFD600"/><stop offset="60%" stop-color="#4DC9A0"/>
+      <stop offset="80%" stop-color="#4A90D9"/><stop offset="100%" stop-color="#9B59E8"/>
+    </linearGradient>
+    <linearGradient id="g2h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF85B3"/><stop offset="20%" stop-color="#FFB347"/>
+      <stop offset="40%" stop-color="#FFE44D"/><stop offset="60%" stop-color="#7DDFC4"/>
+      <stop offset="80%" stop-color="#74B3F0"/><stop offset="100%" stop-color="#BC8AF5"/>
+    </linearGradient>
+    <linearGradient id="g3h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB3D4"/><stop offset="20%" stop-color="#FFD0A0"/>
+      <stop offset="40%" stop-color="#FFF0A0"/><stop offset="60%" stop-color="#B0EEE0"/>
+      <stop offset="80%" stop-color="#B0D8FF"/><stop offset="100%" stop-color="#DCC8FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M 13 78 A 55 55 0 0 1 123 78" stroke="url(#g1h)" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <path d="M 26 78 A 42 42 0 0 1 110 78" stroke="url(#g2h)" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <path d="M 39 78 A 29 29 0 0 1 97 78"  stroke="url(#g3h)" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <polygon transform="translate(40,89)" points="0,-5 1.5,-1.8 5,-1.8 2.2,0.9 3.1,4.7 0,2.8 -3.1,4.7 -2.2,0.9 -5,-1.8 -1.5,-1.8" fill="#FFD700"/>
+  <polygon transform="translate(54,89)" points="0,-5 1.5,-1.8 5,-1.8 2.2,0.9 3.1,4.7 0,2.8 -3.1,4.7 -2.2,0.9 -5,-1.8 -1.5,-1.8" fill="#FFD700"/>
+  <polygon transform="translate(68,89)" points="0,-6 1.8,-2.1 6,-2.1 2.6,1.1 3.7,5.6 0,3.3 -3.7,5.6 -2.6,1.1 -6,-2.1 -1.8,-2.1" fill="#FFBF3A"/>
+  <polygon transform="translate(82,89)" points="0,-5 1.5,-1.8 5,-1.8 2.2,0.9 3.1,4.7 0,2.8 -3.1,4.7 -2.2,0.9 -5,-1.8 -1.5,-1.8" fill="#FFD700"/>
+  <polygon transform="translate(96,89)" points="0,-5 1.5,-1.8 5,-1.8 2.2,0.9 3.1,4.7 0,2.8 -3.1,4.7 -2.2,0.9 -5,-1.8 -1.5,-1.8" fill="#FFD700"/>
+  <text x="148" y="66"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="36" font-weight="700"
+        fill="#122050"
+        text-anchor="start"
+        letter-spacing="-0.5">Wunschhimmel</text>
+</svg>

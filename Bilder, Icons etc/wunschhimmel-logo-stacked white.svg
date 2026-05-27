@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="400" height="240">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F25990"/>
+      <stop offset="20%" stop-color="#FF8C42"/>
+      <stop offset="40%" stop-color="#FFD600"/>
+      <stop offset="60%" stop-color="#4DC9A0"/>
+      <stop offset="80%" stop-color="#4A90D9"/>
+      <stop offset="100%" stop-color="#9B59E8"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF85B3"/>
+      <stop offset="20%" stop-color="#FFB347"/>
+      <stop offset="40%" stop-color="#FFE44D"/>
+      <stop offset="60%" stop-color="#7DDFC4"/>
+      <stop offset="80%" stop-color="#74B3F0"/>
+      <stop offset="100%" stop-color="#BC8AF5"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB3D4"/>
+      <stop offset="20%" stop-color="#FFD0A0"/>
+      <stop offset="40%" stop-color="#FFF0A0"/>
+      <stop offset="60%" stop-color="#B0EEE0"/>
+      <stop offset="80%" stop-color="#B0D8FF"/>
+      <stop offset="100%" stop-color="#DCC8FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Arc center: x=200, y=148 -->
+  <!-- Outer arc r=120: leftmost x=80, topmost y=148-120=28 → need y>=20 padding, ok -->
+  <path d="M 80 148 A 120 120 0 0 1 320 148" stroke="url(#g1)" stroke-width="15" fill="none" stroke-linecap="round"/>
+  <!-- Middle arc r=97 -->
+  <path d="M 103 148 A 97 97 0 0 1 297 148" stroke="url(#g2)" stroke-width="15" fill="none" stroke-linecap="round"/>
+  <!-- Inner arc r=74 -->
+  <path d="M 126 148 A 74 74 0 0 1 274 148" stroke="url(#g3)" stroke-width="15" fill="none" stroke-linecap="round"/>
+
+  <!-- 5 stars below arc baseline, evenly spaced, no overlap -->
+  <!-- Stars at y=163, spaced 28px apart, centered on x=200 -->
+  <!-- x positions: 144, 172, 200, 228, 256 -->
+  <polygon transform="translate(144,163)" points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5" fill="#FFD700"/>
+  <polygon transform="translate(172,163)" points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5" fill="#FFD700"/>
+  <polygon transform="translate(200,163)" points="0,-8 2.3,-2.9 8,-2.9 3.5,1.4 5,7.6 0,4.4 -5,7.6 -3.5,1.4 -8,-2.9 -2.3,-2.9" fill="#FFBF3A"/>
+  <polygon transform="translate(228,163)" points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5" fill="#FFD700"/>
+  <polygon transform="translate(256,163)" points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5" fill="#FFD700"/>
+
+  <!-- Wordmark -->
+  <text x="200" y="212"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="32" font-weight="700"
+        fill="#122050"
+        text-anchor="middle"
+        letter-spacing="-0.5">Wunschhimmel</text>
+</svg>
