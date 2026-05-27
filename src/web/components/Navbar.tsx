@@ -8,36 +8,80 @@ import {
   IconSun, IconMoon, IconGlobe, IconSettings, IconGift
 } from "./Icons";
 
-// Inline SVG Logo — Konzept 1 "Festlich-verspielt"
-// Heller Hintergrund, pastelliger Regenbogen, goldene Sternchen — genau wie im CI
+// Wunschhimmel Logo Icon — nach Design System (Navy-Hintergrund, Regenbogen, Goldene Sterne)
 function WunschhimmelIcon({ size = 32 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
-      style={{ borderRadius: 12, flexShrink: 0 }}>
-      {/* Heller cremiger Hintergrund */}
-      <rect width="100" height="100" rx="18" fill="#FFF8F0" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 140 140"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ borderRadius: Math.round(size * 0.17), flexShrink: 0, display: "block" }}
+    >
+      {/* Navy Hintergrund */}
+      <rect width="140" height="140" rx="24" fill="#122050" />
 
-      {/* Regenbogen — pastell, von außen nach innen */}
-      <path d="M10 62 Q50 10 90 62" stroke="#FF6B9D" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      <path d="M16 62 Q50 18 84 62" stroke="#FF9F6B" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      <path d="M22 62 Q50 26 78 62" stroke="#FFCA3A" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      <path d="M28 62 Q50 34 72 62" stroke="#A78BFA" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      <path d="M34 62 Q50 42 66 62" stroke="#6BCB77" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      {/* Regenbogen — 3 Bögen, Mitte x=70, y=90 */}
+      {/* Outer arc r=62 */}
+      <defs>
+        <linearGradient id="nav-g1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="#F25990" />
+          <stop offset="20%"  stopColor="#FF8C42" />
+          <stop offset="40%"  stopColor="#FFD600" />
+          <stop offset="60%"  stopColor="#4DC9A0" />
+          <stop offset="80%"  stopColor="#4A90D9" />
+          <stop offset="100%" stopColor="#9B59E8" />
+        </linearGradient>
+        <linearGradient id="nav-g2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="#FF85B3" />
+          <stop offset="20%"  stopColor="#FFB347" />
+          <stop offset="40%"  stopColor="#FFE44D" />
+          <stop offset="60%"  stopColor="#7DDFC4" />
+          <stop offset="80%"  stopColor="#74B3F0" />
+          <stop offset="100%" stopColor="#BC8AF5" />
+        </linearGradient>
+        <linearGradient id="nav-g3" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="#FFB3D4" />
+          <stop offset="20%"  stopColor="#FFD0A0" />
+          <stop offset="40%"  stopColor="#FFF0A0" />
+          <stop offset="60%"  stopColor="#B0EEE0" />
+          <stop offset="80%"  stopColor="#B0D8FF" />
+          <stop offset="100%" stopColor="#DCC8FF" />
+        </linearGradient>
+      </defs>
 
-      {/* Abdeckung unten — saubere Basis */}
-      <rect x="0" y="62" width="100" height="38" fill="#FFF8F0" />
+      {/* Outer arc: center (70,90), r=62 → start (8,90), end (132,90) */}
+      <path d="M 8 90 A 62 62 0 0 1 132 90"
+        stroke="url(#nav-g1)" strokeWidth="13" strokeLinecap="round" fill="none" />
+      {/* Middle arc: r=48 */}
+      <path d="M 22 90 A 48 48 0 0 1 118 90"
+        stroke="url(#nav-g2)" strokeWidth="13" strokeLinecap="round" fill="none" />
+      {/* Inner arc: r=34 */}
+      <path d="M 36 90 A 34 34 0 0 1 104 90"
+        stroke="url(#nav-g3)" strokeWidth="13" strokeLinecap="round" fill="none" />
 
-      {/* Kleine Sternchen verteilt */}
-      <path d="M20 74 L21 77 L24 74 L21 71 Z" fill="#FFCA3A" opacity="0.9"/>
-      <path d="M50 70 L51.5 74.5 L56 74.5 L52.5 77 L54 82 L50 79 L46 82 L47.5 77 L44 74.5 L48.5 74.5 Z" fill="#FFCA3A"/>
-      <path d="M80 74 L81 77 L84 74 L81 71 Z" fill="#FFCA3A" opacity="0.9"/>
-      <circle cx="35" cy="78" r="2" fill="#FFCA3A" opacity="0.6"/>
-      <circle cx="65" cy="78" r="2" fill="#FFCA3A" opacity="0.6"/>
-      <circle cx="50" cy="86" r="1.5" fill="#FFCA3A" opacity="0.5"/>
-      {/* Winzige Sternchen oben */}
-      <circle cx="12" cy="25" r="1.5" fill="#FF6B9D" opacity="0.4"/>
-      <circle cx="88" cy="30" r="1.5" fill="#A78BFA" opacity="0.4"/>
-      <circle cx="50" cy="5" r="1.5" fill="#FFCA3A" opacity="0.5"/>
+      {/* 5 Sterne mit Abstand: x = 34, 52, 70, 88, 106 | y=103 */}
+      {/* Stern 1 */}
+      <polygon transform="translate(34,103)"
+        points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5"
+        fill="#FFD700" />
+      {/* Stern 2 */}
+      <polygon transform="translate(52,103)"
+        points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5"
+        fill="#FFD700" />
+      {/* Stern 3 — Mitte, etwas größer */}
+      <polygon transform="translate(70,103)"
+        points="0,-8 2.3,-2.9 8,-2.9 3.5,1.4 5,7.6 0,4.4 -5,7.6 -3.5,1.4 -8,-2.9 -2.3,-2.9"
+        fill="#FFBF3A" />
+      {/* Stern 4 */}
+      <polygon transform="translate(88,103)"
+        points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5"
+        fill="#FFD700" />
+      {/* Stern 5 */}
+      <polygon transform="translate(106,103)"
+        points="0,-7 2,-2.5 7,-2.5 3,1.2 4.3,6.5 0,3.8 -4.3,6.5 -3,1.2 -7,-2.5 -2,-2.5"
+        fill="#FFD700" />
     </svg>
   );
 }
@@ -70,9 +114,14 @@ export function Navbar() {
   const go = (path: string) => { setMenuOpen(false); navigate(path); };
   const signOut = async () => { await authClient.signOut(); go("/"); };
 
+  // ── FIX: Immer Navy-dunkel, egal welches Theme ──
   const navBg = scrolled
-    ? isTeal ? "rgba(15,25,35,0.98)" : "rgba(255,248,240,0.98)"
-    : isTeal ? "rgba(15,25,35,0.92)" : "rgba(255,248,240,0.95)";
+    ? "rgba(12, 22, 58, 0.98)"   // #0C163A fast opak
+    : "rgba(18, 32, 80, 0.95)";  // #122050 Navy-700
+
+  const navBorder = scrolled
+    ? "rgba(242,89,144,0.18)"    // Rose-Akzent
+    : "rgba(255,255,255,0.08)";
 
   return (
     <>
@@ -87,29 +136,33 @@ export function Navbar() {
         }
         .nav-pill-btn {
           display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(26,26,78,0.06); border: 1px solid rgba(26,26,78,0.12);
-          color: #1A1A4E; border-radius: 999px;
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.14);
+          color: rgba(255,255,255,0.80);
+          border-radius: 999px;
           padding: 6px 14px; font-size: 13px; font-weight: 600;
           cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
           transition: background 0.15s, color 0.15s;
           white-space: nowrap;
         }
-        [data-theme="teal"] .nav-pill-btn {
-          background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75);
+        .nav-pill-btn:hover {
+          background: rgba(242,89,144,0.18);
+          color: #FF85B3;
+          border-color: rgba(242,89,144,0.3);
         }
-        .nav-pill-btn:hover { background: rgba(255,107,157,0.1); color: #FF6B9D; border-color: rgba(255,107,157,0.2); }
-        [data-theme="teal"] .nav-pill-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
         .nav-text-btn {
           background: none; border: none; cursor: pointer;
-          color: #4A4A7A; font-size: 13.5px; font-weight: 500;
+          color: rgba(255,255,255,0.75);
+          font-size: 13.5px; font-weight: 500;
           font-family: 'Plus Jakarta Sans', sans-serif;
           padding: 6px 8px; border-radius: 8px;
           transition: color 0.15s, background 0.15s;
           display: flex; align-items: center; gap: 6px;
         }
-        [data-theme="teal"] .nav-text-btn { color: rgba(255,255,255,0.72); }
-        .nav-text-btn:hover { color: #FF6B9D; background: rgba(255,107,157,0.06); }
-        [data-theme="teal"] .nav-text-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .nav-text-btn:hover {
+          color: #FF85B3;
+          background: rgba(242,89,144,0.10);
+        }
       `}</style>
 
       <nav
@@ -119,22 +172,28 @@ export function Navbar() {
           background: navBg,
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: `1px solid ${isTeal ? "rgba(45,212,191,0.1)" : "rgba(26,26,78,0.08)"}`,
-          transition: "background 0.3s",
+          borderBottom: `1px solid ${navBorder}`,
+          transition: "background 0.3s, border-color 0.3s",
         }}
       >
-        <div style={{ maxWidth: 1152, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{
+          maxWidth: 1152, margin: "0 auto", padding: "0 20px",
+          height: 60, display: "flex", alignItems: "center", justifyContent: "space-between"
+        }}>
 
           {/* Logo */}
           <button
             onClick={() => go("/")}
-            style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: "4px 0" }}
+            style={{
+              display: "flex", alignItems: "center", gap: 10,
+              background: "none", border: "none", cursor: "pointer", padding: "4px 0"
+            }}
           >
-            <WunschhimmelIcon size={32} />
+            <WunschhimmelIcon size={36} />
             <span style={{
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700, fontSize: 17,
-              color: isTeal ? "#2DD4BF" : "#1A1A4E",
+              color: "#ffffff",
               letterSpacing: "-0.02em",
             }}>
               Wunschhimmel
@@ -165,7 +224,11 @@ export function Navbar() {
               </>
             ) : null}
 
-            <div style={{ width: 1, height: 20, background: isTeal ? "rgba(255,255,255,0.12)" : "rgba(26,26,78,0.1)", margin: "0 4px" }} />
+            <div style={{
+              width: 1, height: 20,
+              background: "rgba(255,255,255,0.12)",
+              margin: "0 4px"
+            }} />
 
             {/* Theme toggle */}
             <button
@@ -173,7 +236,9 @@ export function Navbar() {
               className="nav-pill-btn"
               title={isTeal ? "Zum Rose-Design wechseln" : "Zum Dark-Design wechseln"}
             >
-              {isTeal ? <IconSun size={13} color="currentColor" /> : <IconMoon size={13} color="currentColor" />}
+              {isTeal
+                ? <IconSun size={13} color="currentColor" />
+                : <IconMoon size={13} color="currentColor" />}
             </button>
 
             {/* Lang toggle */}
@@ -189,7 +254,11 @@ export function Navbar() {
               <button
                 onClick={() => go("/admin")}
                 className="nav-pill-btn"
-                style={{ background: "rgba(255,179,71,0.15)", borderColor: "rgba(255,179,71,0.3)", color: "#FFB347" }}
+                style={{
+                  background: "rgba(255,179,71,0.15)",
+                  borderColor: "rgba(255,179,71,0.3)",
+                  color: "#FFB347"
+                }}
               >
                 <IconSettings size={13} color="currentColor" />
                 Admin
@@ -200,33 +269,39 @@ export function Navbar() {
               <button
                 onClick={signOut}
                 className="nav-pill-btn"
-                style={{ background: "rgba(255,107,157,0.1)", borderColor: "rgba(255,107,157,0.2)", color: "#FF8FB3" }}
+                style={{
+                  background: "rgba(255,107,157,0.1)",
+                  borderColor: "rgba(255,107,157,0.2)",
+                  color: "#FF8FB3"
+                }}
               >
                 <IconLogOut size={13} color="currentColor" />
                 {t("nav_signout")}
               </button>
             ) : (
               <>
-                <button
-                  onClick={() => go("/sign-in")}
-                  className="nav-text-btn"
-                >
+                <button className="nav-text-btn" onClick={() => go("/sign-in")}>
                   {t("nav_signin")}
                 </button>
                 <button
                   onClick={() => go("/sign-up")}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 6,
-                    background: "linear-gradient(135deg,#FF6B9D,#FF8FB3)",
+                    background: "linear-gradient(135deg,#F25990,#D93B72)",
                     color: "#fff", border: "none", borderRadius: 999,
                     padding: "8px 20px", fontSize: 13, fontWeight: 700,
-                    cursor: "pointer", boxShadow: "0 4px 16px rgba(255,107,157,0.4)",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 16px rgba(242,89,144,0.40)",
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                     transition: "transform 0.15s, box-shadow 0.15s",
                     whiteSpace: "nowrap",
                   }}
-                  onMouseOver={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.04)"; }}
-                  onMouseOut={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+                  onMouseOver={e => {
+                    (e.currentTarget as HTMLElement).style.transform = "scale(1.04)";
+                  }}
+                  onMouseOut={e => {
+                    (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                  }}
                 >
                   🎁 {t("nav_signup")}
                 </button>
@@ -240,9 +315,10 @@ export function Navbar() {
               <button
                 onClick={() => go("/sign-up")}
                 style={{
-                  background: "linear-gradient(135deg,#FF6B9D,#FF8FB3)",
+                  background: "linear-gradient(135deg,#F25990,#D93B72)",
                   color: "#fff", border: "none", borderRadius: 999,
-                  padding: "8px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  padding: "8px 16px", fontSize: 12, fontWeight: 700,
+                  cursor: "pointer",
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
@@ -253,7 +329,7 @@ export function Navbar() {
               onClick={() => setMenuOpen(o => !o)}
               style={{
                 background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.14)",
                 borderRadius: 12, padding: 8, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: 40, height: 40,
@@ -275,8 +351,8 @@ export function Navbar() {
           style={{
             display: menuOpen ? "flex" : "none",
             flexDirection: "column",
-            background: isTeal ? "#0F1923" : "#FFF8F0",
-            borderTop: `1px solid ${isTeal ? "rgba(255,255,255,0.08)" : "rgba(26,26,78,0.08)"}`,
+            background: "#0C163A",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
             padding: "8px 0 20px",
             animation: "wh-slide-down 0.2s ease",
           }}
@@ -287,7 +363,9 @@ export function Navbar() {
               <MobileItem icon={<IconList size={16} color="currentColor" />} label="Meine Listen" onClick={() => go("/dashboard")} />
               <MobileItem icon={<IconGift size={16} color="currentColor" />} label="Feed" onClick={() => go("/feed")} />
               <MobileItem icon={<IconUser size={16} color="currentColor" />} label="Profil" onClick={() => go("/profile")} />
-              {isAdmin && <MobileItem icon={<IconSettings size={16} color="currentColor" />} label="Admin" onClick={() => go("/admin")} />}
+              {isAdmin && (
+                <MobileItem icon={<IconSettings size={16} color="currentColor" />} label="Admin" onClick={() => go("/admin")} />
+              )}
               <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "8px 20px" }} />
               <MobileItem
                 icon={isTeal ? <IconSun size={16} color="currentColor" /> : <IconMoon size={16} color="currentColor" />}
@@ -308,11 +386,13 @@ export function Navbar() {
                 <button
                   onClick={() => go("/sign-up")}
                   style={{
-                    width: "100%", background: "linear-gradient(135deg,#FF6B9D,#FF8FB3)",
+                    width: "100%",
+                    background: "linear-gradient(135deg,#F25990,#D93B72)",
                     color: "#fff", border: "none", borderRadius: 16,
-                    padding: 16, fontSize: 15, fontWeight: 700, cursor: "pointer",
+                    padding: 16, fontSize: 15, fontWeight: 700,
+                    cursor: "pointer",
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    boxShadow: "0 4px 16px rgba(255,107,157,0.35)",
+                    boxShadow: "0 4px 16px rgba(242,89,144,0.35)",
                   }}
                 >
                   Kostenlos registrieren 🎁
@@ -331,14 +411,21 @@ export function Navbar() {
   );
 }
 
-function MobileItem({ icon, label, onClick, muted }: { icon?: React.ReactNode; label: string; onClick: () => void; muted?: boolean }) {
+function MobileItem({
+  icon, label, onClick, muted
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  muted?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
       style={{
         background: "none", border: "none", textAlign: "left",
         padding: "12px 20px", fontSize: 14, fontWeight: 600,
-        color: muted ? "rgba(26,26,78,0.35)" : "#1A1A4E",
+        color: muted ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.85)",
         cursor: "pointer", width: "100%",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
         display: "flex", alignItems: "center", gap: 12,
