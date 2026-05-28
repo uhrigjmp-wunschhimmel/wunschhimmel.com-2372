@@ -11,7 +11,7 @@ const translations = {
     nav_signup: "Registrieren",
     nav_signout: "Abmelden",
     // Landing
-    hero_title: "Deine Wünsche,\nihre Freude.",
+    hero_title: "Deine Wünsche,\ihre Freude.",
     hero_sub: "Erstelle Wunschlisten, teile sie mit deinen Liebsten und mach das Schenken einfacher — für Geburtstage, Weihnachten und jeden Anlass.",
     hero_cta: "Kostenlos starten",
     hero_explore: "Listen entdecken",
@@ -26,7 +26,7 @@ const translations = {
     signin_title: "Willkommen zurück",
     signin_sub: "Melde dich an um deine Wunschlisten zu verwalten",
     signup_title: "Konto erstellen",
-    signup_sub: "Kostenlos — in 30 Sekunden",
+    signup_sub: "Kostenlos — ready in 30 Sekunden",
     email_label: "E-Mail",
     password_label: "Passwort",
     name_label: "Name",
@@ -37,7 +37,7 @@ const translations = {
     // Dashboard
     dashboard_title: "Meine Wunschlisten",
     new_list: "Neue Liste",
-    no_lists: "Noch keine Listen. Erstelle deine erste!",
+    no_lists: "Noch keine Listen. Erstelle deine Erste!",
     public_badge: "Öffentlich",
     private_badge: "Privat",
     // List detail
