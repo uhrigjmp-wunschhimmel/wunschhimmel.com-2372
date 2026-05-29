@@ -127,6 +127,43 @@ export default function Profile() {
     }
   };
 
+  // ─── Profil löschen State ─────────────────────────────────────────────────────
+  const [deleteOpen,    setDeleteOpen]    = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError,   setDeleteError]   = useState<string | null>(null);
+
+  const canDelete = deleteConfirm.trim().toLowerCase() === "löschen";
+
+  const resetDeleteForm = () => {
+    setDeleteOpen(false);
+    setDeleteConfirm("");
+    setDeleteError(null);
+    setDeleteLoading(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!canDelete) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/user", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message ?? "Konto konnte nicht gelöscht werden.");
+      }
+      await authClient.signOut();
+      toast.success("Konto wurde gelöscht.");
+      navigate("/");
+    } catch (err: any) {
+      setDeleteError(err?.message ?? "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setDeleteLoading(false);
+    }
+  };
+
   // ─── Kleine Hilfskomponenten ──────────────────────────────────────────────────
 
   const EyeIcon = ({ visible }: { visible: boolean }) => (
@@ -391,6 +428,77 @@ export default function Profile() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* ── Konto löschen ────────────────────────────────────────────────── */}
+          <div style={{ borderTop: `1px solid ${border}` }} className="pt-6 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <label className="block text-xs font-body font-semibold uppercase tracking-wide" style={{ color: muted }}>Konto</label>
+              {!deleteOpen && (
+                <button
+                  onClick={() => { setDeleteOpen(true); setDeleteError(null); }}
+                  className="font-body text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity hover:opacity-80"
+                  style={{ background: isTeal ? "#2a0a0a" : "#FFF0F0", color: "#E83B3B", border: "1px solid #E83B3B44" }}
+                >
+                  Konto löschen
+                </button>
+              )}
+            </div>
+
+            {deleteOpen && (
+              <div className="rounded-2xl p-5" style={{ background: isTeal ? "#1a0a0a" : "#FFF5F5", border: "1.5px solid #E83B3B44" }}>
+                <p className="font-body text-sm mb-1 font-semibold" style={{ color: "#E83B3B" }}>
+                  Achtung – diese Aktion ist unwiderruflich.
+                </p>
+                <p className="font-body text-xs mb-4" style={{ color: muted }}>
+                  Alle deine Daten, Wünsche und Einstellungen werden dauerhaft gelöscht. Tippe <strong style={{ color: foreground }}>löschen</strong> ein, um zu bestätigen.
+                </p>
+
+                {deleteError && (
+                  <div className="rounded-xl px-4 py-3 mb-4 font-body text-sm" style={{ background: isTeal ? "#2a0a0a" : "#FFF0F0", border: "1.5px solid #E83B3B", color: "#E83B3B" }}>
+                    {deleteError}
+                  </div>
+                )}
+
+                <input
+                  type="text"
+                  value={deleteConfirm}
+                  onChange={e => setDeleteConfirm(e.target.value)}
+                  placeholder="löschen"
+                  className="w-full font-body text-sm rounded-xl px-4 py-3 outline-none transition-colors mb-4"
+                  style={{
+                    background: isTeal ? "#0F1923" : "#FDF8FC",
+                    border: `1.5px solid ${canDelete ? "#E83B3B" : border}`,
+                    color: foreground,
+                  }}
+                  onFocus={e => (e.currentTarget.style.borderColor = "#E83B3B")}
+                  onBlur={e  => (e.currentTarget.style.borderColor = canDelete ? "#E83B3B" : border)}
+                />
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={resetDeleteForm}
+                    className="font-body text-sm font-semibold px-5 py-2.5 rounded-full transition-opacity hover:opacity-70"
+                    style={{ background: isTeal ? "#1E3A4A" : "#FFF0F5", color: muted, border: `1px solid ${border}` }}
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={!canDelete || deleteLoading}
+                    className="flex-1 font-body text-sm font-bold py-2.5 rounded-full transition-all"
+                    style={{
+                      background: canDelete && !deleteLoading ? "#E83B3B" : border,
+                      color: canDelete && !deleteLoading ? "#fff" : muted,
+                      cursor: canDelete && !deleteLoading ? "pointer" : "default",
+                      boxShadow: canDelete && !deleteLoading ? "0 4px 14px rgba(232,59,59,0.3)" : "none",
+                    }}
+                  >
+                    {deleteLoading ? "Wird gelöscht…" : "Konto endgültig löschen"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
