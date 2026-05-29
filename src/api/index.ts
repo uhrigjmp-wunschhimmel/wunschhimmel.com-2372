@@ -731,5 +731,100 @@ app.post("/track/click", async (c) => {
 app.get("/ping", (c) => c.json({ message: `Pong! ${Date.now()}` }));
 
 
+app.delete("/user", authenticatedOnly, async (c) => {
+  const db = drizzle(env.DB, { schema });
+  const user = c.get("user");
+  const userId = user.id;
 
+  try {
+    // 1. Alle Wishlists des Users holen
+    const userWishlists = await db
+      .select({ id: wishlists.id })
+      .from(wishlists)
+      .where(eq(wishlists.userId, userId));
+
+    const wishlistIds = userWishlists.map((w) => w.id);
+
+    if (wishlistIds.length > 0) {
+      // 2. Wishes dieser Wishlists holen
+      const userWishes = await db
+        .select({ id: wishes.id })
+        .from(wishes)
+        .where(inArray(wishes.wishlistId, wishlistIds));
+
+      // 3. ListUpdates dieser Wishlists holen
+      const userUpdates = await db
+        .select({ id: listUpdates.id })
+        .from(listUpdates)
+        .where(inArray(listUpdates.wishlistId, wishlistIds));
+
+      const updateIds = userUpdates.map((u) => u.id);
+
+      // 4. Likes & Kommentare löschen
+      if (updateIds.length > 0) {
+        for (const uid of updateIds) {
+          await db.delete(updateLikes).where(eq(updateLikes.updateId, uid));
+          await db.delete(updateComments).where(eq(updateComments.updateId, uid));
+        }
+      }
+
+      // 5. ListUpdates löschen
+      await db.delete(listUpdates).where(inArray(listUpdates.wishlistId, wishlistIds));
+
+      // 6. ShareInvitations löschen
+      await db.delete(shareInvitations).where(inArray(shareInvitations.wishlistId, wishlistIds));
+
+      // 7. Wishes löschen
+      if (userWishes.length > 0) {
+        for (const w of userWishes) {
+          await db.delete(wishes).where(eq(wishes.id, w.id));
+        }
+      }
+
+      // 8. Wishlists löschen
+      await db.delete(wishlists).where(eq(wishlists.userId, userId));
+    }
+
+    // 9. Updates die der User direkt gepostet hat (userId-Spalte)
+    await db.delete(listUpdates).where(eq(listUpdates.userId, userId));
+
+    // 10. ShareInvitations die der User selbst gesendet hat
+    await db.delete(shareInvitations).where(eq(shareInvitations.sentByUserId, userId));
+
+    // 11. Avatar aus R2 (BUCKET) löschen
+    const profileData = await db
+      .select({ avatarUrl: userProfiles.avatarUrl })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
+      .get();
+
+    if (profileData?.avatarUrl) {
+      try {
+        // URL-Format: /api/files/avatars/userId.ext → Key = avatars/userId.ext
+        const key = profileData.avatarUrl.replace("/api/files/", "");
+        await env.BUCKET.delete(key);
+      } catch { /* R2-Fehler blockiert nicht */ }
+    }
+
+    // 12. userProfile löschen
+    await db.delete(userProfiles).where(eq(userProfiles.userId, userId));
+
+    // 13. Better Auth: sessions + accounts + user löschen
+    const { user: authUser, session: authSession, account: authAccount } = await import("./database/auth-schema");
+    await db.delete(authSession).where(eq(authSession.userId, userId));
+    await db.delete(authAccount).where(eq(authAccount.userId, userId));
+    await db.delete(authUser).where(eq(authUser.id, userId));
+
+    // 14. Session-Cookie löschen
+    c.header(
+      "Set-Cookie",
+      "better-auth.session_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
+    );
+
+    return c.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/user]", err);
+    return c.json({ message: "Konto konnte nicht gelöscht werden. Bitte versuche es erneut." }, 500);
+  }
+});
 export default app;
