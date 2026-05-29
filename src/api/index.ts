@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, desc, sql as drizzleSql, count, gte } from "drizzle-orm";
+import { eq, and, desc, sql as drizzleSql, count, gte, inArray } from "drizzle-orm";
 import { createAuth } from "./auth";
 import { authMiddleware, authenticatedOnly, adminOnly } from "./middleware/authentication";
 import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateLikes, updateComments } from "./database/schema";
