@@ -4,6 +4,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth";
 import { useLocation } from "wouter";
+import { getConsent } from "./CookieBanner";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Product = {
@@ -151,15 +152,17 @@ function WishlistPicker({ product, onClose }: { product: Product; onClose: () =>
 
 // ── Product Card ──────────────────────────────────────────────────────────────
 // Persistent session ID for click tracking (no auth needed)
-const SESSION_ID = (() => {
+function getSessionId(): string {
   if (typeof window === "undefined") return "ssr";
   const key = "wh_session_id";
   const existing = sessionStorage.getItem(key);
   if (existing) return existing;
   const id = crypto.randomUUID();
-  sessionStorage.setItem(key, id);
+  // Nur schreiben wenn Consent vorliegt (notwendige Cookies reichen)
+  const consent = getConsent();
+  if (consent) sessionStorage.setItem(key, id);
   return id;
-})();
+}
 
 function trackClick(product: Product, meta: { recipient?: string | null; occasion?: string | null; budget?: string | null }) {
   fetch("/track/click", {
