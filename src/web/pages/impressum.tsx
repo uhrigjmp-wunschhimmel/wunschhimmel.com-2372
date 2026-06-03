@@ -117,18 +117,6 @@ export default function Impressum() {
 
           <div style={{ borderTop: `1px solid ${border}` }} className="mb-8" />
 
-          {/* Datenschutz */}
-          <section>
-            <h2 className="font-display text-lg font-bold mb-3" style={{ color: foreground }}>Datenschutz</h2>
-            <p className="font-body text-sm leading-relaxed" style={{ color: muted }}>
-              Die Nutzung unserer Website ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name, Anschrift oder E-Mail-Adressen) erhoben werden, erfolgt dies, soweit möglich, stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben.
-            </p>
-            <p className="font-body text-sm leading-relaxed mt-3" style={{ color: muted }}>
-              Wir weisen darauf hin, dass die Datenübertragung im Internet (z. B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.
-            </p>
-          </section>
-        </div>
-
         {/* Footer */}
         <div className="text-center mt-8 font-body text-sm" style={{ color: muted }}>
           <button onClick={() => navigate("/")} style={{ color: accent }} className="hover:underline">
