@@ -10,6 +10,8 @@ import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateL
 import { Resend } from "resend";
 import * as schema from "./database/schema";
 import { agentRoutes } from "./routes/agent";
+import { contactRoute } from './routes/contact.route';
+app.route('/api/contact', contactRoute);
 
 type Bindings = { DB: D1Database; BETTER_AUTH_SECRET: string; RUNABLE_URL: string; RESEND_API_KEY: string; BUCKET: R2Bucket };
 type Variables = { user: any; session: any };
