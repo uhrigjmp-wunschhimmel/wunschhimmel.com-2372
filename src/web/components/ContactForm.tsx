@@ -71,4 +71,39 @@ export function ContactForm({ className }: ContactFormProps) {
       <div style={{ background: '#f0faf4', border: '1.5px solid #a8d5b5', borderRadius: '0.75rem', padding: '1rem 1.25rem', marginTop: '1rem' }}>
         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1d6b3a', margin: 0 }}>
           ✓ Nachricht gesendet! Wir melden uns in der Regel innerhalb von 48 Stunden.
-        </p
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className={className} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1rem' }}>
+      <input name="website" type="text" tabIndex={-1} aria-hidden="true" autoComplete="off" style={{ display: 'none' }} />
+      <div>
+        <label htmlFor="cf-name" style={labelStyle}>Name</label>
+        <input id="cf-name" name="name" type="text" required autoComplete="name" placeholder="Dein Name" disabled={status === 'loading'} style={inputStyle} />
+      </div>
+      <div>
+        <label htmlFor="cf-email" style={labelStyle}>E-Mail-Adresse</label>
+        <input id="cf-email" name="email" type="email" required autoComplete="email" placeholder="deine@email.de" disabled={status === 'loading'} style={inputStyle} />
+      </div>
+      <div>
+        <label htmlFor="cf-message" style={labelStyle}>Nachricht</label>
+        <textarea id="cf-message" name="message" required rows={5} placeholder="Wie können wir dir helfen?" disabled={status === 'loading'} style={{ ...inputStyle, resize: 'vertical', minHeight: '120px' }} />
+      </div>
+      {status === 'error' && (
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.875rem', color: '#c0392b', background: '#fdf0ee', border: '1px solid #f5c6c0', borderRadius: '0.5rem', padding: '0.625rem 0.875rem', margin: 0 }}>
+          {errorMessage}
+        </p>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <button type="submit" disabled={status === 'loading'} style={{ alignSelf: 'flex-start', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, color: '#fff', background: accent, border: 'none', borderRadius: '2rem', padding: '0.625rem 1.75rem', cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.6 : 1 }}>
+          {status === 'loading' ? 'Wird gesendet …' : 'Nachricht senden'}
+        </button>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8125rem', color: muted, margin: 0 }}>
+          Wir antworten in der Regel innerhalb von 48 Stunden (Mo–So).
+        </p>
+      </div>
+    </form>
+  );
+}
