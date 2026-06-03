@@ -50,7 +50,7 @@ export default function Impressum() {
             </p>
           </section>
       
-  import { ContactForm } from '@/components/ContactForm';
+  <import { ContactForm } from '@/components/ContactForm';>
 
           <div style={{ borderTop: `1px solid ${border}` }} className="mb-8" />
 
