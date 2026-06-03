@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import styles from './contactForm.module.css';
+import { useTheme } from '@/lib/theme';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -11,20 +11,18 @@ export function ContactForm({ className }: ContactFormProps) {
   const [status, setStatus] = useState<Status>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  const { theme } = useTheme();
+  const isTeal = theme === 'teal';
+  const accent = isTeal ? '#2DD4BF' : '#FF6B8A';
+  const border = isTeal ? '#1E3A4A' : '#EAD9D9';
+  const muted = isTeal ? '#7FBFB5' : '#6B6B9A';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
-
     const data = new FormData(e.currentTarget);
-
-    // Honeypot check (anti-spam) — should always be empty
-    if (data.get('website')) {
-      setStatus('success'); // Silently swallow bot submissions
-      return;
-    }
-
+    if (data.get('website')) { setStatus('success'); return; }
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -35,12 +33,10 @@ export function ContactForm({ className }: ContactFormProps) {
           message: data.get('message'),
         }),
       });
-
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
         throw new Error(json.error || 'Unbekannter Fehler.');
       }
-
       setStatus('success');
       formRef.current?.reset();
     } catch (err) {
@@ -49,92 +45,30 @@ export function ContactForm({ className }: ContactFormProps) {
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontSize: '0.9375rem',
+    border: `1.5px solid ${border}`,
+    borderRadius: '0.625rem',
+    padding: '0.625rem 0.875rem',
+    width: '100%',
+    boxSizing: 'border-box',
+    background: 'transparent',
+    color: 'inherit',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: muted,
+    display: 'block',
+    marginBottom: '0.375rem',
+  };
+
   if (status === 'success') {
     return (
-      <div className={`${styles.success} ${className ?? ''}`} role="alert">
-        <span className={styles.successIcon}>✓</span>
-        <p>Nachricht gesendet! Wir melden uns in der Regel innerhalb von 48 Stunden.</p>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className={`${styles.form} ${className ?? ''}`}
-      noValidate
-    >
-      {/* Honeypot — hidden from users, bots fill it in */}
-      <input
-        name="website"
-        type="text"
-        tabIndex={-1}
-        aria-hidden="true"
-        autoComplete="off"
-        style={{ display: 'none' }}
-      />
-
-      <div className={styles.field}>
-        <label htmlFor="cf-name">Name</label>
-        <input
-          id="cf-name"
-          name="name"
-          type="text"
-          required
-          autoComplete="name"
-          placeholder="Dein Name"
-          disabled={status === 'loading'}
-          minLength={2}
-          maxLength={100}
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label htmlFor="cf-email">E-Mail-Adresse</label>
-        <input
-          id="cf-email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder="deine@email.de"
-          disabled={status === 'loading'}
-          maxLength={200}
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label htmlFor="cf-message">Nachricht</label>
-        <textarea
-          id="cf-message"
-          name="message"
-          required
-          rows={5}
-          placeholder="Wie können wir dir helfen?"
-          disabled={status === 'loading'}
-          minLength={10}
-          maxLength={2000}
-        />
-      </div>
-
-      {status === 'error' && (
-        <p className={styles.error} role="alert">
-          {errorMessage}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        className={styles.submit}
-      >
-        {status === 'loading' ? 'Wird gesendet …' : 'Nachricht senden'}
-      </button>
-
-      <p className={styles.note}>
-        Wir antworten in der Regel innerhalb von 48 Stunden (Mo–So).
-      </p>
-    </form>
-  );
-}
+      <div style={{ background: '#f0faf4', border: '1.5px solid #a8d5b5', borderRadius: '0.75rem', padding: '1rem 1.25rem', marginTop: '1rem' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1d6b3a', margin: 0 }}>
+          ✓ Nachricht gesendet! Wir melden uns in der Regel innerhalb von 48 Stunden.
+        </p
