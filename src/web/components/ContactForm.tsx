@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import styles from './ContactForm.module.css';
+import styles from './contactForm.module.css';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
