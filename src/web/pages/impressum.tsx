@@ -49,6 +49,8 @@ export default function Impressum() {
               E-Mail: <a href="mailto:kontakt@wunschhimmel.com" style={{ color: accent }}>kontakt@wunschhimmel.com</a>
             </p>
           </section>
+      
+  import { ContactForm } from '@/components/ContactForm';
 
           <div style={{ borderTop: `1px solid ${border}` }} className="mb-8" />
 
