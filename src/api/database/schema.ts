@@ -1,6 +1,18 @@
 import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
+// — Terms & Conditions Acceptance Log ————————————————————————
+export const termsAcceptances = sqliteTable("terms_acceptances", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(), // referenziert Better Auth user.id
+  version: text("version").notNull(),
+  acceptedAt: text("accepted_at")
+    .notNull()
+    .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  ip: text("ip"),
+  userAgent: text("user_agent"),
+});
+
 // ── Better Auth tables ────────────────────────────────────────────────────────
 export { user, session, account, verification } from "./auth-schema";
 
