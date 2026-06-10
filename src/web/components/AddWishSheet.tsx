@@ -132,7 +132,7 @@ export function AddWishSheet({ open, onClose, listId, onAdded, prefillUrl }: Add
       onAdded();
       onClose();
     } catch (e: any) {
-      toast.error(e.message || "Fehler beim Speichern");
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setSaving(false);
     }
