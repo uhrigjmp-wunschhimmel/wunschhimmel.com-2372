@@ -89,7 +89,7 @@ export function WishDetailModal({ wish, isOwner, shareToken, onClose, onUpdated,
       onUpdated();
       setEditing(false);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setSaving(false);
     }
@@ -103,7 +103,7 @@ export function WishDetailModal({ wish, isOwner, shareToken, onClose, onUpdated,
       onDelete?.(wish.id);
       onClose();
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     }
   };
 
@@ -116,7 +116,7 @@ export function WishDetailModal({ wish, isOwner, shareToken, onClose, onUpdated,
       onReserved?.();
       onClose();
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setReserving(false);
     }
