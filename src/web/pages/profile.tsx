@@ -64,7 +64,7 @@ export default function Profile() {
       setAvatarUrl(res.avatarUrl);
       toast.success("Profilbild gespeichert!");
     } catch {
-      toast.error("Upload fehlgeschlagen");
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
       setAvatarUrl(profile?.avatarUrl || null);
     } finally {
       setUploading(false);
