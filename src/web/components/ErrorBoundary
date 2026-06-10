@@ -1,0 +1,186 @@
+import { Component, ReactNode } from "react";
+
+interface Props {
+  children: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
+
+export default class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: { componentStack: string }) {
+    // Hier später Sentry o.ä. einhängen
+    console.error("ErrorBoundary caught:", error, info.componentStack);
+  }
+
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    return (
+      <div className="error-boundary-page">
+        <div className="stars-bg" aria-hidden="true">
+          {["✦","✧","⋆","✦","✧","⋆","✦","✧"].map((s, i) => (
+            <span key={i} className={`star star-${i + 1}`}>{s}</span>
+          ))}
+        </div>
+
+        <div className="error-boundary-card">
+          <div className="icon">🌙</div>
+          <p className="error-code">500</p>
+          <h1 className="error-title">
+            Kurze Wolke vor dem Mond –<br />gleich wieder klar ✨
+          </h1>
+          <p className="error-body">
+            Bei uns ist gerade etwas schiefgelaufen. Wir sind schon dabei,
+            es zu beheben. Bitte versuche es in einem Moment nochmal.
+          </p>
+          <div className="error-actions">
+            <a href="/" className="btn-primary">Zur Startseite</a>
+            <button
+              className="btn-ghost"
+              onClick={() => this.setState({ hasError: false })}
+            >
+              Nochmal versuchen
+            </button>
+          </div>
+        </div>
+
+        <style>{`
+          .error-boundary-page {
+            min-height: 100vh;
+            background: #FDF8FC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          }
+          .stars-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+          }
+          .star {
+            position: absolute;
+            color: #4A90D9;
+            opacity: 0.18;
+            animation: drift 6s ease-in-out infinite;
+          }
+          .star-1 { top: 8%;  left: 7%;  font-size: 18px; animation-delay: 0s; }
+          .star-2 { top: 15%; left: 85%; font-size: 12px; animation-delay: 0.8s; }
+          .star-3 { top: 30%; left: 92%; font-size: 20px; animation-delay: 1.6s; }
+          .star-4 { top: 60%; left: 5%;  font-size: 10px; animation-delay: 2.4s; }
+          .star-5 { top: 75%; left: 88%; font-size: 16px; animation-delay: 0.4s; }
+          .star-6 { top: 88%; left: 15%; font-size: 14px; animation-delay: 3.2s; }
+          .star-7 { top: 5%;  left: 45%; font-size: 10px; animation-delay: 1.2s; }
+          .star-8 { top: 45%; left: 2%;  font-size: 22px; animation-delay: 2.0s; }
+          @keyframes drift {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.18; }
+            50%       { transform: translateY(-8px) rotate(15deg); opacity: 0.35; }
+          }
+          .error-boundary-card {
+            position: relative;
+            background: white;
+            border: 1px solid #F0D5E5;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(18, 32, 80, 0.10);
+            padding: 48px 40px 44px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+          }
+          .icon {
+            font-size: 56px;
+            line-height: 1;
+            margin-bottom: 8px;
+          }
+          .error-code {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 72px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4A90D9, #122050);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin: 4px 0 0;
+          }
+          .error-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #122050;
+            line-height: 1.4;
+            margin: 12px 0 16px;
+          }
+          .error-body {
+            font-size: 15px;
+            color: #5A3A4A;
+            line-height: 1.7;
+            margin: 0 0 32px;
+          }
+          .error-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+          .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #F25990, #B02558);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(210, 59, 114, 0.30);
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.15s;
+          }
+          .btn-primary:hover { opacity: 0.90; transform: translateY(-1px); }
+          .btn-ghost {
+            display: inline-block;
+            background: #FFF0F5;
+            border: 1px solid #FFB3D1;
+            color: #B02558;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.15s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          }
+          .btn-ghost:hover { background: #FFD6E7; transform: translateY(-1px); }
+          @media (max-width: 480px) {
+            .error-boundary-card { padding: 36px 24px 32px; }
+            .error-code { font-size: 56px; }
+            .error-title { font-size: 19px; }
+            .error-actions { flex-direction: column; align-items: center; }
+            .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .star { animation: none; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+}
