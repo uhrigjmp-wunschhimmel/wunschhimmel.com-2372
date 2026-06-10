@@ -22,6 +22,7 @@ export default function ForgotPassword() {
       });
       if (!res.ok) throw new Error();
       setSent(true);
+      toast.success("E-Mail gesendet!");
     } catch {
       toast.error("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
