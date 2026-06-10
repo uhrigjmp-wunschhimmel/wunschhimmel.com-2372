@@ -38,7 +38,7 @@ export default function Dashboard() {
       toast.success("Liste erstellt! 🎉");
       navigate(`/list/${list.id}`);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setCreating(false);
     }
@@ -51,7 +51,7 @@ export default function Dashboard() {
       setLists(prev => prev.filter(l => l.id !== id));
       toast.success("Liste gelöscht");
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     }
   };
 
@@ -60,7 +60,7 @@ export default function Dashboard() {
       const updated = await api.updateList(list.id, { isPublic: !list.isPublic });
       setLists(prev => prev.map(l => l.id === list.id ? updated : l));
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     }
   };
 
