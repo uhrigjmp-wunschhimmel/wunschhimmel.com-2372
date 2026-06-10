@@ -55,7 +55,7 @@ function App() {
         </ThemeProvider>
       </I18nProvider>
     </Provider>
-  <ErrorBoundary>
+   </ErrorBoundary>
   );
 }
 
