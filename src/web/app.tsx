@@ -22,10 +22,12 @@ import Admin from "./pages/admin";
 import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
 import NotFoundPage from "./pages/NotFoundPage";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
-    <Provider>
+   <ErrorBoundary>
+     <Provider>
       <I18nProvider>
         <ThemeProvider>
         <Navbar />
@@ -53,6 +55,7 @@ function App() {
         </ThemeProvider>
       </I18nProvider>
     </Provider>
+  <ErrorBoundary>
   );
 }
 
