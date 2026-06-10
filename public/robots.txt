@@ -1,0 +1,13 @@
+﻿User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /list/
+Disallow: /profile
+Disallow: /feed
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://www.wunschhimmel.com/sitemap.xml
