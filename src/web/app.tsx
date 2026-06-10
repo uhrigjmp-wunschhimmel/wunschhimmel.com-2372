@@ -21,6 +21,7 @@ import Feed from "./pages/feed";
 import Admin from "./pages/admin";
 import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/admin" component={Admin} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route component={NotFoundPage} />
         </Switch>
         <CookieBanner />
         <WunschengelChat />
