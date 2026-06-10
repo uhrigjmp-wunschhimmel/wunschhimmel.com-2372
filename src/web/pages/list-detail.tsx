@@ -93,7 +93,7 @@ export default function ListDetail() {
       setShowShareModal(false);
       setShareEmails(""); setShareMessage("");
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setSharing(false);
     }
@@ -106,7 +106,7 @@ export default function ListDetail() {
       setShowEditModal(false);
       toast.success("Liste aktualisiert!");
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     }
   };
 
@@ -125,7 +125,7 @@ export default function ListDetail() {
       setUpdateText(""); setUpdatePhoto(null); setUpdatePhotoPreview(null);
       toast.success("Update gepostet! 🎉");
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
     } finally {
       setPostingUpdate(false);
     }
