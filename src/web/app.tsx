@@ -6,6 +6,7 @@ import { ThemeProvider } from "./lib/theme";
 import { Navbar } from "./components/Navbar";
 import { CookieBanner } from "./components/CookieBanner";
 import { WunschengelChat } from "./components/WunschengelChat";
+import { ClipboardWishDetector } from "./components/ClipboardWishDetector";
 import { Toaster } from "./components/ui/sonner";
 import LandingPage from "./pages/index";
 import SignIn from "./pages/sign-in";
@@ -51,6 +52,7 @@ function App() {
         </Switch>
         <CookieBanner />
         <WunschengelChat />
+        <ClipboardWishDetector />
         <Toaster richColors position="bottom-center" />
         {import.meta.env.DEV && <AgentFeedback />}
         </ThemeProvider>
