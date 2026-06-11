@@ -68,33 +68,58 @@ app.post("/scrape", authenticatedOnly, async (c) => {
       html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ||
       "";
 
-    // Image: og:image → twitter:image → Amazon data-old-hires (high-res product image) → landingImage src
+    // Image: og:image → twitter:image → Amazon data-old-hires → landingImage
     let image =
       getMeta("og:image") ||
       getMeta("twitter:image") ||
       "";
 
     if (!image) {
-      // Amazon: grab first data-old-hires (high resolution product image)
       const hiresMatch = html.match(/data-old-hires="(https:\/\/m\.media-amazon\.com\/images\/[^"]+)"/);
       if (hiresMatch) {
         image = hiresMatch[1];
       } else {
-        // Fallback: landingImage src
         const landingMatch = html.match(/id="landingImage"[^>]*src="([^"]+)"/);
         if (landingMatch) image = landingMatch[1];
       }
     }
 
-    // Price: structured data → itemprop → Amazon span.a-price
+    // Price: Amazon-spezifisch → itemprop → JSON-LD (neben priceCurrency)
     let price: number | null = null;
-    const priceMatch =
-      html.match(/"price":\s*"?(\d+(?:[.,]\d{1,2})?)"?/) ||
-      html.match(/itemprop="price"[^>]*content="([^"]+)"/) ||
-      html.match(/class="[^"]*a-price-whole[^"]*"[^>]*>(\d+)/) ||
-      html.match(/class="[^"]*price[^"]*"[^>]*>[\s€$£]*(\d+(?:[.,]\d{1,2})?)/i);
-    if (priceMatch) {
-      price = parseFloat(priceMatch[1].replace(",", "."));
+
+    // Amazon: Ganzzahl + Nachkommastellen getrennt in a-price-whole / a-price-fraction
+    // Suche im corePrice-Bereich oder apex_desktop-Bereich
+    const amazonSection =
+      html.match(/id="corePrice_feature_div"([\s\S]{0,1000})/) ||
+      html.match(/id="apex_desktop"([\s\S]{0,1200})/);
+
+    if (amazonSection) {
+      const section = amazonSection[1];
+      const wholeMatch = section.match(/a-price-whole[^>]*>\s*(\d+)/);
+      const fracMatch = section.match(/a-price-fraction[^>]*>\s*(\d+)/);
+      if (wholeMatch) {
+        const whole = wholeMatch[1];
+        const frac = fracMatch ? fracMatch[1].padEnd(2, "0") : "00";
+        price = parseFloat(`${whole}.${frac}`);
+      }
+    }
+
+    if (price === null) {
+      // Fallback 1: itemprop="price" content="..."
+      const itempropMatch = html.match(/itemprop="price"[^>]*content="([\d.,]+)"/);
+      if (itempropMatch) {
+        price = parseFloat(itempropMatch[1].replace(",", "."));
+      }
+    }
+
+    if (price === null) {
+      // Fallback 2: JSON-LD — nur wenn "price" direkt neben "priceCurrency" steht
+      const jsonLdMatch =
+        html.match(/"priceCurrency"\s*:\s*"[^"]*"[\s\S]{0,80}?"price"\s*:\s*"?([\d.,]+)"?/) ||
+        html.match(/"price"\s*:\s*"?([\d.,]+)"?[\s\S]{0,80}?"priceCurrency"/);
+      if (jsonLdMatch) {
+        price = parseFloat(jsonLdMatch[1].replace(",", "."));
+      }
     }
 
     const description = getMeta("og:description") || getMeta("description") || "";
@@ -105,7 +130,7 @@ app.post("/scrape", authenticatedOnly, async (c) => {
   }
 });
 
-// ── Wishlists ────────────────────────────────────────────────────────────────
+// ── Wishlists ─────────────────────────────────────────────────────────────────
 app.get("/wishlists", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
@@ -183,10 +208,8 @@ function injectAmazonTag(url: string): string {
   try {
     const u = new URL(url);
     if (!AMAZON_DOMAINS.test(u.hostname)) return url;
-    // Handle short links — can't inject tag, return as-is
     if (u.hostname.includes("amzn.to") || u.hostname.includes("amzn.eu")) return url;
     u.searchParams.set("tag", AMAZON_AFFILIATE_TAG);
-    // Remove other affiliate tags that might conflict
     u.searchParams.delete("ref");
     return u.toString();
   } catch {
@@ -194,7 +217,7 @@ function injectAmazonTag(url: string): string {
   }
 }
 
-// ── Wishes ───────────────────────────────────────────────────────────────────
+// ── Wishes ────────────────────────────────────────────────────────────────────
 app.post("/wishlists/:id/wishes", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
@@ -208,9 +231,13 @@ app.post("/wishlists/:id/wishes", authenticatedOnly, async (c) => {
     price?: number;
     currency?: string;
     productUrl?: string;
+    url?: string;
+    note?: string;
     priority?: string;
   }>();
   if (!body.title) return c.json({ error: "title required" }, 400);
+  // Support both "url" and "productUrl" field names
+  if (body.url && !body.productUrl) body.productUrl = body.url;
   if (body.productUrl) body.productUrl = injectAmazonTag(body.productUrl);
   const id = nanoid();
   await db.insert(wishes).values({ id, wishlistId: list.id, ...body });
@@ -243,7 +270,7 @@ app.delete("/wishes/:id", authenticatedOnly, async (c) => {
   return c.json({ success: true });
 });
 
-// ── Email share ──────────────────────────────────────────────────────────────
+// ── Email share ───────────────────────────────────────────────────────────────
 app.post("/wishlists/:id/share", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
@@ -315,7 +342,6 @@ app.post("/shared/:token/wishes/:wishId/reserve", async (c) => {
     reservedAt: new Date().toISOString(),
   }).where(eq(wishes.id, wish.id));
 
-  // ── Email notification to list owner ────────────────────────────────────
   try {
     const { user: authUser } = await import("./database/auth-schema");
     const owner = await db.select().from(authUser).where(eq(authUser.id, list.userId)).get();
@@ -345,7 +371,7 @@ app.post("/shared/:token/wishes/:wishId/reserve", async (c) => {
   return c.json({ success: true });
 });
 
-// ── Unreserve a wish ─────────────────────────────────────────────────────────
+// ── Unreserve a wish ──────────────────────────────────────────────────────────
 app.post("/shared/:token/wishes/:wishId/unreserve", async (c) => {
   const db = drizzle(env.DB, { schema });
   const list = await db.select().from(wishlists).where(eq(wishlists.shareToken, c.req.param("token"))).get();
@@ -370,12 +396,11 @@ app.get("/explore", async (c) => {
   return c.json(lists);
 });
 
-// ── User profile / theme ─────────────────────────────────────────────────────
+// ── User profile / theme ──────────────────────────────────────────────────────
 app.get("/profile", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
   let profile = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
-  // Auto-grant admin for Marlene if profile exists but isAdmin=false
   if (profile && user.email === "kontakt@wunschhimmel.com" && !profile.isAdmin) {
     await db.update(userProfiles).set({ isAdmin: true }).where(eq(userProfiles.userId, user.id));
     profile = { ...profile, isAdmin: true };
@@ -397,7 +422,6 @@ app.post("/profile/theme", authenticatedOnly, async (c) => {
   return c.json({ theme });
 });
 
-// Called right after sign-up to save initial theme choice
 app.post("/profile/init", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
@@ -525,13 +549,12 @@ app.delete("/updates/:id", authenticatedOnly, async (c) => {
   return c.json({ success: true });
 });
 
-// ── Public updates (via share token or public list) ──────────────────────────
+// ── Public updates (via share token) ─────────────────────────────────────────
 app.get("/shared/:token/updates", async (c) => {
   const db = drizzle(env.DB, { schema });
   const list = await db.select().from(wishlists).where(eq(wishlists.shareToken, c.req.param("token"))).get();
   if (!list) return c.json({ error: "not found" }, 404);
   const updates = await db.select().from(listUpdates).where(eq(listUpdates.wishlistId, list.id)).orderBy(desc(listUpdates.createdAt));
-  // Enrich with like/comment counts and profile
   const enriched = await Promise.all(updates.map(async (u) => {
     const likes = await db.select().from(updateLikes).where(eq(updateLikes.updateId, u.id));
     const comments = await db.select().from(updateComments).where(eq(updateComments.updateId, u.id)).orderBy(desc(updateComments.createdAt));
@@ -568,7 +591,6 @@ app.post("/updates/:id/comments", async (c) => {
 // ── Global feed (public updates) ──────────────────────────────────────────────
 app.get("/feed", async (c) => {
   const db = drizzle(env.DB, { schema });
-  // Only updates from public lists
   const publicLists = await db.select({ id: wishlists.id, title: wishlists.title, emoji: wishlists.emoji, shareToken: wishlists.shareToken, userId: wishlists.userId })
     .from(wishlists).where(eq(wishlists.isPublic, true));
   const publicListIds = publicLists.map(l => l.id);
@@ -596,17 +618,8 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Parallel aggregate queries
   const [
-    allUsers,
-    allWishlists,
-    allWishes,
-    allShares,
-    allUpdates,
-    allLikes,
-    allComments,
-    recentWishlists,
-    publicLists,
+    allUsers, allWishlists, allWishes, allShares, allUpdates, allLikes, allComments, recentWishlists, publicLists,
   ] = await Promise.all([
     db.select({ id: authUser.id, name: authUser.name, email: authUser.email, createdAt: authUser.createdAt }).from(authUser).all(),
     db.select().from(wishlists).all(),
@@ -615,14 +628,10 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
     db.select().from(listUpdates).all(),
     db.select().from(updateLikes).all(),
     db.select().from(updateComments).all(),
-    db.select({ userId: wishlists.userId, updatedAt: wishlists.updatedAt })
-      .from(wishlists)
-      .where(gte(wishlists.updatedAt, thirtyDaysAgo))
-      .all(),
+    db.select({ userId: wishlists.userId, updatedAt: wishlists.updatedAt }).from(wishlists).where(gte(wishlists.updatedAt, thirtyDaysAgo)).all(),
     db.select({ id: wishlists.id }).from(wishlists).where(eq(wishlists.isPublic, true)).all(),
   ]);
 
-  // Registrations grouped by day (last 30 days)
   const regsByDay: Record<string, number> = {};
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   for (const u of allUsers) {
@@ -632,7 +641,6 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
       regsByDay[key] = (regsByDay[key] || 0) + 1;
     }
   }
-  // Fill last 30 days
   const registrationsByDay = [];
   for (let i = 29; i >= 0; i--) {
     const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
@@ -640,7 +648,6 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
     registrationsByDay.push({ date: key, count: regsByDay[key] || 0 });
   }
 
-  // Top domains from productUrl
   const domainCounts: Record<string, number> = {};
   for (const w of allWishes) {
     if (w.productUrl) {
@@ -650,47 +657,24 @@ app.get("/admin/stats", authenticatedOnly, adminOnly, async (c) => {
       } catch { /* invalid url */ }
     }
   }
-  const topDomains = Object.entries(domainCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
-    .map(([domain, count]) => ({ domain, count }));
-
-  // Active users (created/updated a wishlist in last 30 days)
+  const topDomains = Object.entries(domainCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([domain, count]) => ({ domain, count }));
   const activeUserIds = new Set(recentWishlists.map(w => w.userId));
 
-  // Per-user stats
   const userStats = allUsers.map(u => {
     const userLists = allWishlists.filter(l => l.userId === u.id);
     const wishCount = allWishes.filter(w => userLists.some(l => l.id === w.wishlistId)).length;
     const shareCount = allShares.filter(s => s.sentByUserId === u.id).length;
-    return {
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      createdAt: u.createdAt,
-      listCount: userLists.length,
-      wishCount,
-      shareCount,
-      isActive: activeUserIds.has(u.id),
-    };
+    return { id: u.id, name: u.name, email: u.email, createdAt: u.createdAt, listCount: userLists.length, wishCount, shareCount, isActive: activeUserIds.has(u.id) };
   }).sort((a, b) => b.listCount - a.listCount);
 
   return c.json({
     totals: {
-      users: allUsers.length,
-      wishlists: allWishlists.length,
-      wishes: allWishes.length,
-      links: allWishes.filter(w => !!w.productUrl).length,
-      shares: allShares.length,
-      publicLists: publicLists.length,
-      updates: allUpdates.length,
-      likes: allLikes.length,
-      comments: allComments.length,
-      activeUsers: activeUserIds.size,
+      users: allUsers.length, wishlists: allWishlists.length, wishes: allWishes.length,
+      links: allWishes.filter(w => !!w.productUrl).length, shares: allShares.length,
+      publicLists: publicLists.length, updates: allUpdates.length, likes: allLikes.length,
+      comments: allComments.length, activeUsers: activeUserIds.size,
     },
-    registrationsByDay,
-    topDomains,
-    users: userStats,
+    registrationsByDay, topDomains, users: userStats,
   });
 });
 
@@ -707,17 +691,15 @@ app.post("/track/click", async (c) => {
 
     const db = drizzle(c.env.DB);
     await db.run(
-      sql`INSERT INTO product_clicks (id, session_id, user_id, product_id, partner_id, affiliate_url, recipient, occasion, budget)
+      drizzleSql`INSERT INTO product_clicks (id, session_id, user_id, product_id, partner_id, affiliate_url, recipient, occasion, budget)
           VALUES (${id}, ${sessionId}, ${userId}, ${productId}, ${partnerId ?? "unknown"}, ${affiliateUrl ?? ""}, ${recipient ?? null}, ${occasion ?? null}, ${budget ?? null})`
     );
 
-    // Forward to Plausible as custom event (fire-and-forget)
     fetch("https://plausible.io/api/event", {
       method: "POST",
       headers: { "Content-Type": "application/json", "User-Agent": c.req.header("user-agent") ?? "" },
       body: JSON.stringify({
-        domain: "wunschhimmel.de",
-        name: "Product Click",
+        domain: "wunschhimmel.de", name: "Product Click",
         url: c.req.header("referer") ?? "https://wunschhimmel.de",
         props: { productId, partnerId, occasion, recipient },
       }),
@@ -729,9 +711,7 @@ app.post("/track/click", async (c) => {
   }
 });
 
-
 app.get("/ping", (c) => c.json({ message: `Pong! ${Date.now()}` }));
-
 
 app.delete("/user", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
@@ -739,30 +719,14 @@ app.delete("/user", authenticatedOnly, async (c) => {
   const userId = user.id;
 
   try {
-    // 1. Alle Wishlists des Users holen
-    const userWishlists = await db
-      .select({ id: wishlists.id })
-      .from(wishlists)
-      .where(eq(wishlists.userId, userId));
-
+    const userWishlists = await db.select({ id: wishlists.id }).from(wishlists).where(eq(wishlists.userId, userId));
     const wishlistIds = userWishlists.map((w) => w.id);
 
     if (wishlistIds.length > 0) {
-      // 2. Wishes dieser Wishlists holen
-      const userWishes = await db
-        .select({ id: wishes.id })
-        .from(wishes)
-        .where(inArray(wishes.wishlistId, wishlistIds));
-
-      // 3. ListUpdates dieser Wishlists holen
-      const userUpdates = await db
-        .select({ id: listUpdates.id })
-        .from(listUpdates)
-        .where(inArray(listUpdates.wishlistId, wishlistIds));
-
+      const userWishes = await db.select({ id: wishes.id }).from(wishes).where(inArray(wishes.wishlistId, wishlistIds));
+      const userUpdates = await db.select({ id: listUpdates.id }).from(listUpdates).where(inArray(listUpdates.wishlistId, wishlistIds));
       const updateIds = userUpdates.map((u) => u.id);
 
-      // 4. Likes & Kommentare löschen
       if (updateIds.length > 0) {
         for (const uid of updateIds) {
           await db.delete(updateLikes).where(eq(updateLikes.updateId, uid));
@@ -770,58 +734,36 @@ app.delete("/user", authenticatedOnly, async (c) => {
         }
       }
 
-      // 5. ListUpdates löschen
       await db.delete(listUpdates).where(inArray(listUpdates.wishlistId, wishlistIds));
-
-      // 6. ShareInvitations löschen
       await db.delete(shareInvitations).where(inArray(shareInvitations.wishlistId, wishlistIds));
 
-      // 7. Wishes löschen
       if (userWishes.length > 0) {
         for (const w of userWishes) {
           await db.delete(wishes).where(eq(wishes.id, w.id));
         }
       }
-
-      // 8. Wishlists löschen
       await db.delete(wishlists).where(eq(wishlists.userId, userId));
     }
 
-    // 9. Updates die der User direkt gepostet hat (userId-Spalte)
     await db.delete(listUpdates).where(eq(listUpdates.userId, userId));
-
-    // 10. ShareInvitations die der User selbst gesendet hat
     await db.delete(shareInvitations).where(eq(shareInvitations.sentByUserId, userId));
 
-    // 11. Avatar aus R2 (BUCKET) löschen
-    const profileData = await db
-      .select({ avatarUrl: userProfiles.avatarUrl })
-      .from(userProfiles)
-      .where(eq(userProfiles.userId, userId))
-      .get();
-
+    const profileData = await db.select({ avatarUrl: userProfiles.avatarUrl }).from(userProfiles).where(eq(userProfiles.userId, userId)).get();
     if (profileData?.avatarUrl) {
       try {
-        // URL-Format: /api/files/avatars/userId.ext → Key = avatars/userId.ext
         const key = profileData.avatarUrl.replace("/api/files/", "");
         await env.BUCKET.delete(key);
-      } catch { /* R2-Fehler blockiert nicht */ }
+      } catch { /* R2 error doesn't block */ }
     }
 
-    // 12. userProfile löschen
     await db.delete(userProfiles).where(eq(userProfiles.userId, userId));
 
-    // 13. Better Auth: sessions + accounts + user löschen
     const { user: authUser, session: authSession, account: authAccount } = await import("./database/auth-schema");
     await db.delete(authSession).where(eq(authSession.userId, userId));
     await db.delete(authAccount).where(eq(authAccount.userId, userId));
     await db.delete(authUser).where(eq(authUser.id, userId));
 
-    // 14. Session-Cookie löschen
-    c.header(
-      "Set-Cookie",
-      "better-auth.session_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-    );
+    c.header("Set-Cookie", "better-auth.session_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0");
 
     return c.json({ success: true });
   } catch (err) {
@@ -829,4 +771,5 @@ app.delete("/user", authenticatedOnly, async (c) => {
     return c.json({ message: "Konto konnte nicht gelöscht werden. Bitte versuche es erneut." }, 500);
   }
 });
+
 export default app;
