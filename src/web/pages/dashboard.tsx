@@ -5,13 +5,15 @@ import { useI18n } from "@/lib/i18n";
 import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
 import { IconPlus, IconTrash, IconLock, IconUnlock, IconGift, IconSparkle } from "@/components/Icons";
+import { useClipboardWish } from "@/components/ClipboardWishDetector";
 
-const EMOJIS = ["🎁", "🎂", "🎄", "🌟", "💝", "🛍️", "🌈", "🎮", "👟", "📚", "🎵", "🌸", "✈️", "💄", "🏠"];
+const EMOJIS = ["🎁", "🎂", "🎄", "🌟", "💍", "🛍️", "🌈", "🎮", "👟", "📚", "🎵", "🌸", "✈️", "💄", "🏠"];
 
 export default function Dashboard() {
   const { t } = useI18n();
   const [, navigate] = useLocation();
   const { data: session } = authClient.useSession();
+  const { handleTrigger, checking, Sheet } = useClipboardWish();
 
   const [lists, setLists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,14 +87,44 @@ export default function Dashboard() {
                 {session.user.name?.split(" ")[0] || "Freund"}s Wunschhimmel
               </h1>
             </div>
-            <button
-              onClick={() => setShowNewModal(true)}
-              className="btn-primary"
-              style={{ gap: 8 }}
-            >
-              <IconPlus size={16} color="currentColor" />
-              {t("new_list")}
-            </button>
+
+            {/* Buttons nebeneinander */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                onClick={handleTrigger}
+                disabled={checking}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "10px 20px", borderRadius: 50,
+                  border: "2px solid var(--accent)",
+                  background: "transparent",
+                  fontSize: 14, fontWeight: 700,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  color: "var(--accent)",
+                  cursor: checking ? "wait" : "pointer",
+                  transition: "all 0.15s",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseOver={e => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(242,89,144,0.08)";
+                }}
+                onMouseOut={e => {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                }}
+              >
+                <span>🔗</span>
+                {checking ? "Prüfe…" : "Link hinzufügen"}
+              </button>
+
+              <button
+                onClick={() => setShowNewModal(true)}
+                className="btn-primary"
+                style={{ gap: 8 }}
+              >
+                <IconPlus size={16} color="currentColor" />
+                {t("new_list")}
+              </button>
+            </div>
           </div>
 
           {/* Stats bar */}
@@ -111,14 +143,12 @@ export default function Dashboard() {
 
         {/* ── Content ── */}
         {loading ? (
-          /* Skeleton */
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
             {[1,2,3].map(i => (
               <div key={i} className="skeleton" style={{ height: 180, borderRadius: 20 }} />
             ))}
           </div>
         ) : lists.length === 0 ? (
-          /* Empty state */
           <div style={{
             textAlign: "center", padding: "80px 20px",
             background: "var(--card)", borderRadius: 28,
@@ -139,12 +169,7 @@ export default function Dashboard() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
             {lists.map(list => (
-              <div
-                key={list.id}
-                className="list-card"
-                onClick={() => navigate(`/list/${list.id}`)}
-              >
-                {/* Top row */}
+              <div key={list.id} className="list-card" onClick={() => navigate(`/list/${list.id}`)}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontSize: 38, lineHeight: 1 }}>{list.emoji}</span>
                   <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
@@ -167,8 +192,6 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-
-                {/* Title */}
                 <h3 style={{
                   fontFamily: "'Playfair Display', serif",
                   fontWeight: 700, fontSize: 17, color: "var(--foreground)",
@@ -176,8 +199,6 @@ export default function Dashboard() {
                 }}>
                   {list.title}
                 </h3>
-
-                {/* Description */}
                 {list.description && (
                   <p style={{
                     fontSize: 12, color: "var(--muted-foreground)",
@@ -188,8 +209,6 @@ export default function Dashboard() {
                     {list.description}
                   </p>
                 )}
-
-                {/* Footer */}
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   paddingTop: 12, marginTop: "auto",
@@ -217,18 +236,14 @@ export default function Dashboard() {
               </div>
             ))}
 
-            {/* New list card */}
             <button
               onClick={() => setShowNewModal(true)}
               style={{
-                background: "none",
-                border: "2px dashed var(--border)",
-                borderRadius: 20,
-                padding: 20,
+                background: "none", border: "2px dashed var(--border)",
+                borderRadius: 20, padding: 20,
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center",
-                gap: 10, cursor: "pointer",
-                minHeight: 160,
+                gap: 10, cursor: "pointer", minHeight: 160,
                 transition: "border-color 0.2s, background 0.2s",
               }}
               onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,107,157,0.04)"; }}
@@ -251,45 +266,27 @@ export default function Dashboard() {
 
       {/* ── New list modal ── */}
       {showNewModal && (
-        <div
-          className="wh-modal-backdrop"
-          onClick={() => setShowNewModal(false)}
-        >
-          <div
-            className="wh-modal"
-            onClick={e => e.stopPropagation()}
-            style={{ padding: "32px 28px" }}
-          >
+        <div className="wh-modal-backdrop" onClick={() => setShowNewModal(false)}>
+          <div className="wh-modal" onClick={e => e.stopPropagation()} style={{ padding: "32px 28px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "var(--foreground)" }}>
                 Neue Liste erstellen ✨
               </h2>
-              <button
-                onClick={() => setShowNewModal(false)}
-                className="btn-icon"
-                style={{ width: 36, height: 36 }}
-              >
-                ✕
-              </button>
+              <button onClick={() => setShowNewModal(false)} className="btn-icon" style={{ width: 36, height: 36 }}>✕</button>
             </div>
 
-            {/* Emoji picker */}
             <div style={{ marginBottom: 20 }}>
               <label className="wh-label">Emoji</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {EMOJIS.map(e => (
-                  <button
-                    key={e}
-                    onClick={() => setNewEmoji(e)}
-                    style={{
-                      fontSize: 22, padding: "6px 8px", borderRadius: 12,
-                      border: `2px solid ${newEmoji === e ? "var(--accent)" : "transparent"}`,
-                      background: newEmoji === e ? "rgba(255,107,157,0.1)" : "var(--muted)",
-                      cursor: "pointer",
-                      transform: newEmoji === e ? "scale(1.15)" : "scale(1)",
-                      transition: "all 0.15s",
-                    }}
-                  >
+                  <button key={e} onClick={() => setNewEmoji(e)} style={{
+                    fontSize: 22, padding: "6px 8px", borderRadius: 12,
+                    border: `2px solid ${newEmoji === e ? "var(--accent)" : "transparent"}`,
+                    background: newEmoji === e ? "rgba(255,107,157,0.1)" : "var(--muted)",
+                    cursor: "pointer",
+                    transform: newEmoji === e ? "scale(1.15)" : "scale(1)",
+                    transition: "all 0.15s",
+                  }}>
                     {e}
                   </button>
                 ))}
@@ -299,59 +296,36 @@ export default function Dashboard() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
                 <label className="wh-label">Listenname *</label>
-                <input
-                  value={newTitle}
-                  onChange={e => setNewTitle(e.target.value)}
-                  placeholder="z. B. Weihnachten 2025"
-                  className="wh-input"
-                  autoFocus
-                  onKeyDown={e => { if (e.key === "Enter" && newTitle.trim()) createList(); }}
-                />
+                <input value={newTitle} onChange={e => setNewTitle(e.target.value)}
+                  placeholder="z. B. Weihnachten 2025" className="wh-input" autoFocus
+                  onKeyDown={e => { if (e.key === "Enter" && newTitle.trim()) createList(); }} />
               </div>
               <div>
                 <label className="wh-label">Beschreibung (optional)</label>
-                <textarea
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                  placeholder="Was ist das für eine Liste?"
-                  rows={2}
-                  className="wh-input"
-                  style={{ resize: "none" }}
-                />
+                <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)}
+                  placeholder="Was ist das für eine Liste?" rows={2} className="wh-input" style={{ resize: "none" }} />
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={newPublic}
-                  onChange={e => setNewPublic(e.target.checked)}
-                  style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer" }}
-                />
+                <input type="checkbox" checked={newPublic} onChange={e => setNewPublic(e.target.checked)}
+                  style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer" }} />
                 <span style={{ fontSize: 13, color: "var(--foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
-                  Öffentlich — für andere sichtbar
+                  Öffentlich – für andere sichtbar
                 </span>
               </label>
             </div>
 
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-              <button
-                onClick={() => setShowNewModal(false)}
-                className="btn-secondary"
-                style={{ flex: 1 }}
-              >
-                Abbrechen
-              </button>
-              <button
-                onClick={createList}
-                disabled={creating || !newTitle.trim()}
-                className="btn-primary"
-                style={{ flex: 1 }}
-              >
+              <button onClick={() => setShowNewModal(false)} className="btn-secondary" style={{ flex: 1 }}>Abbrechen</button>
+              <button onClick={createList} disabled={creating || !newTitle.trim()} className="btn-primary" style={{ flex: 1 }}>
                 {creating ? "Erstelle…" : "Liste erstellen ✨"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Sheet vom ClipboardWishDetector */}
+      <Sheet />
     </div>
   );
 }
