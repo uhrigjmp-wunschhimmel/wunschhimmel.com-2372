@@ -113,12 +113,17 @@ app.post("/scrape", authenticatedOnly, async (c) => {
     }
 
     if (price === null) {
-      // Fallback 2: JSON-LD — nur wenn "price" direkt neben "priceCurrency" steht
+      // Fallback 2: JSON-LD — nur Schema.org Offer mit explizitem priceCurrency direkt daneben
+      // Sehr streng: nur wenn price UND priceCurrency innerhalb von 30 Zeichen nebeneinander stehen
       const jsonLdMatch =
-        html.match(/"priceCurrency"\s*:\s*"[^"]*"[\s\S]{0,80}?"price"\s*:\s*"?([\d.,]+)"?/) ||
-        html.match(/"price"\s*:\s*"?([\d.,]+)"?[\s\S]{0,80}?"priceCurrency"/);
+        html.match(/"price"\s*:\s*"([\d.]+)"\s*,\s*"priceCurrency"/) ||
+        html.match(/"priceCurrency"\s*:\s*"[A-Z]{3}"\s*,\s*"price"\s*:\s*"([\d.]+)"/);
       if (jsonLdMatch) {
-        price = parseFloat(jsonLdMatch[1].replace(",", "."));
+        const candidate = parseFloat(jsonLdMatch[1]);
+        // Nur akzeptieren wenn realistischer Produktpreis (0.50 - 9999)
+        if (candidate >= 0.5 && candidate <= 9999) {
+          price = candidate;
+        }
       }
     }
 
