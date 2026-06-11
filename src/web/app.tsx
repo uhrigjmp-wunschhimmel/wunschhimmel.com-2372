@@ -21,9 +21,9 @@ import Feed from "./pages/feed";
 import Admin from "./pages/admin";
 import ForgotPassword from "./pages/forgot-password";
 import ResetPassword from "./pages/reset-password";
+import ShareTarget from "./pages/share-target";
 import NotFoundPage from "./pages/NotFoundPage";
 import ErrorBoundary from "./components/ErrorBoundary";
-
 function App() {
   return (
    <ErrorBoundary>
@@ -46,6 +46,7 @@ function App() {
           <Route path="/admin" component={Admin} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/share-target" component={ShareTarget} />
           <Route component={NotFoundPage} />
         </Switch>
         <CookieBanner />
@@ -58,5 +59,4 @@ function App() {
    </ErrorBoundary>
   );
 }
-
 export default App;

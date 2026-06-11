@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -6,6 +6,12 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#122050" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Wunschhimmel" />
     <title>Wunschhimmel - Wunschlisten erstellen und teilen</title>
     <meta name="description" content="Erstelle deine persoenliche Wunschliste fuer Geburtstag, Weihnachten oder Hochzeit und teile sie mit Familie und Freunden. Kostenlos." />
     <meta name="keywords" content="Wunschliste erstellen, Wunschliste teilen, Geburtstagswuensche, Weihnachtswunschliste, Hochzeitswunschliste, Geschenkideen, Wunschhimmel" />
@@ -34,5 +40,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/web/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
