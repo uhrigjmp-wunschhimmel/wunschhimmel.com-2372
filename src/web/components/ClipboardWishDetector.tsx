@@ -31,7 +31,13 @@ export function useClipboardWish() {
       api.scrape(url)
         .then((data) => {
           if (data.title) setTitle(data.title);
-          if (data.price) setPrice(String(data.price));
+          if (data.price) {
+            setPrice(String(data.price));
+          } else {
+            toast("Preis konnte nicht zuverlässig übertragen werden, bitte gib ihn manuell ein 🩷", {
+              duration: 4000,
+            });
+          }
           if (data.image) setImageUrl(data.image);
         })
         .catch(() => {})
