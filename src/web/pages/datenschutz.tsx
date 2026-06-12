@@ -157,16 +157,24 @@ export default function Datenschutz() {
           </Section>
         </div>
 
-        {/* Footer links */}
-        <div className="text-center mt-8 font-body text-sm space-x-4" style={{ color: muted }}>
-          <button onClick={() => navigate("/")} style={{ color: accent }} className="hover:underline">
-            Startseite
-          </button>
-          <span>·</span>
-          <button onClick={() => navigate("/impressum")} style={{ color: accent }} className="hover:underline">
-            Impressum
-          </button>
-        </div>
+      {/* Footer */}
+<div className="text-center mt-8 font-body text-sm" style={{ color: muted }}>
+  <button onClick={() => navigate("/")} style={{ color: accent }} className="hover:underline">
+    Zurück zur Startseite
+  </button>
+  <span style={{ margin: "0 8px", opacity: 0.4 }}>·</span>
+  <button onClick={() => navigate("/impressum")} style={{ color: accent }} className="hover:underline">
+    Impressum
+  </button>
+  <span style={{ margin: "0 8px", opacity: 0.4 }}>·</span>
+  <button onClick={() => navigate("/datenschutz")} style={{ color: accent }} className="hover:underline">
+    Datenschutz
+  </button>
+  <span style={{ margin: "0 8px", opacity: 0.4 }}>·</span>
+  <button onClick={() => navigate("/agb")} style={{ color: accent }} className="hover:underline">
+    AGB
+  </button>
+</div>
       </div>
     </div>
   );
