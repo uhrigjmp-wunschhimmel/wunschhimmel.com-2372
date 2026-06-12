@@ -42,6 +42,7 @@ function App() {
           <Route path="/explore" component={Explore} />
           <Route path="/impressum" component={Impressum} />
           <Route path="/datenschutz" component={Datenschutz} />
+	  <Route path="/agb" component={AGBPage} />
           <Route path="/profile" component={Profile} />
           <Route path="/feed" component={Feed} />
           <Route path="/admin" component={Admin} />
