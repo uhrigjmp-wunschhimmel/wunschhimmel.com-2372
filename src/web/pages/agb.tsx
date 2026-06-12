@@ -160,6 +160,10 @@ export default function AGBPage() {
             <button onClick={() => navigate("/datenschutz")} style={{ color: accent }} className="hover:underline">
               Datenschutz
             </button>
+            <span style={{ margin: "0 8px", opacity: 0.4 }}>·</span>
+<button onClick={() => navigate("/agb")} style={{ color: accent }} className="hover:underline">
+  AGB
+</button>
           </div>
         </div>
       </div>
