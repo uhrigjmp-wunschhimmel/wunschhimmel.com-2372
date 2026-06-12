@@ -16,6 +16,7 @@ import SharedList from "./pages/shared";
 import Explore from "./pages/explore";
 import Impressum from "./pages/impressum";
 import Datenschutz from "./pages/datenschutz";
+import AGBPage from "./pages/agb";
 import Profile from "./pages/profile";
 import Feed from "./pages/feed";
 import Admin from "./pages/admin";
