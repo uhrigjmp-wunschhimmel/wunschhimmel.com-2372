@@ -372,10 +372,11 @@ export default function LandingPage() {
           <button onClick={() => navigate("/impressum")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Impressum</button>
           <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 6px" }}>·</span>
 <button onClick={() => navigate("/agb")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>AGB</button>
-        </div>
+      <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 6px" }}>·</span>
+        <button onClick={() => navigate("/datenschutz")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 12, cursor: "pointer" }}>Datenschutz</button></div>
         <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 12 }}>© {new Date().getFullYear()} Wunschhimmel</p>
       </footer>
-
+      
     </div>
   );
 }
