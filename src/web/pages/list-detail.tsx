@@ -50,6 +50,7 @@ export default function ListDetail() {
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [editPublic, setEditPublic] = useState(false);
+const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
 
   // Update post form
   const [updateText, setUpdateText] = useState("");
