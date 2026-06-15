@@ -151,8 +151,24 @@ export default function Datenschutz() {
           </Section>
           <Divider />
 
-          {/* 9. Änderungen */}
-          <Section title="9. Änderungen dieser Datenschutzerklärung">
+         {/* 9. Öffentliche Wunschlisten */}
+          <Section title="9. Öffentliche Wunschlisten und Profilsichtbarkeit">
+  <p className="font-body" style={{ color: muted, lineHeight: "1.8" }}>
+    Wenn du eine Wunschliste als öffentlich kennzeichnest, werden dein Name und dein Profilbild (sofern hinterlegt) auf der Listenansicht für eingeloggte Nutzer*innen des Dienstes angezeigt, damit sie die Liste zuordnen können.
+  </p>
+  <p className="font-body mt-3" style={{ color: muted, lineHeight: "1.8" }}>
+    <strong style={{ color: foreground }}>Rechtsgrundlage:</strong> Die Verarbeitung erfolgt auf Grundlage deiner ausdrücklichen Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO, die beim Umstellen der Liste auf öffentlich eingeholt wird.
+  </p>
+  <p className="font-body mt-3" style={{ color: muted, lineHeight: "1.8" }}>
+    <strong style={{ color: foreground }}>Sichtbarkeit:</strong> Nicht eingeloggte Besucher und Suchmaschinen sehen deinen Namen und dein Profilbild nicht. Nur eingeloggte Nutzer*innen von Wunschhimmel können diese Daten sehen.
+  </p>
+  <p className="font-body mt-3" style={{ color: muted, lineHeight: "1.8" }}>
+    <strong style={{ color: foreground }}>Widerruf:</strong> Du kannst deine Einwilligung jederzeit widerrufen, indem du die Liste in den Einstellungen wieder auf privat stellst. Nach dem Widerruf sind Name und Profilbild sofort nicht mehr sichtbar.
+  </p>
+</Section>
+          
+          {/* 10. Änderungen */}
+          <Section title="10. Änderungen dieser Datenschutzerklärung">
             <p>Wir behalten uns vor, diese Datenschutzerklärung bei Änderungen des Dienstes oder der Rechtslage anzupassen. Die aktuelle Version ist stets unter <a href="/datenschutz" style={{ color: accent }}>wunschhimmel.com/datenschutz</a> abrufbar. Bei wesentlichen Änderungen werden registrierte Nutzer per E-Mail informiert.</p>
           </Section>
         </div>
