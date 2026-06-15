@@ -124,7 +124,7 @@ export default function SharedList() {
       <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="bg-[var(--lavender)] rounded-2xl p-3 text-center">
           <p className="font-body text-sm text-foreground">
-            ✨ Diese Liste dient zur Inspiration — stöbere durch die Wünsche und lass dich beschenken lassen!
+            ✨ Diese Liste dient zur Inspiration — stöbere durch die Wünsche und sammle Ideen!
           </p>
         </div>
       </div>
