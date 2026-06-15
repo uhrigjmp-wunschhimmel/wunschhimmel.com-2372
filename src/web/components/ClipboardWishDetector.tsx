@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -8,7 +8,7 @@ export function useClipboardWish() {
   const { theme } = useTheme();
   const isTeal = theme === "teal";
 
-  // Theme-Tokens — identisch zu list-detail.tsx
+  // Theme-Tokens
   const accent      = isTeal ? "#2DD4BF" : "#F25990";
   const foreground  = isTeal ? "#E8F5F3" : "#122050";
   const muted       = isTeal ? "#7FBFB5" : "#9A7085";
@@ -18,7 +18,6 @@ export function useClipboardWish() {
   const labelColor  = isTeal ? "#7FBFB5" : "#9A7085";
   const selectedBg  = isTeal ? "#1E3A4A" : "#FFF0F5";
   const textDark    = isTeal ? "#E8F5F3" : "#122050";
-  const textMid     = isTeal ? "#B0D8D4" : "#5A3A4A";
 
   const [show, setShow] = useState(false);
   const [detectedUrl, setDetectedUrl] = useState("");
@@ -32,6 +31,39 @@ export function useClipboardWish() {
   const [scraping, setScraping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [checking, setChecking] = useState(false);
+
+  // Verhindert doppeltes Triggern
+  const lastCheckedUrl = useRef<string>("");
+  const isLoggedIn = useRef<boolean>(false);
+
+  // Session prüfen
+  const { data: session } = authClient.useSession();
+  useEffect(() => {
+    isLoggedIn.current = !!session?.user;
+  }, [session]);
+
+  // Automatisch prüfen wenn App in Vordergrund kommt
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== "visible") return;
+      if (!isLoggedIn.current) return;
+      if (show) return;
+
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!text || !text.startsWith("http")) return;
+        if (text === lastCheckedUrl.current) return;
+
+        lastCheckedUrl.current = text;
+        openSheet(text, true);
+      } catch {
+        // iOS hat Clipboard-Zugriff verweigert — still ignorieren
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [show]);
 
   const openSheet = (url: string, scrape: boolean) => {
     setDetectedUrl(url);
@@ -60,17 +92,13 @@ export function useClipboardWish() {
     }
   };
 
+  // Manueller Trigger (Button im Dashboard)
   const handleTrigger = async () => {
     setChecking(true);
     try {
       const text = await navigator.clipboard.readText();
       if (text && text.startsWith("http")) {
-        const lastUrl = sessionStorage.getItem("wh_last_clipboard");
-        if (lastUrl === text) {
-          openSheet("", false);
-        } else {
-          openSheet(text, true);
-        }
+        openSheet(text, true);
       } else {
         openSheet("", false);
       }
@@ -82,9 +110,8 @@ export function useClipboardWish() {
   };
 
   const handleDismiss = () => {
-    if (detectedUrl) sessionStorage.setItem("wh_last_clipboard", detectedUrl);
     setShow(false);
-    setTitle(""); setPrice(""); setImageUrl(""); setNote(""); setManualUrl("");
+    setTitle(""); setPrice(""); setImageUrl(""); setNote(""); setManualUrl(""); setDetectedUrl("");
   };
 
   const handleSave = async () => {
@@ -99,7 +126,7 @@ export function useClipboardWish() {
         imageUrl: imageUrl || undefined,
         priority: "medium",
       });
-      if (detectedUrl) sessionStorage.setItem("wh_last_clipboard", detectedUrl);
+      lastCheckedUrl.current = detectedUrl || manualUrl;
       toast.success("Wunsch hinzugefügt! ✨");
       handleDismiss();
     } catch (e: any) {
@@ -222,7 +249,6 @@ export function useClipboardWish() {
           {/* Formular */}
           <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
 
-            {/* Link */}
             <div>
               <label style={lbl}>Link</label>
               <input value={manualUrl} onChange={e => setManualUrl(e.target.value)}
@@ -232,7 +258,6 @@ export function useClipboardWish() {
                 onBlur={e => e.currentTarget.style.borderColor = border} />
             </div>
 
-            {/* Titel */}
             <div>
               <label style={lbl}>Titel *</label>
               <input value={title} onChange={e => setTitle(e.target.value)}
@@ -242,7 +267,6 @@ export function useClipboardWish() {
                 onBlur={e => e.currentTarget.style.borderColor = border} />
             </div>
 
-            {/* Liste wählen */}
             <div>
               <label style={lbl}>Liste *</label>
               {lists.length === 0 ? (
@@ -275,7 +299,6 @@ export function useClipboardWish() {
               )}
             </div>
 
-            {/* Preis */}
             <div>
               <label style={lbl}>Preis (optional)</label>
               <div style={{ position: "relative" }}>
@@ -293,7 +316,6 @@ export function useClipboardWish() {
               </div>
             </div>
 
-            {/* Notiz */}
             <div>
               <label style={lbl}>Notiz (optional)</label>
               <input value={note} onChange={e => setNote(e.target.value)}
