@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq, and, desc, sql as drizzleSql, count, gte, inArray } from "drizzle-orm";
 import { createAuth } from "./auth";
 import { authMiddleware, authenticatedOnly, adminOnly } from "./middleware/authentication";
-import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateLikes, updateComments } from "./database/schema";
+import { wishlists, wishes, shareInvitations, userProfiles, listUpdates, updateLikes, updateComments, publicListConsents } from "./database/schema";
 
 import { Resend } from "resend";
 import * as schema from "./database/schema";
@@ -190,7 +190,7 @@ app.patch("/wishlists/:id", authenticatedOnly, async (c) => {
   if (list.userId !== user.id) return c.json({ error: "forbidden" }, 403);
   const body = await c.req.json<{ title?: string; description?: string; emoji?: string; isPublic?: boolean }>();
  if (typeof body.isPublic === "boolean" && body.isPublic !== list.isPublic) {
-    await db.insert(schema.publicListConsents).values({
+    await db.insert(publicListConsents).values({
       id: nanoid(),
       userId: user.id,
       wishlistId: list.id,
