@@ -327,7 +327,24 @@ app.get("/shared/:token", async (c) => {
   const list = await db.select().from(wishlists).where(eq(wishlists.shareToken, c.req.param("token"))).get();
   if (!list) return c.json({ error: "not found" }, 404);
   const items = await db.select().from(wishes).where(eq(wishes.wishlistId, list.id)).orderBy(desc(wishes.createdAt));
-  return c.json({ ...list, wishes: items });
+
+  // Prüfen ob Nutzer eingeloggt ist
+  const user = c.get("user");
+  const isLoggedIn = !!user;
+
+  // Profildaten nur für eingeloggte Nutzer laden
+  let ownerProfile = null;
+  if (isLoggedIn && list.isPublic) {
+    ownerProfile = await db.select().from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
+  }
+
+  return c.json({
+    ...list,
+    wishes: items,
+    // Name + Bild nur wenn eingeloggt
+    ownerName: isLoggedIn ? ownerProfile?.displayName ?? null : null,
+    ownerAvatar: isLoggedIn ? ownerProfile?.avatarUrl ?? null : null,
+  });
 });
 
 // ── Reserve a wish (public, no auth) ─────────────────────────────────────────
