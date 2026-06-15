@@ -172,7 +172,7 @@ export default function Explore() {
   fontSize: 11, color: "var(--muted-foreground)",
   fontFamily: "'Plus Jakarta Sans', sans-serif",
 }}>
-  ✦ {(list.wishes?.length ?? 0)} Wünsche
+  ✦ {list.wishCount ?? 0} Wünsche
 </span>
                   <span style={{
                     fontSize: 11, fontWeight: 700, color: "var(--accent)",
