@@ -76,6 +76,38 @@ export default function SharedList() {
           <span className="text-5xl block mb-3">{list.emoji}</span>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-white mb-2">{list.title}</h1>
           {list.description && <p className="font-body text-white/70">{list.description}</p>}
+          {list.ownerName && (
+  <div style={{
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 12,
+    background: "rgba(255,255,255,0.12)",
+    borderRadius: 50,
+    padding: "6px 14px 6px 6px",
+    backdropFilter: "blur(8px)",
+  }}>
+    {list.ownerAvatar ? (
+      <img
+        src={list.ownerAvatar}
+        alt={list.ownerName}
+        style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.4)" }}
+      />
+    ) : (
+      <div style={{
+        width: 28, height: 28, borderRadius: "50%",
+        background: "linear-gradient(135deg, #F25990, #B02558)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 12, fontWeight: 700, color: "#fff"
+      }}>
+        {list.ownerName.charAt(0).toUpperCase()}
+      </div>
+    )}
+    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+      von <strong>{list.ownerName}</strong>
+    </span>
+  </div>
+)}
           <div className="mt-5 flex items-center justify-center gap-6">
             <div className="text-center">
               <div className="font-display text-3xl font-bold text-[var(--rose-soft)]">{total}</div>
