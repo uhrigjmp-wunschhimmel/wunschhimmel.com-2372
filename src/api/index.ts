@@ -190,7 +190,6 @@ app.patch("/wishlists/:id", authenticatedOnly, async (c) => {
   if (list.userId !== user.id) return c.json({ error: "forbidden" }, 403);
   const body = await c.req.json<{ title?: string; description?: string; emoji?: string; isPublic?: boolean }>();
  if (typeof body.isPublic === "boolean" && body.isPublic !== list.isPublic) {
-    const { nanoid } = await import("nanoid");
     await db.insert(schema.publicListConsents).values({
       id: nanoid(),
       userId: user.id,
