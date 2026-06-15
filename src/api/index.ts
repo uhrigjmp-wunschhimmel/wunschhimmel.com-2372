@@ -426,12 +426,14 @@ app.get("/explore", async (c) => {
   const { user: authUser } = await import("./database/auth-schema");
   const enriched = await Promise.all(lists.map(async (list) => {
     const ownerUser = await db.select({ name: authUser.name }).from(authUser).where(eq(authUser.id, list.userId)).get();
-    const ownerProfile = await db.select({ avatarUrl: userProfiles.avatarUrl }).from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
-    return {
-      ...list,
-      ownerName: ownerUser?.name ?? null,
-      ownerAvatar: ownerProfile?.avatarUrl ?? null,
-    };
+   const ownerProfile = await db.select({ avatarUrl: userProfiles.avatarUrl }).from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
+const wishCount = await db.select({ count: drizzleSql<number>`count(*)` }).from(wishes).where(eq(wishes.wishlistId, list.id)).get();
+return {
+  ...list,
+  ownerName: ownerUser?.name ?? null,
+  ownerAvatar: ownerProfile?.avatarUrl ?? null,
+  wishCount: wishCount?.count ?? 0,
+};
   }));
   return c.json(enriched);
 });
