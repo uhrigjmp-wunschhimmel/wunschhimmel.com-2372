@@ -13,6 +13,19 @@ export const termsAcceptances = sqliteTable("terms_acceptances", {
   userAgent: text("user_agent"),
 });
 
+// ── Public List Consent Log ────────────────────────────────────────────────
+export const publicListConsents = sqliteTable("public_list_consents", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  wishlistId: text("wishlist_id").notNull(),
+  action: text("action").notNull(), // 'granted' oder 'revoked'
+  consentedAt: text("consented_at")
+    .notNull()
+    .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  ip: text("ip"),
+  userAgent: text("user_agent"),
+});
+
 // ── Better Auth tables ────────────────────────────────────────────────────────
 export { user, session, account, verification } from "./auth-schema";
 
