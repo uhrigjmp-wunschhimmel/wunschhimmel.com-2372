@@ -434,6 +434,7 @@ app.get("/explore", async (c) => {
     };
   }));
   return c.json(enriched);
+});
 
 // ── User profile / theme ──────────────────────────────────────────────────────
 app.get("/profile", authenticatedOnly, async (c) => {
