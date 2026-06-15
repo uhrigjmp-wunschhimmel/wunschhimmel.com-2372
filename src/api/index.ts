@@ -417,8 +417,23 @@ app.get("/explore", async (c) => {
     .where(eq(wishlists.isPublic, true))
     .orderBy(desc(wishlists.createdAt))
     .limit(50);
-  return c.json(lists);
-});
+
+  const user = c.get("user");
+  const isLoggedIn = !!user;
+
+  if (!isLoggedIn) return c.json(lists);
+
+  const { user: authUser } = await import("./database/auth-schema");
+  const enriched = await Promise.all(lists.map(async (list) => {
+    const ownerUser = await db.select({ name: authUser.name }).from(authUser).where(eq(authUser.id, list.userId)).get();
+    const ownerProfile = await db.select({ avatarUrl: userProfiles.avatarUrl }).from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
+    return {
+      ...list,
+      ownerName: ownerUser?.name ?? null,
+      ownerAvatar: ownerProfile?.avatarUrl ?? null,
+    };
+  }));
+  return c.json(enriched);
 
 // ── User profile / theme ──────────────────────────────────────────────────────
 app.get("/profile", authenticatedOnly, async (c) => {
