@@ -40,11 +40,16 @@ export default function Explore() {
               ✦
             </span>
           </h1>
-          <p style={{ fontSize: 16, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 480, margin: "0 auto" }}>
+          <p style={{
+            fontSize: 16, color: "var(--muted-foreground)",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            maxWidth: 480, margin: "0 auto",
+          }}>
             {t("explore_sub")}
           </p>
         </div>
 
+        {/* Grid */}
         {loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
             {[1,2,3,4,5,6].map(i => (
@@ -71,30 +76,80 @@ export default function Explore() {
                 className="list-card"
                 style={{
                   background: "none", border: "none", cursor: "pointer",
-                  width: "100%", textAlign: "left",
+                  width: "100%", textAlign: "left", position: "relative",
                 }}
               >
-                {/* Emoji + arrow */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 40, lineHeight: 1 }}>{list.emoji}</span>
+                {/* Avatar oben links + Pfeil oben rechts */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+
+                  {/* Avatar + Emoji */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {list.ownerName ? (
+                      list.ownerAvatar ? (
+                        <img
+                          src={list.ownerAvatar}
+                          alt={list.ownerName}
+                          style={{
+                            width: 40, height: 40, borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid var(--border)",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: 40, height: 40, borderRadius: "50%",
+                          background: "linear-gradient(135deg, #F25990, #B02558)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 16, fontWeight: 700, color: "#fff",
+                          border: "2px solid var(--border)",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
+                          flexShrink: 0,
+                        }}>
+                          {list.ownerName.charAt(0).toUpperCase()}
+                        </div>
+                      )
+                    ) : (
+                      <span style={{ fontSize: 40, lineHeight: 1 }}>{list.emoji}</span>
+                    )}
+
+                    {/* Name unter Avatar */}
+                    {list.ownerName && (
+                      <div>
+                        <p style={{
+                          fontSize: 11, color: "var(--muted-foreground)",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          margin: 0, lineHeight: 1.3,
+                        }}>
+                          {list.ownerName}
+                        </p>
+                        <span style={{ fontSize: 22, lineHeight: 1 }}>{list.emoji}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pfeil */}
                   <span style={{
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     width: 32, height: 32, borderRadius: "50%",
                     background: "var(--muted)", color: "var(--muted-foreground)",
-                    transition: "background 0.15s, color 0.15s",
+                    flexShrink: 0,
                   }}>
                     <IconArrowRight size={14} color="currentColor" />
                   </span>
                 </div>
 
+                {/* Titel */}
                 <h3 style={{
                   fontFamily: "'Playfair Display', serif", fontWeight: 700,
                   fontSize: 17, color: "var(--foreground)", lineHeight: 1.3,
-                  marginTop: 8,
+                  marginTop: 4, marginBottom: 0,
                 }}>
                   {list.title}
                 </h3>
 
+                {/* Beschreibung */}
                 {list.description && (
                   <p style={{
                     fontSize: 12, color: "var(--muted-foreground)",
@@ -107,12 +162,16 @@ export default function Explore() {
                   </p>
                 )}
 
+                {/* Footer der Kachel */}
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  paddingTop: 12, marginTop: "auto",
+                  paddingTop: 12, marginTop: 8,
                   borderTop: "1px solid var(--border)",
                 }}>
-                  <span style={{ fontSize: 11, color: "var(--muted-foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <span style={{
+                    fontSize: 11, color: "var(--muted-foreground)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  }}>
                     {new Date(list.createdAt).toLocaleDateString("de-DE")}
                   </span>
                   <span style={{
@@ -122,6 +181,7 @@ export default function Explore() {
                     Ansehen →
                   </span>
                 </div>
+
               </button>
             ))}
           </div>
