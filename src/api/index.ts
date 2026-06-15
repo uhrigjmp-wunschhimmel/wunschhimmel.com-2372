@@ -198,8 +198,12 @@ app.patch("/wishlists/:id", authenticatedOnly, async (c) => {
       action: body.isPublic ? "granted" : "revoked",
       ip: c.req.header("cf-connecting-ip") ?? null,
       userAgent: c.req.header("user-agent") ?? null,
-    });
-  }
+   });
+    }
+  await db.update(wishlists).set({ ...body, updatedAt: new Date().toISOString() }).where(eq(wishlists.id, list.id));
+  const updated = await db.select().from(wishlists).where(eq(wishlists.id, list.id)).get();
+  return c.json(updated);
+});
 
 app.delete("/wishlists/:id", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
