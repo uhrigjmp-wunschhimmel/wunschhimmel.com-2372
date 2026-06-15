@@ -333,18 +333,20 @@ app.get("/shared/:token", async (c) => {
   const isLoggedIn = !!user;
 
   // Profildaten nur für eingeloggte Nutzer laden
-  let ownerProfile = null;
-  if (isLoggedIn && list.isPublic) {
-    ownerProfile = await db.select().from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
-  }
+let ownerProfile = null;
+let ownerUser = null;
+if (isLoggedIn && list.isPublic) {
+  const { user: authUser } = await import("./database/auth-schema");
+  ownerProfile = await db.select().from(userProfiles).where(eq(userProfiles.userId, list.userId)).get();
+  ownerUser = await db.select({ name: authUser.name }).from(authUser).where(eq(authUser.id, list.userId)).get();
+}
 
-  return c.json({
-    ...list,
-    wishes: items,
-    // Name + Bild nur wenn eingeloggt
-    ownerName: isLoggedIn ? ownerProfile?.displayName ?? null : null,
-    ownerAvatar: isLoggedIn ? ownerProfile?.avatarUrl ?? null : null,
-  });
+return c.json({
+  ...list,
+  wishes: items,
+  ownerName: isLoggedIn ? ownerUser?.name ?? null : null,
+  ownerAvatar: isLoggedIn ? ownerProfile?.avatarUrl ?? null : null,
+});
 });
 
 // ── Reserve a wish (public, no auth) ─────────────────────────────────────────
