@@ -168,12 +168,12 @@ export default function Explore() {
                   paddingTop: 12, marginTop: 8,
                   borderTop: "1px solid var(--border)",
                 }}>
-                  <span style={{
-                    fontSize: 11, color: "var(--muted-foreground)",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  }}>
-                    {new Date(list.createdAt).toLocaleDateString("de-DE")}
-                  </span>
+                <span style={{
+  fontSize: 11, color: "var(--muted-foreground)",
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
+}}>
+  ✦ {(list.wishes?.length ?? 0)} Wünsche
+</span>
                   <span style={{
                     fontSize: 11, fontWeight: 700, color: "var(--accent)",
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
