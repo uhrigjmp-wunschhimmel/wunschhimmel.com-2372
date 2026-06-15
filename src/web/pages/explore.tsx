@@ -69,14 +69,106 @@ export default function Explore() {
                 key={list.id}
                 onClick={() => navigate(`/shared/${list.shareToken}`)}
                 className="list-card"
-                style={{
-                  background: "none", border: "none", cursor: "pointer",
-                  width: "100%", textAlign: "left",
-                }}
+               style={{
+  background: "none", border: "none", cursor: "pointer",
+  width: "100%", textAlign: "left", position: "relative",
+}}
               >
                 {/* Emoji + arrow */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 40, lineHeight: 1 }}>{list.emoji}</span>
+                {/* Avatar Overlay oben links */}
+<div style={{ position: "relative", marginBottom: 12 }}>
+  <span style={{ fontSize: 40, lineHeight: 1 }}>{list.emoji}</span>
+  {list.ownerName && (
+    <div style={{
+      position: "absolute",
+      top: -8, left: -8,
+      display: "flex", alignItems: "center", gap: 6,
+    }}>
+      {list.ownerAvatar ? (
+        <img src={list.ownerAvatar} alt={list.ownerName}
+          style={{
+            width: 36, height: 36, borderRadius: "50%",
+            objectFit: "cover",
+            border: "2px solid white",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }} />
+      ) : (
+        <div style={{
+          width: 36, height: 36, borderRadius: "50%",
+          background: "linear-gradient(135deg, #F25990, #B02558)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, color: "#fff",
+          border: "2px solid white",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          flexShrink: 0,
+        }}>
+          {list.ownerName.charAt(0).toUpperCase()}
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+{/* Pfeil oben rechts */}
+<div style={{ position: "absolute", top: 16, right: 16 }}>
+  <span style={{
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+    width: 32, height: 32, borderRadius: "50%",
+    background: "var(--muted)", color: "var(--muted-foreground)",
+  }}>
+    <IconArrowRight size={14} color="currentColor" />
+  </span>
+</div>
+
+{/* Name unter Avatar */}
+{list.ownerName && (
+  <p style={{
+    fontSize: 11, color: "var(--muted-foreground)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    marginBottom: 2, marginTop: -4,
+  }}>
+    {list.ownerName}
+  </p>
+)}
+
+<h3 style={{
+  fontFamily: "'Playfair Display', serif", fontWeight: 700,
+  fontSize: 17, color: "var(--foreground)", lineHeight: 1.3,
+  marginTop: 4,
+}}>
+  {list.title}
+</h3>
+
+{list.description && (
+  <p style={{
+    fontSize: 12, color: "var(--muted-foreground)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    lineHeight: 1.5, marginTop: 4,
+    overflow: "hidden", display: "-webkit-box",
+    WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+  }}>
+    {list.description}
+  </p>
+)}
+
+<div style={{
+  display: "flex", alignItems: "center", justifyContent: "space-between",
+  paddingTop: 12, marginTop: "auto",
+  borderTop: "1px solid var(--border)",
+}}>
+  <span style={{
+    fontSize: 11, color: "var(--muted-foreground)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+  }}>
+    {(list.wishes?.length ?? 0)} Wünsche
+  </span>
+  <span style={{
+    fontSize: 11, fontWeight: 700, color: "var(--accent)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+  }}>
+    Ansehen →
+  </span>
+</div>
                   <span style={{
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     width: 32, height: 32, borderRadius: "50%",
