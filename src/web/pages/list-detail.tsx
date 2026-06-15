@@ -464,7 +464,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
         Liste öffentlich machen?
       </h2>
       <p className="font-body text-sm text-center mb-4" style={{ color: muted, lineHeight: 1.7 }}>
-        Alle Personen mit dem Link können deine Wünsche sehen.
+        Deine Liste wird für alle Besucher von Wunschhimmel sichtbar — auch ohne Link und ohne Account.
       </p>
       <div style={{
         background: isTeal ? "#1A2D3E" : "#FFF5FA",
@@ -475,7 +475,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
       }}>
         <p className="font-body text-sm" style={{ color: muted, lineHeight: 1.7 }}>
           <strong style={{ color: foreground }}>Eingeloggte Nutzer</strong> sehen deinen Namen und dein Profilbild auf der Liste.<br /><br />
-          <strong style={{ color: foreground }}>Nicht eingeloggte Besucher</strong> sehen nur deine Wünsche — kein Name, kein Bild.
+<strong style={{ color: foreground }}>Nicht eingeloggte Besucher</strong> sehen deine Wünsche, aber keinen Namen und kein Profilbild.
         </p>
       </div>
       <p className="font-body text-xs text-center mb-6" style={{ color: muted }}>
