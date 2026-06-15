@@ -113,17 +113,7 @@ export default function SharedList() {
               <div className="font-display text-3xl font-bold text-[var(--rose-soft)]">{total}</div>
               <div className="font-body text-xs text-white/60">Wünsche</div>
             </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div className="text-center">
-              <div className="font-display text-3xl font-bold text-[#86EFAC]">{reserved}</div>
-              <div className="font-body text-xs text-white/60">Reserviert</div>
-            </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div className="text-center">
-              <div className="font-display text-3xl font-bold text-[var(--accent)]">{total - reserved}</div>
-              <div className="font-body text-xs text-white/60">Noch frei</div>
-            </div>
-          </div>
+                      </div>
         </div>
         <svg viewBox="0 0 1440 40" className="w-full absolute bottom-0" preserveAspectRatio="none" style={{ height: 30 }}>
           <path fill="var(--background)" d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" />
