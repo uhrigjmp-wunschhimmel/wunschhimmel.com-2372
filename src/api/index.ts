@@ -189,10 +189,17 @@ app.patch("/wishlists/:id", authenticatedOnly, async (c) => {
   if (!list) return c.json({ error: "not found" }, 404);
   if (list.userId !== user.id) return c.json({ error: "forbidden" }, 403);
   const body = await c.req.json<{ title?: string; description?: string; emoji?: string; isPublic?: boolean }>();
-  await db.update(wishlists).set({ ...body, updatedAt: new Date().toISOString() }).where(eq(wishlists.id, list.id));
-  const updated = await db.select().from(wishlists).where(eq(wishlists.id, list.id)).get();
-  return c.json(updated);
-});
+ if (typeof body.isPublic === "boolean" && body.isPublic !== list.isPublic) {
+    const { nanoid } = await import("nanoid");
+    await db.insert(schema.publicListConsents).values({
+      id: nanoid(),
+      userId: user.id,
+      wishlistId: list.id,
+      action: body.isPublic ? "granted" : "revoked",
+      ip: c.req.header("cf-connecting-ip") ?? null,
+      userAgent: c.req.header("user-agent") ?? null,
+    });
+  }
 
 app.delete("/wishlists/:id", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
