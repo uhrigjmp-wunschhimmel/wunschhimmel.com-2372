@@ -443,6 +443,76 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
       )}
 
       {/* ── Edit List Modal ── */}
+      {showPublicConsentModal && (
+  <div style={{
+    position: "fixed", inset: 0, zIndex: 9999,
+    background: "rgba(0,0,0,0.5)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: "24px"
+  }}>
+    <div style={{
+      background: cardBg,
+      borderRadius: 24,
+      padding: "32px 28px",
+      maxWidth: 420,
+      width: "100%",
+      border: `1px solid ${border}`,
+      boxShadow: "0 8px 32px rgba(18,32,80,0.18)"
+    }}>
+      <div style={{ fontSize: 36, textAlign: "center", marginBottom: 12 }}>🌍</div>
+      <h2 className="font-display text-xl font-bold text-center mb-3" style={{ color: foreground }}>
+        Liste öffentlich machen?
+      </h2>
+      <p className="font-body text-sm text-center mb-4" style={{ color: muted, lineHeight: 1.7 }}>
+        Alle Personen mit dem Link können deine Wünsche sehen.
+      </p>
+      <div style={{
+        background: isTeal ? "#1A2D3E" : "#FFF5FA",
+        border: `1px solid ${border}`,
+        borderRadius: 12,
+        padding: "14px 16px",
+        marginBottom: 20
+      }}>
+        <p className="font-body text-sm" style={{ color: muted, lineHeight: 1.7 }}>
+          <strong style={{ color: foreground }}>Eingeloggte Nutzer</strong> sehen deinen Namen und dein Profilbild auf der Liste.<br /><br />
+          <strong style={{ color: foreground }}>Nicht eingeloggte Besucher</strong> sehen nur deine Wünsche — kein Name, kein Bild.
+        </p>
+      </div>
+      <p className="font-body text-xs text-center mb-6" style={{ color: muted }}>
+        Du kannst die Liste jederzeit wieder auf privat stellen. Es gilt §5a unserer{" "}
+        <button onClick={() => { setShowPublicConsentModal(false); setShowEditModal(false); window.location.href = "/agb"; }}
+          style={{ color: accent, background: "none", border: "none", cursor: "pointer", fontSize: 12, padding: 0 }}>
+          AGB
+        </button>.
+      </p>
+      <div style={{ display: "flex", gap: 12 }}>
+        <button
+          onClick={() => setShowPublicConsentModal(false)}
+          className="font-body text-sm"
+          style={{
+            flex: 1, padding: "12px", borderRadius: 50,
+            border: `1px solid ${border}`,
+            background: "transparent", color: muted, cursor: "pointer"
+          }}>
+          Abbrechen
+        </button>
+        <button
+          onClick={() => {
+            setEditPublic(true);
+            setShowPublicConsentModal(false);
+          }}
+          className="font-body text-sm font-bold"
+          style={{
+            flex: 1, padding: "12px", borderRadius: 50,
+            background: isTeal ? "#2DD4BF" : "linear-gradient(135deg, #F25990, #B02558)",
+            color: "#fff", border: "none", cursor: "pointer"
+          }}>
+          Ja, öffentlich machen ✓
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-md shadow-2xl">
@@ -453,7 +523,13 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
               <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={2}
                 className="w-full bg-[var(--background)] border border-border rounded-xl px-4 py-2.5 font-body text-foreground outline-none focus:border-[var(--accent)] resize-none" />
               <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={editPublic} onChange={e => setEditPublic(e.target.checked)} className="w-4 h-4 accent-[var(--accent)]" />
+                <input type="checkbox" checked={editPublic} onChange={e => {
+  if (e.target.checked) {
+    setShowPublicConsentModal(true);
+  } else {
+    setEditPublic(false);
+  }
+}} className="w-4 h-4 accent-[var(--accent)]" />
                 <span className="font-body text-sm text-foreground">Öffentlich (für alle sichtbar)</span>
               </label>
             </div>
