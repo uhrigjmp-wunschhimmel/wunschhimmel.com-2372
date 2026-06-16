@@ -127,10 +127,17 @@
   --foreground:        #1A3A2A;
   --primary:           #1A3A2A;
   --accent:            #10B981;
-  --muted-foreground:  #10B981;
+  --muted-foreground:  #059669;
   --border:            #6EE7B7;
+  --card:              #FFFFFF;
   --rose-soft:         #D1FAE5;
   --lavender:          #A7F3D0;
-  --card:              #FFFFFF;
   --navy:              #1A3A2A;
+  --grad-accent:       linear-gradient(135deg, #34D399, #059669);
+  --grad-primary:      linear-gradient(135deg, #1A3A2A, #2D6A4F);
+  --shadow-accent:     0 8px 28px rgba(16,185,129,0.35);
+  --muted:             #D1FAE5;
+  --input:             #F1FDF4;
+  --secondary:         #A7F3D0;
+  --ring:              #10B981;
 }
