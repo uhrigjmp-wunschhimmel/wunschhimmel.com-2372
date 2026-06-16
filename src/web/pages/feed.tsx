@@ -7,11 +7,11 @@ import { UpdatePost } from "@/components/UpdatePost";
 export default function Feed() {
   const { theme } = useTheme();
   const [, navigate] = useLocation();
-  const isTeal = theme === "teal";
-  const bg = isTeal ? "#0F1923" : "#FFF8F0";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
-  const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const accent = isTeal ? "#2DD4BF" : "var(--accent)";
+  const isPine  = theme === "pine";
+  const bg = isPine  ? "#0F1923" : "#FFF8F0";
+  const foreground = isPine  ? "#E8F5F3" : "#1A1A4E";
+  const muted = isPine  ? "#7FBFB5" : "#6B6B9A";
+  const accent = isPine  ? "#2DD4BF" : "var(--accent)";
 
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
