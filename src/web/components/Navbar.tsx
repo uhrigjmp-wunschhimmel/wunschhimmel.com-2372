@@ -55,7 +55,7 @@ function WunschhimmelIcon({ size = 32 }: { size?: number }) {
 export function Navbar() {
   const { t, lang, setLang } = useI18n();
   const { theme, setTheme } = useTheme();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { data: session } = authClient.useSession();
   const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -193,10 +193,12 @@ export function Navbar() {
 
             <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)", margin: "0 4px" }} />
 
+            {location !== "/" && (
             <button onClick={() => setTheme(isPine ? "rose" : "pine")} className="nav-pill-btn"
               title={isPine ? "Zum Rose-Design wechseln" : "Zum Dark-Design wechseln"}>
               {isPine ? <IconSun size={13} color="currentColor" /> : <IconMoon size={13} color="currentColor" />}
             </button>
+      )}
 
             <button onClick={() => setLang(lang === "de" ? "en" : "de")} className="nav-pill-btn">
               <IconGlobe size={13} color="currentColor" />
@@ -287,11 +289,13 @@ export function Navbar() {
               <MobileItem icon={<IconUser size={16} color="currentColor" />} label="Profil" onClick={() => go("/profile")} />
               {isAdmin && <MobileItem icon={<IconSettings size={16} color="currentColor" />} label="Admin" onClick={() => go("/admin")} />}
               <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "8px 20px" }} />
+             {location !== "/" && (
               <MobileItem
                 icon={isPine ? <IconSun size={16} color="currentColor" /> : <IconMoon size={16} color="currentColor" />}
                 label={isPine ? "Rose-Design" : "Dark-Design"}
                 onClick={() => { setTheme(isPine ? "rose" : "pine"); setMenuOpen(false); }}
               />
+              )}
               <MobileItem icon={<IconGlobe size={16} color="currentColor" />}
                 label={lang === "de" ? "English" : "Deutsch"}
                 onClick={() => { setLang(lang === "de" ? "en" : "de"); setMenuOpen(false); }} />
