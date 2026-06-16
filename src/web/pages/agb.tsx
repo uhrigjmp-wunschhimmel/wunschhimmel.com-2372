@@ -4,16 +4,16 @@ import { useTheme } from "@/lib/theme";
 export default function AGBPage() {
   const [, navigate] = useLocation();
   const { theme } = useTheme();
-  const isTeal = theme === "teal";
+  const isPine = theme === "pine";
 
-  const bg = isTeal ? "#0F1923" : "#FFF8F0";
-  const cardBg = isTeal ? "#162230" : "#FFFFFF";
-  const border = isTeal ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isTeal ? "#E8F5F3" : "#1A1A4E";
-  const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const accent = isTeal ? "#2DD4BF" : "#FF6B8A";
-  const sectionBg = isTeal ? "#1A2D3D" : "#FFFBFF";
-  const newBadgeBg = isTeal ? "#2DD4BF" : "#F25990";
+  const bg = isPine ? "#0F1923" : "#FFF8F0";
+  const cardBg = isPine ? "#162230" : "#FFFFFF";
+  const border = isPine ? "#1E3A4A" : "#EAD9D9";
+  const foreground = isPine ? "#E8F5F3" : "#1A1A4E";
+  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
+  const accent = isPine ? "#2DD4BF" : "#FF6B8A";
+  const sectionBg = isPine ? "#1A2D3D" : "#FFFBFF";
+  const newBadgeBg = isPine ? "#2DD4BF" : "#F25990";
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4" style={{ background: bg }}>
