@@ -12,11 +12,11 @@ export default function SharedList() {
   const { t } = useI18n();
   const params = useParams<{ token: string }>();
   const { theme } = useTheme();
-  const isTeal = theme === "teal";
-  const foreground = isTeal ? "#E8F5F3" : "var(--primary)";
-  const muted = isTeal ? "#7FBFB5" : "#6B6B9A";
-  const border = isTeal ? "#1E3A4A" : "#EAD9D9";
-  const cardBg = isTeal ? "#162230" : "#FFFFFF";
+  const isPine = theme === "pine";
+  const foreground = isPine ? "#E8F5F3" : "var(--primary)";
+  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
+  const border = isPine ? "#1E3A4A" : "#EAD9D9";
+  const cardBg = isPine ? "#162230" : "#FFFFFF";
 
   const [list, setList] = useState<any>(null);
   const [loading, setLoading] = useState(true);
