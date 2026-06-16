@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { authClient } from "./auth";
 
-export type Theme = "rose" | "teal";
+export type Theme = "rose" | "pine";
 
 interface ThemeContextType {
   theme: Theme;
