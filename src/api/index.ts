@@ -464,7 +464,7 @@ app.post("/profile/theme", authenticatedOnly, async (c) => {
   const db = drizzle(env.DB, { schema });
   const user = c.get("user");
   const { theme } = await c.req.json<{ theme: string }>();
-  if (!["rose", "teal"].includes(theme)) return c.json({ error: "invalid theme" }, 400);
+  if (!["rose", "pine"].includes(theme)) return c.json({ error: "invalid theme" }, 400);
   const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
   if (existing) {
     await db.update(userProfiles).set({ theme }).where(eq(userProfiles.userId, user.id));
@@ -481,7 +481,7 @@ app.post("/profile/init", authenticatedOnly, async (c) => {
   const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, user.id)).get();
   const isAdmin = user.email === "kontakt@wunschhimmel.com";
   if (!existing) {
-    await db.insert(userProfiles).values({ userId: user.id, theme: ["rose", "teal"].includes(theme) ? theme : "rose", isAdmin });
+    await db.insert(userProfiles).values({ userId: user.id, theme: ["rose", "pine"].includes(theme) ? theme : "rose", isAdmin });
   } else if (isAdmin && !existing.isAdmin) {
     await db.update(userProfiles).set({ isAdmin: true }).where(eq(userProfiles.userId, user.id));
   }
