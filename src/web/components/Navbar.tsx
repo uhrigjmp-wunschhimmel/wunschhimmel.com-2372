@@ -62,7 +62,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { handleTrigger, checking, Sheet } = useClipboardWish();
 
-  const isTeal = theme === "teal";
+  const isPine = theme === "pine";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -193,9 +193,9 @@ export function Navbar() {
 
             <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.12)", margin: "0 4px" }} />
 
-            <button onClick={() => setTheme(isTeal ? "rose" : "teal")} className="nav-pill-btn"
-              title={isTeal ? "Zum Rose-Design wechseln" : "Zum Dark-Design wechseln"}>
-              {isTeal ? <IconSun size={13} color="currentColor" /> : <IconMoon size={13} color="currentColor" />}
+            <button onClick={() => setTheme(isPine ? "rose" : "pine")} className="nav-pill-btn"
+              title={isPine ? "Zum Rose-Design wechseln" : "Zum Dark-Design wechseln"}>
+              {isPine ? <IconSun size={13} color="currentColor" /> : <IconMoon size={13} color="currentColor" />}
             </button>
 
             <button onClick={() => setLang(lang === "de" ? "en" : "de")} className="nav-pill-btn">
@@ -288,9 +288,9 @@ export function Navbar() {
               {isAdmin && <MobileItem icon={<IconSettings size={16} color="currentColor" />} label="Admin" onClick={() => go("/admin")} />}
               <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "8px 20px" }} />
               <MobileItem
-                icon={isTeal ? <IconSun size={16} color="currentColor" /> : <IconMoon size={16} color="currentColor" />}
-                label={isTeal ? "Rose-Design" : "Dark-Design"}
-                onClick={() => { setTheme(isTeal ? "rose" : "teal"); setMenuOpen(false); }}
+                icon={isPine ? <IconSun size={16} color="currentColor" /> : <IconMoon size={16} color="currentColor" />}
+                label={isPine ? "Rose-Design" : "Dark-Design"}
+                onClick={() => { setTheme(isPine ? "rose" : "pine"); setMenuOpen(false); }}
               />
               <MobileItem icon={<IconGlobe size={16} color="currentColor" />}
                 label={lang === "de" ? "English" : "Deutsch"}
