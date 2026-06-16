@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
 import { IconPlus, IconTrash, IconLock, IconUnlock, IconGift, IconSparkle } from "@/components/Icons";
 import { useClipboardWish } from "@/components/ClipboardWishDetector";
+import { useTheme } from "@/lib/theme";
 
 const EMOJIS = ["🎁", "🎂", "🎄", "🌟", "💍", "🛍️", "🌈", "🎮", "👟", "📚", "🎵", "🌸", "✈️", "💄", "🏠"];
 
@@ -14,7 +15,9 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const { data: session } = authClient.useSession();
   const { handleTrigger, checking, Sheet } = useClipboardWish();
-
+const { theme } = useTheme();
+const isPine = theme === "pine";
+  
   const [lists, setLists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -154,7 +157,7 @@ export default function Dashboard() {
                         padding: "4px 10px", borderRadius: 999, border: "none",
                         cursor: "pointer", transition: "all 0.15s",
                         background: list.isPublic ? "var(--lavender)" : "var(--rose-soft)",
-                        color: list.isPublic ? "var(--primary)" : "#9F1239",
+                       color: list.isPublic ? "var(--primary)" : isPine ? "#059669" : "#9F1239",
                       }}
                     >
                       {list.isPublic
@@ -218,7 +221,7 @@ export default function Dashboard() {
                 gap: 10, cursor: "pointer", minHeight: 160,
                 transition: "border-color 0.2s, background 0.2s",
               }}
-              onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,107,157,0.04)"; }}
+              onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.background = isPine ? "rgba(16,185,129,0.04)" : "rgba(255,107,157,0.04)"; }}
               onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.background = "none"; }}
             >
               <div style={{
@@ -252,13 +255,13 @@ export default function Dashboard() {
           borderRadius: 50,
           border: "none",
           background: checking
-            ? "linear-gradient(135deg, #F8A8C8, #D97BAA)"
-            : "linear-gradient(135deg, #F25990, #B02558)",
+  ? isPine ? "linear-gradient(135deg, #6EE7B7, #34D399)" : "linear-gradient(135deg, #F8A8C8, #D97BAA)"
+  : isPine ? "linear-gradient(135deg, #34D399, #059669)" : "linear-gradient(135deg, #F25990, #B02558)",
           color: "#fff",
           fontSize: 14,
           fontWeight: 700,
           fontFamily: "'Plus Jakarta Sans', sans-serif",
-          boxShadow: "0 6px 24px rgba(210, 59, 114, 0.40)",
+          boxShadow: isPine ? "0 6px 24px rgba(16,185,129,0.40)" : "0 6px 24px rgba(210, 59, 114, 0.40)",
           cursor: checking ? "wait" : "pointer",
           transition: "transform 0.15s, box-shadow 0.15s",
           whiteSpace: "nowrap",
