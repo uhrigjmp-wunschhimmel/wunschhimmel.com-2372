@@ -100,7 +100,7 @@ export default function Explore() {
                       ) : (
                         <div style={{
                           width: 40, height: 40, borderRadius: "50%",
-                          background: "linear-gradient(135deg, #F25990, #B02558)",
+                          background: "var(--grad-accent)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 16, fontWeight: 700, color: "#fff",
                           border: "2px solid var(--border)",
