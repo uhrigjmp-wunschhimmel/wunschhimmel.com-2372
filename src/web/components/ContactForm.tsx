@@ -12,10 +12,10 @@ export function ContactForm({ className }: ContactFormProps) {
   const [errorMessage, setErrorMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
   const { theme } = useTheme();
-  const isTeal = theme === 'teal';
-  const accent = isTeal ? '#2DD4BF' : '#FF6B8A';
-  const border = isTeal ? '#1E3A4A' : '#EAD9D9';
-  const muted = isTeal ? '#7FBFB5' : '#6B6B9A';
+  const isPine = theme === 'pine';
+  const accent = isPine ? '#2DD4BF' : '#FF6B8A';
+  const border = isPine ? '#1E3A4A' : '#EAD9D9';
+  const muted = isPine ? '#7FBFB5' : '#6B6B9A';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
