@@ -111,40 +111,32 @@
   --destructive: oklch(0.577 0.245 27.325);
 }
 
-/* ── TEAL DARK THEME ────────────────────────────────────────────────────── */
-[data-theme="teal"] {
-  --background: #0F1923;
-  --foreground: #E8F5F3;
-  --card: #162230;
-  --card-foreground: #E8F5F3;
-  --popover: #162230;
-  --popover-foreground: #E8F5F3;
-  --primary: #2DD4BF;
-  --primary-foreground: #0F1923;
-  --secondary: #1E3040;
-  --secondary-foreground: #E8F5F3;
-  --muted: #1A2D3E;
-  --muted-foreground: #7FBFB5;
-  --accent: #2DD4BF;
-  --accent-foreground: #0F1923;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #1E3A4A;
-  --input: #1A2D3E;
-  --ring: #2DD4BF;
-  --rose-soft: #1E3040;
-  --lavender: #1A3545;
-  --coral: #2DD4BF;
-  --navy: #0F1923;
-  --gold: #FFB347;
-  --mint: #34D399;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
-  --shadow-accent: 0 8px 28px rgba(45, 212, 191, 0.25);
-  --grad-hero: linear-gradient(160deg, #0F1923 0%, #162230 50%, #1A2D3E 100%);
-  --grad-primary: linear-gradient(135deg, #2DD4BF 0%, #0d9488 100%);
-  --grad-accent: linear-gradient(135deg, #2DD4BF 0%, #5EEAD4 100%);
-  --grad-card: linear-gradient(160deg, #162230 0%, #1A2D3E 100%);
+/* ── PINE THEME ───────────────────────────────────────────────────────── */
+[data-theme="pine"] {
+  --background:        #F1FDF4;
+  --foreground:        #1A3A2A;
+  --card:              #FFFFFF;
+  --card-foreground:   #1A3A2A;
+  --primary:           #1A3A2A;
+  --primary-foreground:#FFFFFF;
+  --secondary:         #A7F3D0;
+  --secondary-foreground: #1A3A2A;
+  --muted:             #D1FAE5;
+  --muted-foreground:  #059669;
+  --accent:            #10B981;
+  --accent-foreground: #FFFFFF;
+  --border:            #6EE7B7;
+  --input:             #F1FDF4;
+  --ring:              #10B981;
+  --rose-soft:         #D1FAE5;
+  --lavender:          #A7F3D0;
+  --navy:              #1A3A2A;
+  --grad-accent:       linear-gradient(135deg, #34D399, #059669);
+  --grad-primary:      linear-gradient(135deg, #1A3A2A, #2D6A4F);
+  --shadow-accent:     0 8px 28px rgba(16,185,129,0.35);
+  --shadow-sm:         0 2px 8px rgba(26,58,42,0.08);
+  --shadow-md:         0 8px 24px rgba(26,58,42,0.12);
+  --shadow-lg:         0 16px 48px rgba(26,58,42,0.16);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1185,62 +1177,4 @@
   border-radius: 6px;
 }
 
-/* ── PINE THEME ───────────────────────────────────────────────────────── */
-[data-theme="pine"] .blob-bg {
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(6,78,59,0.15) 0%, transparent 60%),
-    #F1FDF4;
-}
-[data-theme="pine"] .wave-divider::after {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 56'%3E%3Cpath fill='%23F1FDF4' d='M0,28 C240,56 480,0 720,28 C960,56 1200,0 1440,28 L1440,56 L0,56 Z'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: cover;
-}
-[data-theme="pine"] .section-pill {
-  background: rgba(16,185,129,0.15);
-  color: #059669;
-}
-[data-theme="pine"] .headline-gradient {
-  background: linear-gradient(135deg, #1A3A2A 0%, #10B981 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-[data-theme="pine"] .glass-card {
-  background: rgba(255,255,255,0.9);
-  border-color: rgba(16,185,129,0.15);
-  box-shadow: 0 20px 60px rgba(26,58,42,0.15);
-}
-[data-theme="pine"] .wangel-window {
-  background: #FFFFFF;
-  border-color: rgba(16,185,129,0.1);
-}
-[data-theme="pine"] .wangel-header {
-  background: linear-gradient(135deg, #1A3A2A 0%, #10B981 100%);
-}
-[data-theme="pine"] .wangel-bubble-assistant {
-  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-  color: #1A3A2A;
-}
-[data-theme="pine"] .wangel-product-card {
-  background: #FFFFFF;
-  border-color: #6EE7B7;
-}
-[data-theme="pine"] .wish-card:hover {
-  box-shadow: 0 12px 32px rgba(16,185,129,0.12);
-}
-[data-theme="pine"] .list-card:hover {
-  border-color: rgba(16,185,129,0.25);
-}
-[data-theme="pine"] .list-card::before {
-  background: linear-gradient(135deg, #34D399, #059669);
-}
-[data-theme="pine"] .wh-input:focus {
-  border-color: #10B981;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
-}
-[data-theme="pine"] .wh-footer {
-  background: #1A3A2A;
-}
-[data-theme="pine"] .nav-pill-btn {
-  color: rgba(255,255,255,0.85);
-}
+
