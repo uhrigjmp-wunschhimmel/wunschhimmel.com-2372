@@ -120,3 +120,17 @@
    Sterne primär:   #FFD700
    Sterne sekundär: #FFBF3A
 */
+
+/* ── PINE THEME ─────────────────────────────────────────────────────────── */
+[data-theme="pine"] {
+  --background:        #F1FDF4;
+  --foreground:        #1A3A2A;
+  --primary:           #1A3A2A;
+  --accent:            #10B981;
+  --muted-foreground:  #10B981;
+  --border:            #6EE7B7;
+  --rose-soft:         #D1FAE5;
+  --lavender:          #A7F3D0;
+  --card:              #FFFFFF;
+  --navy:              #1A3A2A;
+}
