@@ -291,6 +291,7 @@ export function WunschengelChat() {
   // "/sign-in", "/sign-up", "/forgot-password", "/reset-password" → komplett versteckt
   // alle anderen (authentifiziert) → voll funktional
   const isLanding = location === "/";
+  const isListDetail = location.startsWith("/list/");
   const isAuthPage = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password", "/dashboard", "/profile", "/admin", "/explore", "/feed", "/impressum", "/datenschutz", "/agb", "/share-target"].includes(location);
   const isAuthenticated = !!session?.user;
 
