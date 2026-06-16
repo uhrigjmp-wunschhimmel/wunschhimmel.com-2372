@@ -69,7 +69,7 @@ export default function Dashboard() {
   if (!session) { navigate("/sign-in"); return null; }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", paddingTop: 88, paddingBottom: 64 }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", paddingTop: 88, paddingBottom: 100 }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
 
         {/* ── Header ── */}
@@ -88,43 +88,15 @@ export default function Dashboard() {
               </h1>
             </div>
 
-            {/* Buttons nebeneinander */}
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button
-                onClick={handleTrigger}
-                disabled={checking}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  padding: "10px 20px", borderRadius: 50,
-                  border: "2px solid var(--accent)",
-                  background: "transparent",
-                  fontSize: 14, fontWeight: 700,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  color: "var(--accent)",
-                  cursor: checking ? "wait" : "pointer",
-                  transition: "all 0.15s",
-                  whiteSpace: "nowrap",
-                }}
-                onMouseOver={e => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(242,89,144,0.08)";
-                }}
-                onMouseOut={e => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                }}
-              >
-                <span>🔗</span>
-                {checking ? "Prüfe…" : "Link hinzufügen"}
-              </button>
-
-              <button
-                onClick={() => setShowNewModal(true)}
-                className="btn-primary"
-                style={{ gap: 8 }}
-              >
-                <IconPlus size={16} color="currentColor" />
-                {t("new_list")}
-              </button>
-            </div>
+            {/* Nur noch: Neue Liste */}
+            <button
+              onClick={() => setShowNewModal(true)}
+              className="btn-primary"
+              style={{ gap: 8 }}
+            >
+              <IconPlus size={16} color="currentColor" />
+              {t("new_list")}
+            </button>
           </div>
 
           {/* Stats bar */}
@@ -264,6 +236,48 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* ── FAB: Wunsch hinzufügen ── */}
+      <button
+        onClick={handleTrigger}
+        disabled={checking}
+        style={{
+          position: "fixed",
+          bottom: 28,
+          right: 24,
+          zIndex: 900,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "14px 22px",
+          borderRadius: 50,
+          border: "none",
+          background: checking
+            ? "linear-gradient(135deg, #F8A8C8, #D97BAA)"
+            : "linear-gradient(135deg, #F25990, #B02558)",
+          color: "#fff",
+          fontSize: 14,
+          fontWeight: 700,
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          boxShadow: "0 6px 24px rgba(210, 59, 114, 0.40)",
+          cursor: checking ? "wait" : "pointer",
+          transition: "transform 0.15s, box-shadow 0.15s",
+          whiteSpace: "nowrap",
+        }}
+        onMouseOver={e => {
+          if (!checking) {
+            (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+            (e.currentTarget as HTMLElement).style.boxShadow = "0 10px 32px rgba(210, 59, 114, 0.50)";
+          }
+        }}
+        onMouseOut={e => {
+          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+          (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 24px rgba(210, 59, 114, 0.40)";
+        }}
+      >
+        <span style={{ fontSize: 18 }}>🎁</span>
+        {checking ? "Prüfe…" : "Wunsch hinzufügen"}
+      </button>
+
       {/* ── New list modal ── */}
       {showNewModal && (
         <div className="wh-modal-backdrop" onClick={() => setShowNewModal(false)}>
@@ -309,7 +323,7 @@ export default function Dashboard() {
                 <input type="checkbox" checked={newPublic} onChange={e => setNewPublic(e.target.checked)}
                   style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer" }} />
                 <span style={{ fontSize: 13, color: "var(--foreground)", fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
-                  Öffentlich – für andere sichtbar
+                  Öffentlich — für andere sichtbar
                 </span>
               </label>
             </div>
