@@ -16,8 +16,8 @@ const THEMES: { id: Theme; label: string; sub: string; bg: string; accent: strin
     preview: "linear-gradient(135deg, var(--rose-soft) 0%, var(--background) 60%, var(--lavender) 100%)",
   },
   {
-    id: "teal",
-    label: "Teal",
+    id: "pine",
+    label: "pine",
     sub: "Modern & dunkel",
     bg: "#0F1923",
     accent: "#2DD4BF",
@@ -193,7 +193,7 @@ export default function SignUp() {
               type="submit"
               disabled={loading}
               className="w-full font-body font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 mt-2 flex items-center justify-center gap-2"
-              style={{ background: selectedTheme === "teal" ? "#2DD4BF" : "var(--accent)", color: selectedTheme === "teal" ? "#0F1923" : "#fff" }}
+              style={{ background: selectedTheme === "pine" ? "#2DD4BF" : "var(--accent)", color: selectedTheme === "pine" ? "#0F1923" : "#fff" }}
             >
               {loading ? (
                 <>
