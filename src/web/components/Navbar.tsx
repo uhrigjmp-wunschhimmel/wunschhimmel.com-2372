@@ -179,11 +179,7 @@ export function Navbar() {
                   onClick={handleTrigger}
                   disabled={checking}
                   className="nav-pill-btn"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(242,89,144,0.25), rgba(176,37,88,0.25))",
-                    borderColor: "rgba(242,89,144,0.4)",
-                    color: "#FF85B3",
-                  }}
+                  style={{}}
                 >
                   <span>🔗</span>
                   {checking ? "Prüfe…" : "Link hinzufügen"}
