@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+﻿import { useLocation } from "wouter";
 import { useTheme } from "@/lib/theme";
 
 export default function Datenschutz() {
@@ -6,12 +6,12 @@ export default function Datenschutz() {
   const { theme } = useTheme();
   const isPine = theme === "pine";
 
-  const bg = isPine ? "#0F1923" : "#FFF8F0";
-  const cardBg = isPine ? "#162230" : "#FFFFFF";
-  const border = isPine ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isPine ? "#E8F5F3" : "#1A1A4E";
-  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
-  const accent = isPine ? "#2DD4BF" : "#FF6B8A";
+  const bg = isPine ? "#F1FDF4" : "#FFF8F0";
+  const cardBg = isPine ? "#FFFFFF" : "#FFFFFF";
+  const border = isPine ? "#6EE7B7" : "#EAD9D9";
+  const foreground = isPine ? "#1A3A2A" : "#1A1A4E";
+  const muted = isPine ? "#10B981" : "#6B6B9A";
+  const accent = isPine ? "#10B981" : "#FF6B8A";
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section className="mb-8">
@@ -80,27 +80,27 @@ export default function Datenschutz() {
             <p>Wir setzen folgende externe Dienste ein, mit denen ein Auftragsverarbeitungsvertrag (AVV) gemäß Art. 28 DSGVO besteht:</p>
 
             <div className="space-y-4 mt-2">
-              <div className="rounded-xl p-4" style={{ background: isPine ? "#1E3A4A" : "#FFF0F8", border: `1px solid ${border}` }}>
+              <div className="rounded-xl p-4" style={{ background: isPine ? "#D1FAE5" : "#FFF0F8", border: `1px solid ${border}` }}>
                 <p className="font-semibold mb-1" style={{ color: foreground }}>Cloudflare, Inc.</p>
                 <p>Zweck: DNS-Verwaltung, DDoS-Schutz, E-Mail-Weiterleitung (Email Routing)<br />
                 Sitz: USA – abgesichert durch Data Processing Addendum (DPA) und EU-Standardvertragsklauseln (SCC)<br />
                 DPA: <a href="https://www.cloudflare.com/cloudflare-customer-dpa/" target="_blank" rel="noopener noreferrer" style={{ color: accent }}>cloudflare.com/cloudflare-customer-dpa</a></p>
               </div>
 
-              <div className="rounded-xl p-4" style={{ background: isPine ? "#1E3A4A" : "#FFF0F8", border: `1px solid ${border}` }}>
+              <div className="rounded-xl p-4" style={{ background: isPine ? "#D1FAE5" : "#FFF0F8", border: `1px solid ${border}` }}>
                 <p className="font-semibold mb-1" style={{ color: foreground }}>Resend (Resend Inc.)</p>
                 <p>Zweck: Versand von Transaktions-E-Mails (Registrierung, Passwort-Reset, Reservierungsbenachrichtigungen)<br />
                 Sitz: USA – abgesichert durch DPA und SCCs<br />
                 Datenschutz: <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: accent }}>resend.com/privacy</a></p>
               </div>
 
-              <div className="rounded-xl p-4" style={{ background: isPine ? "#1E3A4A" : "#FFF0F8", border: `1px solid ${border}` }}>
+              <div className="rounded-xl p-4" style={{ background: isPine ? "#D1FAE5" : "#FFF0F8", border: `1px solid ${border}` }}>
                 <p className="font-semibold mb-1" style={{ color: foreground }}>Amazon Partnerprogramm (Amazon Europe Core S.à r.l.)</p>
                 <p>Zweck: Affiliate-Links zu Amazon-Produkten. Wenn du auf einen Produktlink klickst, kann Amazon Cookies setzen und Daten über das Klickverhalten erfassen.<br />
                 Datenschutz: <a href="https://www.amazon.de/gp/help/customer/display.html?nodeId=GX7NJQ4ZB8MHFRNJ" target="_blank" rel="noopener noreferrer" style={{ color: accent }}>Amazon Datenschutzhinweis</a></p>
               </div>
 
-              <div className="rounded-xl p-4" style={{ background: isPine ? "#1E3A4A" : "#FFF0F8", border: `1px solid ${border}` }}>
+              <div className="rounded-xl p-4" style={{ background: isPine ? "#D1FAE5" : "#FFF0F8", border: `1px solid ${border}` }}>
                 <p className="font-semibold mb-1" style={{ color: foreground }}>Awin AG</p>
                 <p>Zweck: Affiliate-Marketing. Wunschhimmel ist Mitglied im Awin-Partnerprogramm. Wenn du auf Affiliate-Links klickst, kann Awin Cookies und ein Tracking-Pixel einsetzen, um die Vermittlung von Käufen nachzuverfolgen. Dabei können Daten wie IP-Adresse, Browser-Typ und Klickverhalten erhoben werden.<br /><br />
                 Die Nutzung dieser Tracking-Technologien erfolgt nur mit deiner Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TTDSG.<br /><br />

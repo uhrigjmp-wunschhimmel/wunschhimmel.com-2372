@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -9,15 +9,15 @@ export function useClipboardWish() {
   const isPine = theme === "pine";
 
   // Theme-Tokens
-  const accent      = isPine ? "#2DD4BF" : "#F25990";
-  const foreground  = isPine ? "#E8F5F3" : "#122050";
-  const muted       = isPine ? "#7FBFB5" : "#9A7085";
-  const cardBg      = isPine ? "#162230" : "#FFFFFF";
-  const inputBg     = isPine ? "#1A2D3E" : "#FAFAFA";
-  const border      = isPine ? "#1E3A4A" : "#F0D5E5";
-  const labelColor  = isPine ? "#7FBFB5" : "#9A7085";
-  const selectedBg  = isPine ? "#1E3A4A" : "#FFF0F5";
-  const textDark    = isPine ? "#E8F5F3" : "#122050";
+  const accent      = isPine ? "#10B981" : "#F25990";
+  const foreground  = isPine ? "#1A3A2A" : "#122050";
+  const muted       = isPine ? "#10B981" : "#9A7085";
+  const cardBg      = isPine ? "#FFFFFF" : "#FFFFFF";
+  const inputBg     = isPine ? "#F1FDF4" : "#FAFAFA";
+  const border      = isPine ? "#6EE7B7" : "#F0D5E5";
+  const labelColor  = isPine ? "#10B981" : "#9A7085";
+  const selectedBg  = isPine ? "#6EE7B7" : "#FFF0F5";
+  const textDark    = isPine ? "#1A3A2A" : "#122050";
 
   const [show, setShow] = useState(false);
   const [detectedUrl, setDetectedUrl] = useState("");
@@ -200,7 +200,7 @@ export function useClipboardWish() {
             <div style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 14px", borderRadius: 12,
-              background: isPine ? "#1A2D3E" : "#FFF5FA",
+              background: isPine ? "#F1FDF4" : "#FFF5FA",
               border: `1px solid ${border}`, marginBottom: 14,
             }}>
               <div style={{
@@ -219,7 +219,7 @@ export function useClipboardWish() {
             <div style={{
               display: "flex", alignItems: "center", gap: 12,
               padding: "10px 12px", borderRadius: 12,
-              background: isPine ? "#1A2D3E" : "#FFF5FA",
+              background: isPine ? "#F1FDF4" : "#FFF5FA",
               border: `1px solid ${border}`, marginBottom: 14,
             }}>
               {imageUrl && (
@@ -342,13 +342,13 @@ export function useClipboardWish() {
               style={{
                 flex: 2, padding: "13px", borderRadius: 50, border: "none",
                 background: isPine
-                  ? "linear-gradient(135deg, #2DD4BF, #0F9B8E)"
+                  ? "linear-gradient(135deg, #34D399, #059669)"
                   : "linear-gradient(135deg, #F25990, #B02558)",
                 fontSize: 14, fontWeight: 700,
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                color: isPine ? "#0F1923" : "#fff",
+                color: isPine ? "#F1FDF4" : "#fff",
                 boxShadow: isPine
-                  ? "0 4px 16px rgba(45,212,191,0.30)"
+                  ? "0 4px 16px rgba(52,211,153,0.30)"
                   : "0 4px 16px rgba(210,59,114,0.30)",
                 opacity: saving || !title.trim() || !selectedListId ? 0.6 : 1,
                 cursor: saving || !title.trim() || !selectedListId ? "not-allowed" : "pointer",

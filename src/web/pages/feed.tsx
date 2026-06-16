@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { api } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
@@ -8,10 +8,10 @@ export default function Feed() {
   const { theme } = useTheme();
   const [, navigate] = useLocation();
   const isPine  = theme === "pine";
-  const bg = isPine  ? "#0F1923" : "#FFF8F0";
-  const foreground = isPine  ? "#E8F5F3" : "#1A1A4E";
-  const muted = isPine  ? "#7FBFB5" : "#6B6B9A";
-  const accent = isPine  ? "#2DD4BF" : "var(--accent)";
+  const bg = isPine  ? "#F1FDF4" : "#FFF8F0";
+  const foreground = isPine  ? "#1A3A2A" : "#1A1A4E";
+  const muted = isPine  ? "#10B981" : "#6B6B9A";
+  const accent = isPine  ? "#10B981" : "var(--accent)";
 
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

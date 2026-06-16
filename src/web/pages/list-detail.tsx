@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
@@ -18,12 +18,12 @@ export default function ListDetail() {
   const { data: session } = authClient.useSession();
   const { theme } = useTheme();
   const isPine = theme === "pine";
-  const accent = isPine ? "#2DD4BF" : "var(--accent)";
-  const border = isPine ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isPine ? "#E8F5F3" : "var(--primary)";
-  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
-  const cardBg = isPine ? "#162230" : "#FFFFFF";
-  const inputBg = isPine ? "#1A2D3E" : "var(--background)";
+  const accent = isPine ? "#10B981" : "var(--accent)";
+  const border = isPine ? "#6EE7B7" : "#EAD9D9";
+  const foreground = isPine ? "#1A3A2A" : "var(--primary)";
+  const muted = isPine ? "#10B981" : "#6B6B9A";
+  const cardBg = isPine ? "#FFFFFF" : "#FFFFFF";
+  const inputBg = isPine ? "#F1FDF4" : "var(--background)";
 
   const [list, setList] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -277,7 +277,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
             <button
               onClick={() => setShowUpdateModal(true)}
               className="font-body text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-              style={{ background: accent, color: isPine ? "#0F1923" : "#fff" }}
+              style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff" }}
             >
               + Update
             </button>
@@ -351,7 +351,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
               </button>
               <button onClick={postUpdate} disabled={postingUpdate || !updateText.trim()}
                 className="flex-1 font-body font-semibold py-2.5 rounded-xl text-sm disabled:opacity-60"
-                style={{ background: accent, color: isPine ? "#0F1923" : "#fff" }}>
+                style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff" }}>
                 {postingUpdate ? "Poste..." : "Posten 🎉"}
               </button>
             </div>
@@ -467,7 +467,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
         Deine Liste wird für alle Besucher von Wunschhimmel sichtbar — auch ohne Link und ohne Account.
       </p>
       <div style={{
-        background: isPine ? "#1A2D3E" : "#FFF5FA",
+        background: isPine ? "#F1FDF4" : "#FFF5FA",
         border: `1px solid ${border}`,
         borderRadius: 12,
         padding: "14px 16px",
@@ -504,7 +504,7 @@ const [showPublicConsentModal, setShowPublicConsentModal] = useState(false);
           className="font-body text-sm font-bold"
           style={{
             flex: 1, padding: "12px", borderRadius: 50,
-            background: isPine ? "#2DD4BF" : "linear-gradient(135deg, #F25990, #B02558)",
+            background: isPine ? "#10B981" : "linear-gradient(135deg, #F25990, #B02558)",
             color: "#fff", border: "none", cursor: "pointer"
           }}>
           Ja, öffentlich machen ✓

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useParams } from "wouter";
 import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
@@ -13,10 +13,10 @@ export default function SharedList() {
   const params = useParams<{ token: string }>();
   const { theme } = useTheme();
   const isPine = theme === "pine";
-  const foreground = isPine ? "#E8F5F3" : "var(--primary)";
-  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
-  const border = isPine ? "#1E3A4A" : "#EAD9D9";
-  const cardBg = isPine ? "#162230" : "#FFFFFF";
+  const foreground = isPine ? "#1A3A2A" : "var(--primary)";
+  const muted = isPine ? "#10B981" : "#6B6B9A";
+  const border = isPine ? "#6EE7B7" : "#EAD9D9";
+  const cardBg = isPine ? "#FFFFFF" : "#FFFFFF";
 
   const [list, setList] = useState<any>(null);
   const [loading, setLoading] = useState(true);

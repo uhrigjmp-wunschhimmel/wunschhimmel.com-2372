@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { api } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
@@ -14,12 +14,12 @@ interface UpdatePostProps {
 export function UpdatePost({ update, shareToken, isOwner, onDelete, onUpdated }: UpdatePostProps) {
   const { theme } = useTheme();
   const isPine = theme === "pine";
-  const cardBg = isPine ? "#162230" : "#FFFFFF";
-  const border = isPine ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isPine ? "#E8F5F3" : "#1A1A4E";
-  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
-  const accent = isPine ? "#2DD4BF" : "#FF6B8A";
-  const inputBg = isPine ? "#1A2D3E" : "#FFF8F0";
+  const cardBg = isPine ? "#FFFFFF" : "#FFFFFF";
+  const border = isPine ? "#6EE7B7" : "#EAD9D9";
+  const foreground = isPine ? "#1A3A2A" : "#1A1A4E";
+  const muted = isPine ? "#10B981" : "#6B6B9A";
+  const accent = isPine ? "#10B981" : "#FF6B8A";
+  const inputBg = isPine ? "#F1FDF4" : "#FFF8F0";
 
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -63,7 +63,7 @@ export function UpdatePost({ update, shareToken, isOwner, onDelete, onUpdated }:
         {update.avatarUrl ? (
           <img src={update.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
         ) : (
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-display font-bold" style={{ background: accent, color: isPine ? "#0F1923" : "#fff" }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-display font-bold" style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff" }}>
             {(update.ownerName || "?")[0].toUpperCase()}
           </div>
         )}
@@ -131,7 +131,7 @@ export function UpdatePost({ update, shareToken, isOwner, onDelete, onUpdated }:
                 onClick={handleComment}
                 disabled={submitting || !commentText.trim()}
                 className="text-sm font-body font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
-                style={{ background: accent, color: isPine ? "#0F1923" : "#fff" }}
+                style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff" }}
               >
                 →
               </button>

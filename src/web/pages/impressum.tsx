@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+﻿import { useLocation } from "wouter";
 import { useTheme } from "@/lib/theme";
 import { ContactForm } from "@/components/ContactForm";
 
@@ -6,12 +6,12 @@ export default function Impressum() {
   const [, navigate] = useLocation();
   const { theme } = useTheme();
   const isPine = theme === "pine";
-  const bg = isPine ? "#0F1923" : "#FFF8F0";
-  const cardBg = isPine ? "#162230" : "#FFFFFF";
-  const border = isPine ? "#1E3A4A" : "#EAD9D9";
-  const foreground = isPine ? "#E8F5F3" : "#1A1A4E";
-  const muted = isPine ? "#7FBFB5" : "#6B6B9A";
-  const accent = isPine ? "#2DD4BF" : "#FF6B8A";
+  const bg = isPine ? "#F1FDF4" : "#FFF8F0";
+  const cardBg = isPine ? "#FFFFFF" : "#FFFFFF";
+  const border = isPine ? "#6EE7B7" : "#EAD9D9";
+  const foreground = isPine ? "#1A3A2A" : "#1A1A4E";
+  const muted = isPine ? "#10B981" : "#6B6B9A";
+  const accent = isPine ? "#10B981" : "#FF6B8A";
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4" style={{ background: bg }}>

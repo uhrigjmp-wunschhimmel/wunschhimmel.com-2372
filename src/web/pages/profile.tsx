@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { authClient } from "@/lib/auth";
 import { api } from "@/lib/api";
@@ -30,12 +30,12 @@ export default function Profile() {
   const { data: session } = authClient.useSession();
   const isPine = theme === "pine";
 
-  const bg         = isPine ? "#0F1923"          : "var(--background)";
-  const cardBg     = isPine ? "#162230"          : "#FFFFFF";
-  const border     = isPine ? "#1E3A4A"          : "#EAD9D9";
-  const foreground = isPine ? "#E8F5F3"          : "var(--primary)";
-  const muted      = isPine ? "#7FBFB5"          : "#6B6B9A";
-  const accent     = isPine ? "#2DD4BF"          : "var(--accent)";
+  const bg         = isPine ? "#F1FDF4"          : "var(--background)";
+  const cardBg     = isPine ? "#FFFFFF"          : "#FFFFFF";
+  const border     = isPine ? "#6EE7B7"          : "#EAD9D9";
+  const foreground = isPine ? "#1A3A2A"          : "var(--primary)";
+  const muted      = isPine ? "#10B981"          : "#6B6B9A";
+  const accent     = isPine ? "#10B981"          : "var(--accent)";
 
   // ─── Avatar State ─────────────────────────────────────────────────────────────
   const [profile, setProfile]     = useState<any>(null);
@@ -203,7 +203,7 @@ export default function Profile() {
           autoComplete={autoComplete}
           className="w-full font-body text-sm rounded-xl px-4 py-3 pr-10 outline-none transition-colors"
           style={{
-            background: isPine ? "#0F1923" : "#FDF8FC",
+            background: isPine ? "#F1FDF4" : "#FDF8FC",
             border: `1.5px solid ${border}`,
             color: foreground,
           }}
@@ -250,7 +250,7 @@ export default function Profile() {
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover" style={{ border: `3px solid ${accent}` }} />
               ) : (
-                <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-display font-bold" style={{ background: accent, color: isPine ? "#0F1923" : "#fff", border: `3px solid ${accent}` }}>
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-display font-bold" style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff", border: `3px solid ${accent}` }}>
                   {session.user.name?.[0]?.toUpperCase() || "?"}
                 </div>
               )}
@@ -258,7 +258,7 @@ export default function Profile() {
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
                 className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-sm transition-opacity hover:opacity-80 disabled:opacity-50"
-                style={{ background: accent, color: isPine ? "#0F1923" : "#fff" }}
+                style={{ background: accent, color: isPine ? "#F1FDF4" : "#fff" }}
               >
                 {uploading ? "⏳" : "✏️"}
               </button>
@@ -287,7 +287,7 @@ export default function Profile() {
                 <button
                   onClick={() => { setPwOpen(true); setPwError(null); }}
                   className="font-body text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity hover:opacity-80"
-                  style={{ background: isPine ? "#1E3A4A" : "#FFF0F5", color: accent, border: `1px solid ${isPine ? "#2DD4BF33" : "#FFB3D1"}` }}
+                  style={{ background: isPine ? "#6EE7B7" : "#FFF0F5", color: accent, border: `1px solid ${isPine ? "#2DD4BF33" : "#FFB3D1"}` }}
                 >
                   Passwort ändern
                 </button>
@@ -296,7 +296,7 @@ export default function Profile() {
 
             {/* Erfolg */}
             {pwSuccess && (
-              <div className="rounded-2xl p-4 text-center" style={{ background: isPine ? "#0a2a1e" : "#F0FDF7", border: "1.5px solid #2CA96E" }}>
+              <div className="rounded-2xl p-4 text-center" style={{ background: isPine ? "#F0FDF7" : "#F0FDF7", border: "1.5px solid #2CA96E" }}>
                 <p className="font-display font-bold mb-1" style={{ color: foreground }}>Passwort geändert ✦</p>
                 <p className="font-body text-sm" style={{ color: muted }}>Dein neues Passwort ist aktiv.</p>
                 <button onClick={resetPwForm} className="font-body text-xs mt-3 underline hover:opacity-70" style={{ color: muted }}>Schließen</button>
@@ -305,11 +305,11 @@ export default function Profile() {
 
             {/* Formular */}
             {pwOpen && !pwSuccess && (
-              <div className="rounded-2xl p-5" style={{ background: isPine ? "#0F1923" : "#FFF5FA", border: `1px solid ${border}` }}>
+              <div className="rounded-2xl p-5" style={{ background: isPine ? "#F1FDF4" : "#FFF5FA", border: `1px solid ${border}` }}>
 
                 {/* Globaler Fehler */}
                 {pwError && (
-                  <div className="rounded-xl px-4 py-3 mb-4 font-body text-sm" style={{ background: isPine ? "#2a0a0a" : "#FFF0F0", border: "1.5px solid #E83B3B", color: "#E83B3B" }}>
+                  <div className="rounded-xl px-4 py-3 mb-4 font-body text-sm" style={{ background: isPine ? "#FFF0F0" : "#FFF0F0", border: "1.5px solid #E83B3B", color: "#E83B3B" }}>
                     {pwError}
                   </div>
                 )}
@@ -343,7 +343,7 @@ export default function Profile() {
                 )}
 
                 {/* Anforderungen */}
-                <div className="rounded-xl p-3 mb-4 grid grid-cols-2 gap-y-1.5 gap-x-3" style={{ background: isPine ? "#162230" : "#FFF0F5" }}>
+                <div className="rounded-xl p-3 mb-4 grid grid-cols-2 gap-y-1.5 gap-x-3" style={{ background: isPine ? "#FFFFFF" : "#FFF0F5" }}>
                   <ReqItem met={req.length}    label="8+ Zeichen" />
                   <ReqItem met={req.uppercase} label="Großbuchstabe" />
                   <ReqItem met={req.number}    label="Zahl (0–9)" />
@@ -369,7 +369,7 @@ export default function Profile() {
                   <button
                     onClick={resetPwForm}
                     className="font-body text-sm font-semibold px-5 py-2.5 rounded-full transition-opacity hover:opacity-70"
-                    style={{ background: isPine ? "#1E3A4A" : "#FFF0F5", color: muted, border: `1px solid ${border}` }}
+                    style={{ background: isPine ? "#6EE7B7" : "#FFF0F5", color: muted, border: `1px solid ${border}` }}
                   >
                     Abbrechen
                   </button>
@@ -380,14 +380,14 @@ export default function Profile() {
                     style={{
                       background: canSave
                         ? isPine
-                          ? "linear-gradient(135deg, #2DD4BF, #0e9f8a)"
+                          ? "linear-gradient(135deg, #34D399, #059669)"
                           : "linear-gradient(135deg, #F25990, #B02558)"
                         : border,
-                      color: canSave ? (isPine ? "#0F1923" : "#fff") : muted,
+                      color: canSave ? (isPine ? "#F1FDF4" : "#fff") : muted,
                       cursor: canSave ? "pointer" : "default",
                       boxShadow: canSave
                         ? isPine
-                          ? "0 4px 14px rgba(45,212,191,0.25)"
+                          ? "0 4px 14px rgba(52,211,153,0.25)"
                           : "0 4px 14px rgba(210,59,114,0.25)"
                         : "none",
                     }}
@@ -410,7 +410,7 @@ export default function Profile() {
             <div className="grid grid-cols-2 gap-3">
               {([
                 { id: "rose", label: "🌸 Rose", preview: "linear-gradient(135deg, var(--rose-soft), var(--background))" },
-                { id: "pine", label: "🌊 pine", preview: "linear-gradient(135deg, #0F1923, #0e4a5a)" },
+                { id: "pine", label: "🌊 pine", preview: "linear-gradient(135deg, #D1FAE5, #6EE7B7)" },
               ] as const).map(th => (
                 <button
                   key={th.id}
@@ -418,7 +418,7 @@ export default function Profile() {
                   className="rounded-2xl p-3 text-sm font-body font-semibold transition-all border-2"
                   style={{
                     background: th.preview,
-                    color: th.id === "pine" ? "#2DD4BF" : "var(--primary)",
+                    color: th.id === "pine" ? "#10B981" : "var(--primary)",
                     borderColor: theme === th.id ? accent : "transparent",
                     transform: theme === th.id ? "scale(1.03)" : "scale(1)",
                   }}
@@ -438,7 +438,7 @@ export default function Profile() {
                 <button
                   onClick={() => { setDeleteOpen(true); setDeleteError(null); }}
                   className="font-body text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity hover:opacity-80"
-                  style={{ background: isPine ? "#2a0a0a" : "#FFF0F0", color: "#E83B3B", border: "1px solid #E83B3B44" }}
+                  style={{ background: isPine ? "#FFF0F0" : "#FFF0F0", color: "#E83B3B", border: "1px solid #E83B3B44" }}
                 >
                   Konto löschen
                 </button>
@@ -446,7 +446,7 @@ export default function Profile() {
             </div>
 
             {deleteOpen && (
-              <div className="rounded-2xl p-5" style={{ background: isPine ? "#1a0a0a" : "#FFF5F5", border: "1.5px solid #E83B3B44" }}>
+              <div className="rounded-2xl p-5" style={{ background: isPine ? "#FFF5F5" : "#FFF5F5", border: "1.5px solid #E83B3B44" }}>
                 <p className="font-body text-sm mb-1 font-semibold" style={{ color: "#E83B3B" }}>
                   Achtung – diese Aktion ist unwiderruflich.
                 </p>
@@ -455,7 +455,7 @@ export default function Profile() {
                 </p>
 
                 {deleteError && (
-                  <div className="rounded-xl px-4 py-3 mb-4 font-body text-sm" style={{ background: isPine ? "#2a0a0a" : "#FFF0F0", border: "1.5px solid #E83B3B", color: "#E83B3B" }}>
+                  <div className="rounded-xl px-4 py-3 mb-4 font-body text-sm" style={{ background: isPine ? "#FFF0F0" : "#FFF0F0", border: "1.5px solid #E83B3B", color: "#E83B3B" }}>
                     {deleteError}
                   </div>
                 )}
@@ -467,7 +467,7 @@ export default function Profile() {
                   placeholder="löschen"
                   className="w-full font-body text-sm rounded-xl px-4 py-3 outline-none transition-colors mb-4"
                   style={{
-                    background: isPine ? "#0F1923" : "#FDF8FC",
+                    background: isPine ? "#F1FDF4" : "#FDF8FC",
                     border: `1.5px solid ${canDelete ? "#E83B3B" : border}`,
                     color: foreground,
                   }}
@@ -479,7 +479,7 @@ export default function Profile() {
                   <button
                     onClick={resetDeleteForm}
                     className="font-body text-sm font-semibold px-5 py-2.5 rounded-full transition-opacity hover:opacity-70"
-                    style={{ background: isPine ? "#1E3A4A" : "#FFF0F5", color: muted, border: `1px solid ${border}` }}
+                    style={{ background: isPine ? "#6EE7B7" : "#FFF0F5", color: muted, border: `1px solid ${border}` }}
                   >
                     Abbrechen
                   </button>
