@@ -1,4 +1,5 @@
 import { Route, Switch } from "wouter";
+import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "./components/provider";
 import { AgentFeedback } from "@runablehq/website-runtime";
 import { I18nProvider } from "./lib/i18n";
@@ -30,37 +31,39 @@ import ErrorBoundary from "./components/ErrorBoundary";
 function App() {
   return (
     <ErrorBoundary>
-      <Provider>
-        <I18nProvider>
-          <ThemeProvider>
-            <Navbar />
-            <Switch>
-              <Route path="/" component={LandingPage} />
-              <Route path="/sign-in" component={SignIn} />
-              <Route path="/sign-up" component={SignUp} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/list/:id" component={ListDetail} />
-              <Route path="/shared/:token" component={SharedList} />
-              <Route path="/explore" component={Explore} />
-              <Route path="/impressum" component={Impressum} />
-              <Route path="/datenschutz" component={Datenschutz} />
-              <Route path="/agb" component={AGBPage} />
-              <Route path="/profile" component={Profile} />
-              <Route path="/feed" component={Feed} />
-              <Route path="/admin" component={Admin} />
-              <Route path="/forgot-password" component={ForgotPassword} />
-              <Route path="/reset-password" component={ResetPassword} />
-              <Route path="/share-target" component={ShareTarget} />
-              <Route component={NotFoundPage} />
-            </Switch>
-            <Footer />
-            <CookieBanner />
-            <WunschengelChat />
-            <Toaster richColors position="bottom-center" />
-            {import.meta.env.DEV && <AgentFeedback />}
-          </ThemeProvider>
-        </I18nProvider>
-      </Provider>
+      <HelmetProvider>
+        <Provider>
+          <I18nProvider>
+            <ThemeProvider>
+              <Navbar />
+              <Switch>
+                <Route path="/" component={LandingPage} />
+                <Route path="/sign-in" component={SignIn} />
+                <Route path="/sign-up" component={SignUp} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/list/:id" component={ListDetail} />
+                <Route path="/shared/:token" component={SharedList} />
+                <Route path="/explore" component={Explore} />
+                <Route path="/impressum" component={Impressum} />
+                <Route path="/datenschutz" component={Datenschutz} />
+                <Route path="/agb" component={AGBPage} />
+                <Route path="/profile" component={Profile} />
+                <Route path="/feed" component={Feed} />
+                <Route path="/admin" component={Admin} />
+                <Route path="/forgot-password" component={ForgotPassword} />
+                <Route path="/reset-password" component={ResetPassword} />
+                <Route path="/share-target" component={ShareTarget} />
+                <Route component={NotFoundPage} />
+              </Switch>
+              <Footer />
+              <CookieBanner />
+              <WunschengelChat />
+              <Toaster richColors position="bottom-center" />
+              {import.meta.env.DEV && <AgentFeedback />}
+            </ThemeProvider>
+          </I18nProvider>
+        </Provider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }
