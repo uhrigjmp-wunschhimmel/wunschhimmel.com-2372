@@ -11,6 +11,7 @@ export default function LandingPage() {
   // Smooth theme transition via CSS transition on wrapper
   const [displayed, setDisplayed] = useState<OccasionTheme>(active);
   const [fading, setFading] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
     if (active.id === displayed.id) return;
@@ -23,6 +24,15 @@ export default function LandingPage() {
   }, [active.id]);
 
   const t = displayed;
+
+  const faqs = [
+    { q: "Ist Wunschhimmel kostenlos?", a: "Ja, das Erstellen und Teilen deiner Wunschliste ist komplett kostenlos." },
+    { q: "Brauche ich ein Konto?", a: "Für eine eigene Liste ja — die Anmeldung dauert aber nur eine Minute." },
+    { q: "Kann ich Produkte von jeder Website hinzufügen, nicht nur Amazon?", a: "Ja, du kannst Links von beliebigen Online-Shops einfügen." },
+    { q: "Sehen andere, was ich mir wünsche, bevor ich etwas reserviere?", a: "Nein — wer einen Wunsch für dich reserviert, bleibt für dich unsichtbar. So bleibt die Überraschung erhalten." },
+    { q: "Wie teile ich meine Liste?", a: "Per Link, WhatsApp-Button oder QR-Code — du entscheidest, wie und mit wem." },
+    { q: "Ist meine Liste privat oder kann sie jeder sehen?", a: "Du entscheidest: privat (nur mit Link sichtbar) oder öffentlich auffindbar über die Entdecken-Seite." },
+  ];
 
   return (
     <div style={{
@@ -321,6 +331,77 @@ export default function LandingPage() {
                 <span style={{ fontSize: 22 }}>{u.emoji}</span> {u.label}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────────────────── */}
+      <section className="landing-section-pad" style={{ background: "#FFF4E8", padding: "72px 24px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: t.accent, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, transition: "color 0.4s" }}>Das sagen Nutzerinnen</div>
+          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "#2D1B69", marginBottom: 48, fontFamily: "Playfair Display, serif" }}>
+            Familien lieben Wunschhimmel 💛
+          </h2>
+          <div className="landing-grid-features" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))", gap: 20 }}>
+            {[
+              { quote: "Endlich keine doppelten Geschenke mehr! Meine ganze Familie liebt Wunschhimmel.", name: "[Platzhalter Name]", role: "Mama von zwei Kindern" },
+              { quote: "Wir haben unsere komplette Hochzeitsliste in 10 Minuten erstellt. So einfach hätte es schon immer sein sollen.", name: "[Platzhalter Name]", role: "frisch verheiratet" },
+              { quote: "Ich liebe, dass ich Produkte von jeder Website hinzufügen kann, nicht nur von Amazon.", name: "[Platzhalter Name]", role: "Nutzerin seit 2026" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: "#fff", borderRadius: 20, padding: "28px 24px",
+                boxShadow: "0 2px 16px rgba(45,27,105,0.06)", border: `1px solid ${t.accent}18`,
+                textAlign: "left", transition: "border-color 0.4s",
+              }}>
+                <div style={{ fontSize: 18, marginBottom: 12, color: "#FFBF3A" }}>★★★★★</div>
+                <p style={{ fontSize: 14, color: "#7B6B8D", lineHeight: 1.6, marginBottom: 16 }}>"{item.quote}"</p>
+                <div style={{ fontWeight: 800, fontSize: 13, color: "#2D1B69" }}>{item.name}</div>
+                <div style={{ fontSize: 12, color: "#A89BBD" }}>{item.role}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12, color: "#A89BBD", marginTop: 32 }}>
+            * Beispiel-Stimmen — werden durch echte Erfahrungsberichte ersetzt.
+          </p>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
+      <section className="landing-section-pad" style={{ background: "#FFF0F5", padding: "72px 24px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: t.accent, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, transition: "color 0.4s" }}>Fragen & Antworten</div>
+            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "#2D1B69", fontFamily: "Playfair Display, serif" }}>
+              Häufige Fragen ❓
+            </h2>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {faqs.map((item, i) => {
+              const isOpen = openFaq === i;
+              return (
+                <div key={i} style={{
+                  background: "#fff", borderRadius: 16, border: `1px solid ${t.accent}18`,
+                  overflow: "hidden", transition: "border-color 0.4s",
+                }}>
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : i)}
+                    style={{
+                      width: "100%", textAlign: "left", background: "none", border: "none",
+                      padding: "18px 22px", cursor: "pointer", display: "flex",
+                      alignItems: "center", justifyContent: "space-between", gap: 12,
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: 15, color: "#2D1B69" }}>{item.q}</span>
+                    <span style={{ fontSize: 18, color: t.accent, transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>+</span>
+                  </button>
+                  {isOpen && (
+                    <div style={{ padding: "0 22px 20px", fontSize: 14, color: "#7B6B8D", lineHeight: 1.6 }}>
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
