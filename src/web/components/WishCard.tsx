@@ -8,6 +8,12 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
+declare global {
+  interface Window {
+    umami?: { track: (event: string, data?: Record<string, any>) => void };
+  }
+}
+
 interface WishCardProps {
   wish: any;
   isOwner?: boolean;
@@ -121,7 +127,10 @@ export function WishCard({ wish, isOwner, shareToken, onClick, onDelete, onReser
     <>
       <div
         className="wish-card cursor-pointer group"
-        onClick={() => onClick?.(wish)}
+        onClick={() => {
+          window.umami?.track('wish_view', { wishId: wish.id, category: wish.category || 'none' });
+          onClick?.(wish);
+        }}
         style={{ position: "relative" }}
       >
         {/* Image zone */}
@@ -237,6 +246,7 @@ export function WishCard({ wish, isOwner, shareToken, onClick, onDelete, onReser
                 href={withAffiliateTag(wish.productUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => window.umami?.track('affiliate_click', { wishId: wish.id, category: wish.category || 'none', type: 'direct_link' })}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   width: "100%", padding: "10px 16px", borderRadius: 999,
@@ -257,6 +267,7 @@ export function WishCard({ wish, isOwner, shareToken, onClick, onDelete, onReser
                 href={buildAmazonSearchUrl(wish.title)}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => window.umami?.track('affiliate_click', { wishId: wish.id, category: wish.category || 'none', type: 'search_fallback' })}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   width: "100%", padding: "10px 16px", borderRadius: 999,
