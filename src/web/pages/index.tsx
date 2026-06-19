@@ -29,9 +29,10 @@ export default function LandingPage() {
     { q: "Ist Wunschhimmel kostenlos?", a: "Ja, das Erstellen und Teilen deiner Wunschliste ist komplett kostenlos." },
     { q: "Brauche ich ein Konto?", a: "Für eine eigene Liste ja — die Anmeldung dauert aber nur eine Minute." },
     { q: "Kann ich Produkte von jeder Website hinzufügen, nicht nur Amazon?", a: "Ja, du kannst Links von beliebigen Online-Shops einfügen." },
-    { q: "Sehen andere, was ich mir wünsche, bevor ich etwas reserviere?", a: "Nein — wer einen Wunsch für dich reserviert, bleibt für dich unsichtbar. So bleibt die Überraschung erhalten." },
+    { q: "Sehe ich, wenn jemand einen Wunsch für mich reserviert?", a: "Nein, bewusst nicht — sonst wäre die Überraschung weg. Andere Schenkende sehen, dass ein Wunsch schon vergeben ist, du als Besitzerin der Liste aber nicht." },
     { q: "Wie teile ich meine Liste?", a: "Per Link, WhatsApp-Button oder QR-Code — du entscheidest, wie und mit wem." },
     { q: "Ist meine Liste privat oder kann sie jeder sehen?", a: "Du entscheidest: privat (nur mit Link sichtbar) oder öffentlich auffindbar über die Entdecken-Seite." },
+ { q: "Ich möchte Wunschhimmel doch nicht nutzen, kann ich mein Konto wieder löschen? – Natürlich! Du kannst dein Konto jederzeit und innerhalb weniger Sekunden direkt in deinem Profil löschen. Alternativ steht dir natürlich auch das gesetzliche Widerrufsrecht zur Verfügung." },
   ];
 
   return (
