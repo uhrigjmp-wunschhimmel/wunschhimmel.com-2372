@@ -147,8 +147,9 @@ export async function fetchFullMerchantFeed(params: {
   apiToken: string;
   merchantId: string; // = fid, NICHT die Advertiser-ID
   maxItems?: number;
+  maxScan?: number; // Sicherheitsgrenze: max. Zeilen durchsehen (CPU-Schutz bei riesigen Feeds)
 }): Promise<AwinDatafeedProduct[]> {
-  const { apiToken, merchantId, maxItems = 300 } = params;
+  const { apiToken, merchantId, maxItems = 300, maxScan = 8000 } = params;
 
   const url = new URL(
     `${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/csv/`
@@ -172,7 +173,7 @@ export async function fetchFullMerchantFeed(params: {
     const reservoir: AwinDatafeedProduct[] = [];
     let seenCount = 0; // Anzahl gesehener Produktzeilen (ohne Header)
 
-    while (true) {
+    readLoop: while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
@@ -203,6 +204,11 @@ export async function fetchFullMerchantFeed(params: {
             reservoir[j] = rowFromLine(line, headers);
           }
         }
+
+        // Sicherheitsgrenze: bei riesigen Feeds (z.B. OTTO mit 292k Zeilen)
+        // nicht den ganzen Feed scannen — das würde den Worker an die
+        // CPU-/Zeit-Grenze bringen und zu einem 503 führen.
+        if (seenCount >= maxScan) break readLoop;
       }
     }
 
