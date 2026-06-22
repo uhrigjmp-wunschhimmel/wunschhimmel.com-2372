@@ -1,12 +1,19 @@
 // ── Awin Product Datafeed ─────────────────────────────────────────────────────
 // WICHTIG: Die IDs unten sind ECHTE FEED-IDs (aus /admin/awin-feedlist ermittelt),
-// NICHT die Advertiser-/Merchant-IDs. Awin unterscheidet beides — die fid ist
-// der eigentliche, konkrete Datenfeed, eine Advertiser-ID kann mehrere Feeds
-// haben (z. B. OTTO: 3 Feeds für Wohnen/Technik/Mode getrennt).
+// NICHT die Advertiser-/Merchant-IDs.
 //
-// fetchFullMerchantFeed() nutzt CSV-Format mit dem korrekten Download-API-Key
-// (AWIN_API_TOKEN = der "60259e25..."-Key aus der Create-a-Feed-Übersicht,
-// NICHT der allgemeine Publisher-API-Key).
+// fetchFullMerchantFeed() nutzt RESERVOIR SAMPLING: Der komplette Feed wird
+// gestreamt durchlaufen (kein Speicherproblem, da nie alles auf einmal im
+// RAM liegt), aber wir behalten eine zufällige, über den GANZEN Feed verteilte
+// Stichprobe von `maxItems` Produkten — nicht einfach "die ersten N".
+// Das ist wichtig für Produktempfehlungen: ohne das würden wir bei jedem
+// Sync exakt dieselben ersten 300 Zeilen bekommen, egal wie oft wir syncen.
+//
+// Bei kleinen/mittleren Feeds (die meisten unserer Merchants, <30.000
+// Produkte) deckt das den GESAMTEN Katalog ab. Bei riesigen Feeds wie OTTO
+// (292k) oder Avocadostore (509k) ist es eine echte Zufallsstichprobe über
+// den gesamten Feed — deutlich besser als ein fixer Ausschnitt, aber das
+// Lesen selbst dauert entsprechend länger (Zeitbudget unten erhöht).
 //
 // Docs: https://wiki.awin.com/index.php/Product_Feeds_API
 
@@ -14,13 +21,15 @@ import type { LiveProduct } from "../live-search";
 
 export const AWIN_BASE = "https://productdata.awin.com/datafeed/download/apikey";
 const TIMEOUT_MS = 8000;
-const FULL_FEED_TIMEOUT_MS = 20000;
+const FULL_FEED_TIMEOUT_MS = 30000; // großzügiger, da wir bei großen Feeds länger lesen
 
 // Merchant-Feeds (echte Feed-IDs, Stand: Lookup vom 22.06.2026)
 export const MERCHANT_PRIORITIES = [
   { id: "54165",  name: "OTTO DE",           weight: 10 }, // Wohnen, Spielzeug und Baumarkt
-  { id: "69595",  name: "Avocadostore DE",   weight: 9  }, // Group-ID (DE)
-  { id: "104979", name: "babymarkt DE",      weight: 8  }, // Preissuchmaschinen-Feed
+  { id: "104979", name: "babymarkt DE",      weight: 8  },
+  // Avocadostore DE: Awin-Programm wurde gekündigt (Stand 22.06.2026) —
+  // entfernt. Bereits gesyncte Produkte mit DELETE FROM awin_products
+  // WHERE merchant_id = '69595'; aus D1 löschen. // Preissuchmaschinen-Feed
   { id: "85863",  name: "Stapelstein DE",    weight: 8  },
   { id: "66585",  name: "MyHappyMoments DE", weight: 7  },
   { id: "101641", name: "World of Sweets",   weight: 7  },
@@ -87,7 +96,7 @@ function normalizeAwinProduct(p: AwinDatafeedProduct): LiveProduct {
   };
 }
 
-// ── CSV-Parser ────────────────────────────────────────────────────────────────
+// ── CSV-Zeilen-Parser (gequotete Felder mit Kommas/Anführungszeichen) ───────
 function parseCsvLine(line: string): string[] {
   const result: string[] = [];
   let cur = "";
@@ -121,26 +130,19 @@ function parseCsvLine(line: string): string[] {
   return result;
 }
 
-function parseAwinCsv(text: string): AwinDatafeedProduct[] {
-  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-  if (lines.length < 2) return [];
-
-  const headers = parseCsvLine(lines[0]).map(h => h.trim());
-  const rows: AwinDatafeedProduct[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCsvLine(lines[i]);
-    const row: Record<string, string> = {};
-    headers.forEach((h, idx) => {
-      row[h] = values[idx] ?? "";
-    });
-    rows.push(row as unknown as AwinDatafeedProduct);
-  }
-
-  return rows;
+function rowFromLine(line: string, headers: string[]): AwinDatafeedProduct {
+  const values = parseCsvLine(line);
+  const row: Record<string, string> = {};
+  headers.forEach((h, idx) => {
+    row[h] = values[idx] ?? "";
+  });
+  return row as unknown as AwinDatafeedProduct;
 }
 
-// ── Voller Katalog-Download für den Batch-Sync (CSV-Format) ─────────────────
+// ── Voller Katalog-Download mit Reservoir Sampling ───────────────────────────
+// Liest den kompletten Feed gestreamt durch (kein Speicherproblem), behält
+// aber eine zufällige, gleichmäßig über den GESAMTEN Feed verteilte Stich-
+// probe von `maxItems` Produkten statt einfach "die ersten N".
 export async function fetchFullMerchantFeed(params: {
   apiToken: string;
   merchantId: string; // = fid, NICHT die Advertiser-ID
@@ -157,12 +159,61 @@ export async function fetchFullMerchantFeed(params: {
 
   try {
     const res = await fetch(url.toString(), { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!res.ok) return [];
+    if (!res.ok || !res.body) {
+      clearTimeout(timeout);
+      return [];
+    }
 
-    const text = await res.text();
-    const items = parseAwinCsv(text);
-    return items.slice(0, maxItems);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let headers: string[] | null = null;
+
+    const reservoir: AwinDatafeedProduct[] = [];
+    let seenCount = 0; // Anzahl gesehener Produktzeilen (ohne Header)
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+        const line = buffer.slice(0, newlineIndex).replace(/\r$/, "");
+        buffer = buffer.slice(newlineIndex + 1);
+
+        if (!line.trim()) continue;
+
+        if (!headers) {
+          headers = parseCsvLine(line).map(h => h.trim());
+          continue;
+        }
+
+        seenCount++;
+
+        if (reservoir.length < maxItems) {
+          // Reservoir noch nicht voll — einfach aufnehmen
+          reservoir.push(rowFromLine(line, headers));
+        } else {
+          // Reservoir Sampling: mit Wahrscheinlichkeit maxItems/seenCount
+          // einen zufälligen bestehenden Eintrag ersetzen
+          const j = Math.floor(Math.random() * seenCount);
+          if (j < maxItems) {
+            reservoir[j] = rowFromLine(line, headers);
+          }
+        }
+      }
+    }
+
+    try {
+      await reader.cancel();
+    } catch {
+      /* ignore */
+    }
+
+    clearTimeout(timeout);
+    return reservoir;
   } catch {
     clearTimeout(timeout);
     return [];
