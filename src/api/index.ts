@@ -925,7 +925,47 @@ app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
   return c.json(result);
 });
 
+// ── Admin: Awin-Katalog manuell synchronisieren (zum Testen) ────────────────
+app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
+  const result = await syncAwinCatalog();
+  return c.json(result);
+});
+
+// ── TEMPORÄR: Zeigt Header + erste Zeile eines Feeds im Klartext ────────────
+app.get("/admin/awin-rawrow/:fid", authenticatedOnly, adminOnly, async (c) => {
+  const fid = c.req.param("fid");
+  const apiToken = (env as any).AWIN_API_TOKEN as string | undefined;
+  if (!apiToken) return c.json({ error: "AWIN_API_TOKEN nicht gesetzt" }, 400);
+
+  const columns = [
+    "aw_product_id", "product_name", "description", "merchant_image_url",
+    "search_price", "currency", "aw_deep_link", "merchant_id",
+    "merchant_name", "category_name", "brand_name", "in_stock",
+  ].join(",");
+
+  const url = `https://productdata.awin.com/datafeed/download/apikey/${apiToken}/language/de/fid/${fid}/columns/${columns}/format/csv/`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+    return c.json({
+      status: res.status,
+      headerLine: lines[0]?.slice(0, 500),
+      firstDataLine: lines[1]?.slice(0, 500),
+      totalLinesPreview: lines.length,
+    });
+  } catch (err: any) {
+    return c.json({ error: err?.message ?? String(err) }, 500);
+  }
+});
+
 export default {
+  fetch: app.fetch,
+  scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
+    ctx.waitUntil(syncAwinCatalog());
+  },
+};
   fetch: app.fetch,
   scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
     ctx.waitUntil(syncAwinCatalog());
