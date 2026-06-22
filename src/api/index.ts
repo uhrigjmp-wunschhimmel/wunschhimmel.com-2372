@@ -846,35 +846,73 @@ app.delete("/user", authenticatedOnly, async (c) => {
   }
 });
 
-// ── TEMPORÄR: Debug-Route für die Awin-Feed-Diagnose ────────────────────────
-// Zeigt die rohe HTTP-Antwort (Status + Auszug) für EINEN Merchant.
-// Nach der Diagnose wieder entfernen — nicht für Produktion gedacht.
+// ── TEMPORÄR: Feed-ID-Lookup für unsere Merchants ───────────────────────────
+// Lädt die komplette Awin-Feed-Liste (CSV) und filtert nach den Advertiser-IDs
+// aus MERCHANT_PRIORITIES, damit wir die echten Feed-IDs zuverlässig finden
+// statt sie händisch aus einem Riesen-CSV abzulesen.
 
-app.get("/admin/awin-debug/:merchantId", authenticatedOnly, adminOnly, async (c) => {
-  const merchantId = c.req.param("merchantId");
-  const apiToken = (env as any).AWIN_API_TOKEN as string | undefined;
+function parseAwinListLine(line: string): string[] {
+  const result: string[] = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        cur += ch;
+      }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === "\t" || ch === ",") { result.push(cur); cur = ""; }
+      else cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
+}
 
-  if (!apiToken) {
+app.get("/admin/awin-feedlist", authenticatedOnly, adminOnly, async (c) => {
+  const downloadKey = (env as any).AWIN_API_TOKEN as string | undefined;
+  if (!downloadKey) {
     return c.json({ error: "AWIN_API_TOKEN nicht gesetzt" }, 400);
   }
 
-  const columns = [
-    "aw_product_id", "product_name", "description", "merchant_image_url",
-    "search_price", "currency", "aw_deep_link", "merchant_id",
-    "merchant_name", "category_name", "brand_name", "in_stock",
-  ].join(",");
+  const ourAdvertiserIds = new Set([
+    "14336", "19075", "14824", "20615", "27221", "112586",
+    "16916", "18556", "9958", "114772", "114336", "125332",
+  ]);
 
-  const url = `https://productdata.awin.com/datafeed/download/apikey/${apiToken}/language/de/fid/${merchantId}/columns/${columns}/format/csv/`;
+  const url = `https://productdata.awin.com/datafeed/list/apikey/${downloadKey}`;
 
   try {
     const res = await fetch(url);
+    if (!res.ok) {
+      return c.json({ error: `Feed-Liste HTTP ${res.status}` }, 500);
+    }
     const text = await res.text();
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+    const headers = parseAwinListLine(lines[0]);
+
+    const matches: Record<string, string>[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseAwinListLine(lines[i]);
+      const advertiserId = cols[0]?.trim();
+      if (ourAdvertiserIds.has(advertiserId)) {
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => {
+          row[h.trim()] = cols[idx] ?? "";
+        });
+        matches.push(row);
+      }
+    }
+
     return c.json({
-      requestedUrl: url.replace(apiToken, "***TOKEN***"),
-      status: res.status,
-      statusText: res.statusText,
-      bodyPreview: text.slice(0, 800),
-      bodyLength: text.length,
+      totalLines: lines.length,
+      matchesFound: matches.length,
+      matches,
     });
   } catch (err: any) {
     return c.json({ error: err?.message ?? String(err) }, 500);
