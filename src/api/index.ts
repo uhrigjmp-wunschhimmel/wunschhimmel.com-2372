@@ -11,6 +11,7 @@ import { Resend } from "resend";
 import * as schema from "./database/schema";
 import { agentRoutes } from "./routes/agent";
 import { contactRoute } from './routes/contact.route';
+import { syncAwinCatalog } from "./agent/partners/awin-sync";
 
 type Bindings = { DB: D1Database; BETTER_AUTH_SECRET: string; RUNABLE_URL: string; RESEND_API_KEY: string; BUCKET: R2Bucket };
 type Variables = { user: any; session: any };
@@ -845,4 +846,15 @@ app.delete("/user", authenticatedOnly, async (c) => {
   }
 });
 
-export default app;
+// ── Admin: Awin-Katalog manuell synchronisieren (zum Testen) ────────────────
+app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
+  const result = await syncAwinCatalog();
+  return c.json(result);
+});
+
+export default {
+  fetch: app.fetch,
+  scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
+    ctx.waitUntil(syncAwinCatalog());
+  },
+};
