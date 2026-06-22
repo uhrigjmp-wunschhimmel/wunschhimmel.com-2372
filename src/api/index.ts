@@ -846,6 +846,41 @@ app.delete("/user", authenticatedOnly, async (c) => {
   }
 });
 
+// ── TEMPORÄR: Debug-Route für die Awin-Feed-Diagnose ────────────────────────
+// Zeigt die rohe HTTP-Antwort (Status + Auszug) für EINEN Merchant.
+// Nach der Diagnose wieder entfernen — nicht für Produktion gedacht.
+
+app.get("/admin/awin-debug/:merchantId", authenticatedOnly, adminOnly, async (c) => {
+  const merchantId = c.req.param("merchantId");
+  const apiToken = (env as any).AWIN_API_TOKEN as string | undefined;
+
+  if (!apiToken) {
+    return c.json({ error: "AWIN_API_TOKEN nicht gesetzt" }, 400);
+  }
+
+  const columns = [
+    "aw_product_id", "product_name", "description", "merchant_image_url",
+    "search_price", "currency", "aw_deep_link", "merchant_id",
+    "merchant_name", "category_name", "brand_name", "in_stock",
+  ].join(",");
+
+  const url = `https://productdata.awin.com/datafeed/download/apikey/${apiToken}/language/de/fid/${merchantId}/columns/${columns}/format/json/`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    return c.json({
+      requestedUrl: url.replace(apiToken, "***TOKEN***"),
+      status: res.status,
+      statusText: res.statusText,
+      bodyPreview: text.slice(0, 800),
+      bodyLength: text.length,
+    });
+  } catch (err: any) {
+    return c.json({ error: err?.message ?? String(err) }, 500);
+  }
+});
+
 // ── Admin: Awin-Katalog manuell synchronisieren (zum Testen) ────────────────
 app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
   const result = await syncAwinCatalog();
