@@ -864,7 +864,7 @@ app.get("/admin/awin-debug/:merchantId", authenticatedOnly, adminOnly, async (c)
     "merchant_name", "category_name", "brand_name", "in_stock",
   ].join(",");
 
-  const url = `https://productdata.awin.com/datafeed/download/apikey/${apiToken}/language/de/fid/${merchantId}/columns/${columns}/format/json/`;
+  const url = `https://productdata.awin.com/datafeed/download/apikey/${apiToken}/language/de/fid/${merchantId}/columns/${columns}/format/csv/`;
 
   try {
     const res = await fetch(url);
