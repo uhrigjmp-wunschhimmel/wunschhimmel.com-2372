@@ -966,8 +966,3 @@ export default {
     ctx.waitUntil(syncAwinCatalog());
   },
 };
-  fetch: app.fetch,
-  scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
-    ctx.waitUntil(syncAwinCatalog());
-  },
-};
