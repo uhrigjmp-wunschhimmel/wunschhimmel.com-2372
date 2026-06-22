@@ -2,9 +2,13 @@
 // Zwei Nutzungsarten:
 // 1. fetchFullMerchantFeed() — voller Katalog pro Merchant, NUR für den
 //    geplanten Batch-Sync (siehe awin-sync.ts). Läuft per Cron, nicht live.
+//    WICHTIG: Awin liefert für dieses Konto kein JSON mehr aus
+//    ("415 Unsupported Media Type — json is not supported. Please use CSV
+//    format") — deshalb wird hier CSV angefragt und selbst geparst.
 // 2. searchAwin() — die alte Live-Suche pro Chat-Anfrage. Bleibt im Code für
-//    Referenz/Debugging, wird aber in live-search.ts NICHT mehr aufgerufen,
-//    weil sie laut Praxiserfahrung instabil ist ("Feed-API instabil").
+//    Referenz/Debugging, wird aber in live-search.ts NICHT mehr aufgerufen.
+//    (Nutzt noch das alte JSON-Format — falls sie je wieder gebraucht wird,
+//    müsste sie auf CSV umgestellt werden, analog zu fetchFullMerchantFeed.)
 //
 // Docs: https://wiki.awin.com/index.php/Product_Feeds_API
 
@@ -83,9 +87,61 @@ function normalizeAwinProduct(p: AwinDatafeedProduct): LiveProduct {
   };
 }
 
-// ── NEU: Voller Katalog-Download für den Batch-Sync ──────────────────────────
-// Kein "keyword"-Parameter — wir wollen den ganzen (gedeckelten) Merchant-Feed,
-// nicht nur Treffer zu einer einzelnen Chat-Anfrage.
+// ── CSV-Parser (einfach, aber robust genug für Awin-Feeds) ───────────────────
+// Unterstützt gequotete Felder mit Kommas/Anführungszeichen darin.
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++; // escaped quote
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        cur += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ",") {
+        result.push(cur);
+        cur = "";
+      } else {
+        cur += ch;
+      }
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+function parseAwinCsv(text: string): AwinDatafeedProduct[] {
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+  if (lines.length < 2) return []; // nur Header oder leer
+
+  const headers = parseCsvLine(lines[0]).map(h => h.trim());
+  const rows: AwinDatafeedProduct[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCsvLine(lines[i]);
+    const row: Record<string, string> = {};
+    headers.forEach((h, idx) => {
+      row[h] = values[idx] ?? "";
+    });
+    rows.push(row as unknown as AwinDatafeedProduct);
+  }
+
+  return rows;
+}
+
+// ── NEU: Voller Katalog-Download für den Batch-Sync (CSV-Format) ────────────
 export async function fetchFullMerchantFeed(params: {
   apiToken: string;
   merchantId: string;
@@ -94,7 +150,7 @@ export async function fetchFullMerchantFeed(params: {
   const { apiToken, merchantId, maxItems = 300 } = params;
 
   const url = new URL(
-    `${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/json/`
+    `${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/csv/`
   );
 
   const controller = new AbortController();
@@ -106,19 +162,7 @@ export async function fetchFullMerchantFeed(params: {
     if (!res.ok) return [];
 
     const text = await res.text();
-    let data: unknown;
-
-    if (text.includes("Redirecting to legacy_system")) {
-      const loc = JSON.parse(text)?.location;
-      if (!loc) return [];
-      const res2 = await fetch(loc, { signal: controller.signal });
-      if (!res2.ok) return [];
-      data = await res2.json();
-    } else {
-      data = JSON.parse(text);
-    }
-
-    const items = Array.isArray(data) ? (data as AwinDatafeedProduct[]) : [];
+    const items = parseAwinCsv(text);
     return items.slice(0, maxItems);
   } catch {
     clearTimeout(timeout);
@@ -126,9 +170,9 @@ export async function fetchFullMerchantFeed(params: {
   }
 }
 
-// ── ALT: Live-Suche pro Chat-Anfrage ──────────────────────────────────────────
-// Wird in live-search.ts nicht mehr aufgerufen — bleibt nur als Referenz/
-// Fallback erhalten, falls sie für ein anderes Feature wieder gebraucht wird.
+// ── ALT: Live-Suche pro Chat-Anfrage (JSON-Format, ungenutzt) ────────────────
+// Wird in live-search.ts nicht mehr aufgerufen. Falls sie reaktiviert werden
+// soll: auf CSV umstellen wie fetchFullMerchantFeed oben.
 async function searchMerchantFeed(params: {
   apiToken: string;
   merchantId: string;
