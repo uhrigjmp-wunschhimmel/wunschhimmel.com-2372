@@ -1,14 +1,12 @@
 // ── Awin Product Datafeed ─────────────────────────────────────────────────────
-// Zwei Nutzungsarten:
-// 1. fetchFullMerchantFeed() — voller Katalog pro Merchant, NUR für den
-//    geplanten Batch-Sync (siehe awin-sync.ts). Läuft per Cron, nicht live.
-//    WICHTIG: Awin liefert für dieses Konto kein JSON mehr aus
-//    ("415 Unsupported Media Type — json is not supported. Please use CSV
-//    format") — deshalb wird hier CSV angefragt und selbst geparst.
-// 2. searchAwin() — die alte Live-Suche pro Chat-Anfrage. Bleibt im Code für
-//    Referenz/Debugging, wird aber in live-search.ts NICHT mehr aufgerufen.
-//    (Nutzt noch das alte JSON-Format — falls sie je wieder gebraucht wird,
-//    müsste sie auf CSV umgestellt werden, analog zu fetchFullMerchantFeed.)
+// WICHTIG: Die IDs unten sind ECHTE FEED-IDs (aus /admin/awin-feedlist ermittelt),
+// NICHT die Advertiser-/Merchant-IDs. Awin unterscheidet beides — die fid ist
+// der eigentliche, konkrete Datenfeed, eine Advertiser-ID kann mehrere Feeds
+// haben (z. B. OTTO: 3 Feeds für Wohnen/Technik/Mode getrennt).
+//
+// fetchFullMerchantFeed() nutzt CSV-Format mit dem korrekten Download-API-Key
+// (AWIN_API_TOKEN = der "60259e25..."-Key aus der Create-a-Feed-Übersicht,
+// NICHT der allgemeine Publisher-API-Key).
 //
 // Docs: https://wiki.awin.com/index.php/Product_Feeds_API
 
@@ -16,22 +14,24 @@ import type { LiveProduct } from "../live-search";
 
 export const AWIN_BASE = "https://productdata.awin.com/datafeed/download/apikey";
 const TIMEOUT_MS = 8000;
-const FULL_FEED_TIMEOUT_MS = 20000; // Voller Feed kann groß sein, mehr Zeit geben
+const FULL_FEED_TIMEOUT_MS = 20000;
 
-// Merchant IDs (joined programmes)
+// Merchant-Feeds (echte Feed-IDs, Stand: Lookup vom 22.06.2026)
 export const MERCHANT_PRIORITIES = [
-  { id: "14336", name: "OTTO DE",           weight: 10 },
-  { id: "19075", name: "Avocadostore DE",   weight: 9  },
-  { id: "14824", name: "babymarkt DE",      weight: 8  },
-  { id: "20615", name: "Stapelstein DE",    weight: 8  },
-  { id: "27221", name: "MyHappyMoments DE", weight: 7  },
-  { id: "112586", name: "World of Sweets",  weight: 7  },
-  { id: "16916", name: "Roastmarket DE",    weight: 7  },
-  { id: "18556", name: "Fackelmann DE",     weight: 6  },
-  { id: "9958",  name: "Lights4fun DE",     weight: 6  },
-  { id: "114772", name: "Runnershub DE",    weight: 6  },
-  { id: "114336", name: "House-of-Sneakers",weight: 5  },
-  { id: "125332", name: "Autofull EU",      weight: 4  },
+  { id: "54165",  name: "OTTO DE",           weight: 10 }, // Wohnen, Spielzeug und Baumarkt
+  { id: "69595",  name: "Avocadostore DE",   weight: 9  }, // Group-ID (DE)
+  { id: "104979", name: "babymarkt DE",      weight: 8  }, // Preissuchmaschinen-Feed
+  { id: "85863",  name: "Stapelstein DE",    weight: 8  },
+  { id: "66585",  name: "MyHappyMoments DE", weight: 7  },
+  { id: "101641", name: "World of Sweets",   weight: 7  },
+  { id: "73219",  name: "Roastmarket DE",    weight: 7  }, // DE-Lieferung (nicht AT)
+  { id: "18693",  name: "Lights4fun DE",     weight: 6  },
+  { id: "106082", name: "Runnershub DE",     weight: 6  },
+  { id: "106084", name: "House-of-Sneakers DE", weight: 5 }, // "für Deutschland"-Feed
+  // Fackelmann DE (Advertiser 18556) und Autofull EU (Advertiser 125332):
+  // KEIN aktiver Awin-Feed gefunden (Stand 22.06.2026). Erst über
+  // Awin-Interface → Toolbox → Create-a-Feed einen Feed anlegen, dann hier
+  // mit der neuen fid wieder ergänzen.
 ];
 
 export const AWIN_COLUMNS = [
@@ -87,8 +87,7 @@ function normalizeAwinProduct(p: AwinDatafeedProduct): LiveProduct {
   };
 }
 
-// ── CSV-Parser (einfach, aber robust genug für Awin-Feeds) ───────────────────
-// Unterstützt gequotete Felder mit Kommas/Anführungszeichen darin.
+// ── CSV-Parser ────────────────────────────────────────────────────────────────
 function parseCsvLine(line: string): string[] {
   const result: string[] = [];
   let cur = "";
@@ -100,7 +99,7 @@ function parseCsvLine(line: string): string[] {
       if (ch === '"') {
         if (line[i + 1] === '"') {
           cur += '"';
-          i++; // escaped quote
+          i++;
         } else {
           inQuotes = false;
         }
@@ -124,7 +123,7 @@ function parseCsvLine(line: string): string[] {
 
 function parseAwinCsv(text: string): AwinDatafeedProduct[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-  if (lines.length < 2) return []; // nur Header oder leer
+  if (lines.length < 2) return [];
 
   const headers = parseCsvLine(lines[0]).map(h => h.trim());
   const rows: AwinDatafeedProduct[] = [];
@@ -141,10 +140,10 @@ function parseAwinCsv(text: string): AwinDatafeedProduct[] {
   return rows;
 }
 
-// ── NEU: Voller Katalog-Download für den Batch-Sync (CSV-Format) ────────────
+// ── Voller Katalog-Download für den Batch-Sync (CSV-Format) ─────────────────
 export async function fetchFullMerchantFeed(params: {
   apiToken: string;
-  merchantId: string;
+  merchantId: string; // = fid, NICHT die Advertiser-ID
   maxItems?: number;
 }): Promise<AwinDatafeedProduct[]> {
   const { apiToken, merchantId, maxItems = 300 } = params;
@@ -170,9 +169,7 @@ export async function fetchFullMerchantFeed(params: {
   }
 }
 
-// ── ALT: Live-Suche pro Chat-Anfrage (JSON-Format, ungenutzt) ────────────────
-// Wird in live-search.ts nicht mehr aufgerufen. Falls sie reaktiviert werden
-// soll: auf CSV umstellen wie fetchFullMerchantFeed oben.
+// ── ALT: Live-Suche pro Chat-Anfrage (ungenutzt, JSON-Format) ────────────────
 async function searchMerchantFeed(params: {
   apiToken: string;
   merchantId: string;
@@ -195,7 +192,6 @@ async function searchMerchantFeed(params: {
   try {
     const res = await fetch(url.toString(), { signal: controller.signal });
     clearTimeout(timeout);
-
     if (!res.ok) return [];
 
     const text = await res.text();
@@ -203,7 +199,6 @@ async function searchMerchantFeed(params: {
     if (text.includes("Redirecting to legacy_system")) {
       const loc = JSON.parse(text)?.location;
       if (!loc) return [];
-
       const res2 = await fetch(loc, { signal: controller.signal });
       if (!res2.ok) return [];
       const data = await res2.json();
