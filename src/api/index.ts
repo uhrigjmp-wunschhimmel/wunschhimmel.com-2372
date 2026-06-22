@@ -29,6 +29,27 @@ app.all("/auth/*", async (c) => {
   return auth.handler(c.req.raw);
 });
 
+// ── Health Check ─────────────────────────────────────────────────
+app.get("/health", async (c) => {
+  const start = Date.now();
+  try {
+    const db = drizzle(c.env.DB);
+    await db.select({ count: count() }).from(wishlists).limit(1);
+    return c.json({
+      status: "ok",
+      db: "connected",
+      latencyMs: Date.now() - start,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    return c.json({
+      status: "error",
+      db: "unreachable",
+      timestamp: new Date().toISOString(),
+    }, 503);
+  }
+});
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function nanoid(len = 21) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
