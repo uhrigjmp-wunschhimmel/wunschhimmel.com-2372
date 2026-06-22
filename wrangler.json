@@ -24,5 +24,8 @@
       "bucket_name": "wunschhimmel-images",
       "binding": "BUCKET"
     }
-  ]
+  ],
+  "triggers": {
+    "crons": ["0 3 * * 1"]
+  }
 }

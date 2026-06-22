@@ -1,15 +1,21 @@
-// ── Awin Product Datafeed Search ─────────────────────────────────────────────
-// AWIN nutzt Product Data Feeds, keine direkte Search-API.
-// Endpoint: https://productdata.awin.com/datafeed/download/apikey/TOKEN/...
+// ── Awin Product Datafeed ─────────────────────────────────────────────────────
+// Zwei Nutzungsarten:
+// 1. fetchFullMerchantFeed() — voller Katalog pro Merchant, NUR für den
+//    geplanten Batch-Sync (siehe awin-sync.ts). Läuft per Cron, nicht live.
+// 2. searchAwin() — die alte Live-Suche pro Chat-Anfrage. Bleibt im Code für
+//    Referenz/Debugging, wird aber in live-search.ts NICHT mehr aufgerufen,
+//    weil sie laut Praxiserfahrung instabil ist ("Feed-API instabil").
+//
 // Docs: https://wiki.awin.com/index.php/Product_Feeds_API
 
 import type { LiveProduct } from "../live-search";
 
-const AWIN_BASE = "https://productdata.awin.com/datafeed/download/apikey";
+export const AWIN_BASE = "https://productdata.awin.com/datafeed/download/apikey";
 const TIMEOUT_MS = 8000;
+const FULL_FEED_TIMEOUT_MS = 20000; // Voller Feed kann groß sein, mehr Zeit geben
 
 // Merchant IDs (joined programmes)
-const MERCHANT_PRIORITIES = [
+export const MERCHANT_PRIORITIES = [
   { id: "14336", name: "OTTO DE",           weight: 10 },
   { id: "19075", name: "Avocadostore DE",   weight: 9  },
   { id: "14824", name: "babymarkt DE",      weight: 8  },
@@ -24,7 +30,7 @@ const MERCHANT_PRIORITIES = [
   { id: "125332", name: "Autofull EU",      weight: 4  },
 ];
 
-const AWIN_COLUMNS = [
+export const AWIN_COLUMNS = [
   "aw_product_id",
   "product_name",
   "description",
@@ -39,7 +45,7 @@ const AWIN_COLUMNS = [
   "in_stock",
 ].join(",");
 
-interface AwinDatafeedProduct {
+export interface AwinDatafeedProduct {
   aw_product_id: string;
   product_name: string;
   description: string;
@@ -77,7 +83,52 @@ function normalizeAwinProduct(p: AwinDatafeedProduct): LiveProduct {
   };
 }
 
-// Search AWIN datafeed for a specific merchant with keyword filter
+// ── NEU: Voller Katalog-Download für den Batch-Sync ──────────────────────────
+// Kein "keyword"-Parameter — wir wollen den ganzen (gedeckelten) Merchant-Feed,
+// nicht nur Treffer zu einer einzelnen Chat-Anfrage.
+export async function fetchFullMerchantFeed(params: {
+  apiToken: string;
+  merchantId: string;
+  maxItems?: number;
+}): Promise<AwinDatafeedProduct[]> {
+  const { apiToken, merchantId, maxItems = 300 } = params;
+
+  const url = new URL(
+    `${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/json/`
+  );
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FULL_FEED_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url.toString(), { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return [];
+
+    const text = await res.text();
+    let data: unknown;
+
+    if (text.includes("Redirecting to legacy_system")) {
+      const loc = JSON.parse(text)?.location;
+      if (!loc) return [];
+      const res2 = await fetch(loc, { signal: controller.signal });
+      if (!res2.ok) return [];
+      data = await res2.json();
+    } else {
+      data = JSON.parse(text);
+    }
+
+    const items = Array.isArray(data) ? (data as AwinDatafeedProduct[]) : [];
+    return items.slice(0, maxItems);
+  } catch {
+    clearTimeout(timeout);
+    return [];
+  }
+}
+
+// ── ALT: Live-Suche pro Chat-Anfrage ──────────────────────────────────────────
+// Wird in live-search.ts nicht mehr aufgerufen — bleibt nur als Referenz/
+// Fallback erhalten, falls sie für ein anderes Feature wieder gebraucht wird.
 async function searchMerchantFeed(params: {
   apiToken: string;
   merchantId: string;
@@ -88,7 +139,6 @@ async function searchMerchantFeed(params: {
 }): Promise<AwinDatafeedProduct[]> {
   const { apiToken, merchantId, keyword, minPrice, maxPrice, pageSize = 8 } = params;
 
-  // AWIN Datafeed URL format
   const url = new URL(`${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/json/`);
   url.searchParams.set("keyword", keyword);
   url.searchParams.set("limit", String(pageSize));
@@ -106,7 +156,6 @@ async function searchMerchantFeed(params: {
 
     const text = await res.text();
 
-    // Handle redirect to legacy
     if (text.includes("Redirecting to legacy_system")) {
       const loc = JSON.parse(text)?.location;
       if (!loc) return [];
@@ -142,10 +191,7 @@ export async function searchAwin(params: {
     return { products: [], error: "Awin API token not configured" };
   }
 
-  // Build best search query from keywords
   const query = keywords.slice(0, 3).join(" ");
-
-  // Pick top 3 merchants to search (avoid too many parallel requests)
   const merchantsToSearch = MERCHANT_PRIORITIES.slice(0, 3);
 
   const results = await Promise.allSettled(

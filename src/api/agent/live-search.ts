@@ -1,8 +1,22 @@
 // ── Live Product Search Aggregator ───────────────────────────────────────────
 // Parallel fetches from all partners → merge → score → dedupe → relax if needed
+//
+// ÄNDERUNGEN (Wunschengel-Fix):
+// - Awin läuft nicht mehr live pro Anfrage gegen den Feed, sondern gegen die
+//   per Batch-Sync gefüllte D1-Tabelle (siehe partners/awin-db-search.ts +
+//   partners/awin-sync.ts). Grund: Live-Feed-Abruf war instabil und hat fast
+//   immer in den 60-Produkte-Fallback durchschlagen.
+// - Amazon läuft nicht mehr über HTML-Scraping (partners/amazon-scrape.ts).
+//   Das war technisch fragil (Bot-Detection) UND ein Verstoß gegen die
+//   Amazon-Partnerprogramm-AGB (Bewertungen/Sterne dürfen nur über die
+//   Creators API angezeigt werden). Ersetzt durch ToS-sichere, klar als
+//   "auf Amazon suchen" gekennzeichnete Such-Link-Karten ohne Scraping.
+// - Der "remove_excludes"-Relaxation-Schritt wurde entfernt: er hat bereits
+//   gezeigte Produkte wieder zulässig gemacht, was sich wie Wiederholungen
+//   angefühlt hat.
 
-import { searchAwin } from "./partners/awin";
-import { scrapeAmazon } from "./partners/amazon-scrape";
+import { searchAwinCatalog } from "./partners/awin-db-search";
+import { generateAmazonSearchCards } from "./partners/amazon-search";
 import { searchTradedoubler } from "./partners/tradedoubler";
 import { expandKeywords, buildSearchTerms } from "./keyword-map";
 import fallbackProducts from "./products-fallback.json";
@@ -49,13 +63,12 @@ export type SearchParams = {
   excludeIds?: string[];
   limit?: number;
   locale?: string;
-  // Injected from env
-  awinToken?: string;
-  awinPublisherId?: string;
   // Tradedoubler — echte Live-Such-API
   tdToken?: string;
   tdFeedIds?: string[];   // Feed-IDs der joined Programmes
-  // Amazon läuft jetzt per Scraper — keine Keys nötig
+  // Awin & Amazon brauchen hier keine Tokens mehr:
+  // Awin liest aus der per Cron gesyncten D1-Tabelle (awin_products),
+  // Amazon generiert nur noch Such-Link-Karten ohne API/Scraping.
 };
 
 // ── Scoring ──────────────────────────────────────────────────────────────────
@@ -75,15 +88,16 @@ function scoreProduct(product: LiveProduct, keywords: string[]): number {
   ).length;
   score += (kwMatches / Math.max(kw.length, 1)) * 40;
 
-  // Has image (quality signal)
+  // Has image (quality signal) — Amazon-Suchkarten haben bewusst kein Bild
   if (product.imageUrl && product.imageUrl.startsWith("http")) score += 10;
 
   // Has price (better than "Preis beim Händler")
   if (product.price != null && product.price > 0) score += 10;
 
-  // Partner preference: live > fallback
+  // Partner preference: echte Produktdaten (Awin/Tradedoubler) > reine Such-Links (Amazon) > Fallback
   if (product.partnerId === "awin") score += 15;
-  else if (product.partnerId === "amazon") score += 12;
+  else if (product.partnerId === "tradedoubler") score += 14;
+  else if (product.partnerId === "amazon") score += 6; // nur Such-Link, kein echtes Produktbild/-titel
   else score += 5; // fallback
 
   // Availability bonus
@@ -100,7 +114,7 @@ function normTitle(title: string): string {
 function dedupe(products: LiveProduct[]): LiveProduct[] {
   const seen = new Set<string>();
   return products.filter(p => {
-    const key = `${p.partnerId === "amazon" ? p.rawSourceId : normTitle(p.title)}`;
+    const key = normTitle(p.title);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -166,6 +180,8 @@ type RelaxStep = {
   apply: (p: SearchParams) => SearchParams;
 };
 
+// "remove_excludes" wurde bewusst entfernt — das hat bereits gezeigte
+// Produkte wieder zulässig gemacht und sich wie Wiederholungen angefühlt.
 const RELAX_STEPS: RelaxStep[] = [
   {
     label: "synonyms",
@@ -182,10 +198,6 @@ const RELAX_STEPS: RelaxStep[] = [
     label: "remove_occasion",
     apply: p => ({ ...p, occasion: undefined }),
   },
-  {
-    label: "remove_excludes",
-    apply: p => ({ ...p, excludeIds: [] }),
-  },
 ];
 
 // ── Main search function ──────────────────────────────────────────────────────
@@ -198,7 +210,6 @@ export async function liveSearch(params: SearchParams): Promise<{
     limit = 6,
     excludeIds = [],
     locale = "de",
-    awinToken, awinPublisherId,
     tdToken, tdFeedIds,
   } = params;
 
@@ -228,12 +239,20 @@ export async function liveSearch(params: SearchParams): Promise<{
       (tdToken && tdFeedIds && tdFeedIds.length > 0)
         ? searchTradedoubler({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 12, token: tdToken, feedIds: tdFeedIds })
         : Promise.resolve({ products: [], error: "not_configured" }),
-      // Awin — Fallback (Feed-API instabil, bleibt drin für Kompatibilität)
-      (awinToken && awinPublisherId)
-        ? searchAwin({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, locale, pageSize: 8, publisherId: awinPublisherId, apiToken: awinToken, occasion: p.occasion, recipient: p.recipient })
-        : Promise.resolve({ products: [], error: "not_configured" }),
-      // Amazon: Scraper
-      scrapeAmazon({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, pageSize: 6 }),
+      // Awin — jetzt gegen die gesyncte D1-Tabelle, nicht mehr live gegen den Feed
+      searchAwinCatalog({ keywords: kw, minPrice: p.minPrice, maxPrice: p.maxPrice, pageSize: 8 }),
+      // Amazon — ToS-sichere Such-Link-Karten, kein Scraping
+      Promise.resolve(
+        generateAmazonSearchCards({
+          keywords: kw,
+          occasion: p.occasion,
+          recipient: p.recipient,
+          ageGroup: p.ageGroup,
+          minPrice: p.minPrice,
+          maxPrice: p.maxPrice,
+          pageSize: 4,
+        })
+      ),
     ]);
 
     const live: LiveProduct[] = [];
@@ -250,7 +269,7 @@ export async function liveSearch(params: SearchParams): Promise<{
 
     if (awinRes.status === "fulfilled") {
       const r = awinRes.value;
-      if (r.error && r.error !== "not_configured") meta.partnerErrors["awin"] = r.error;
+      if (r.error) meta.partnerErrors["awin"] = r.error;
       if (r.products.length > 0) {
         meta.partnersResponded.push("awin");
         meta.totalFoundByPartner["awin"] = r.totalFound ?? r.products.length;
@@ -260,7 +279,7 @@ export async function liveSearch(params: SearchParams): Promise<{
 
     if (amazonRes.status === "fulfilled") {
       const r = amazonRes.value;
-      if (r.error && r.error !== "not_configured") meta.partnerErrors["amazon"] = r.error;
+      if (r.error) meta.partnerErrors["amazon"] = r.error;
       if (r.products.length > 0) {
         meta.partnersResponded.push("amazon");
         meta.totalFoundByPartner["amazon"] = r.totalFound ?? r.products.length;
@@ -291,7 +310,7 @@ export async function liveSearch(params: SearchParams): Promise<{
 
       const relaxed = await fetchLive(current, current.keywords);
       const relaxedCandidates = dedupe([...liveProducts, ...relaxed])
-        .filter(p => !(current.excludeIds ?? []).includes(p.id))
+        .filter(p => !excludeIds.includes(p.id)) // excludeIds bleiben IMMER aktiv
         .map(p => ({ ...p, _score: scoreProduct(p, current.keywords) }))
         .sort((a, b) => (b._score ?? 0) - (a._score ?? 0));
 

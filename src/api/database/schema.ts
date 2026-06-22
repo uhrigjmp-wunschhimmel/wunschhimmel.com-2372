@@ -108,3 +108,27 @@ export const updateComments = sqliteTable("update_comments", {
   text: text("text").notNull(),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
+
+// ── Awin Synced Product Catalog ───────────────────────────────────────────────
+// Wird NUR durch den geplanten Batch-Sync (awin-sync.ts, wöchentlicher Cron)
+// befüllt — niemals live pro Chat-Anfrage. approxPrice dient ausschließlich
+// der groben Budget-Vorfilterung; der verbindliche Preis steht immer erst
+// beim Händler (Klick über deepLink).
+export const awinProducts = sqliteTable("awin_products", {
+  id: text("id").primaryKey(), // z.B. "awin_123456789"
+  awProductId: text("aw_product_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  category: text("category"),
+  brand: text("brand"),
+  merchantId: text("merchant_id").notNull(),
+  merchantName: text("merchant_name"),
+  deepLink: text("deep_link").notNull(),
+  approxPrice: real("approx_price"),
+  currency: text("currency").default("EUR"),
+  inStock: integer("in_stock", { mode: "boolean" }).notNull().default(true),
+  lastSyncedAt: text("last_synced_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});

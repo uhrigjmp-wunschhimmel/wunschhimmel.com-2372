@@ -29,6 +29,13 @@
       "when": 1776254599778,
       "tag": "0003_soft_madame_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1782119383997,
+      "tag": "0004_left_star_brand",
+      "breakpoints": true
     }
   ]
 }
