@@ -947,7 +947,11 @@ app.get("/admin/awin-rawrow/:fid", authenticatedOnly, adminOnly, async (c) => {
 
   try {
     const res = await fetch(url);
-    const text = await res.text();
+    if (!res.ok || !res.body) {
+      return c.json({ status: res.status, error: "keine OK-Antwort" }, 500);
+    }
+    const decompressedStream = res.body.pipeThrough(new DecompressionStream("gzip"));
+    const text = await new Response(decompressedStream).text();
     const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
     return c.json({
       status: res.status,
