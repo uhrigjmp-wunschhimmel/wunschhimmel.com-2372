@@ -165,7 +165,11 @@ export async function fetchFullMerchantFeed(params: {
       return [];
     }
 
-    const reader = res.body.getReader();
+    // Awin liefert die Datei gzip-komprimiert aus, OHNE den passenden
+    // Content-Encoding-Header (sonst würde fetch() das automatisch
+    // entpacken). Wir entpacken daher selbst, bevor wir als Text lesen.
+    const decompressedStream = res.body.pipeThrough(new DecompressionStream("gzip"));
+    const reader = decompressedStream.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
     let headers: string[] | null = null;
