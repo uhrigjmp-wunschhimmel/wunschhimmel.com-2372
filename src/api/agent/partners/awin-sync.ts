@@ -4,11 +4,14 @@
 //     in src/api/index.ts)
 //  b) manuell über POST /api/admin/awin-sync (zum Testen / sofortigen Befüllen)
 //
-// Lädt pro Merchant den vollen Feed (gedeckelt auf MAX_PRODUCTS_PER_MERCHANT),
-// und upserted Titel/Bild/Kategorie in die D1-Tabelle awin_products.
-// Preise werden NUR als grobe Näherung (approxPrice) gespeichert — niemals als
-// verbindlicher, beim Nutzer angezeigter Preis. Der echte Preis steht immer
-// erst beim Klick auf den deepLink beim Händler.
+// Lädt pro Merchant eine Zufallsstichprobe (Reservoir Sampling) und upserted
+// Titel/Bild/Kategorie in die D1-Tabelle awin_products.
+//
+// WICHTIG: Wir nutzen db.batch() mit EINZELNEN Insert-Statements statt einer
+// einzigen Mehrzeilen-INSERT-Anweisung. Letzteres hat bei 25 Zeilen x 14
+// Spalten = 350 gebundene Parameter das D1-Parameter-Limit pro Statement
+// überschritten ("Failed query"-Fehler). db.batch() führt mehrere kleine
+// Statements in einem Netzwerk-Durchgang aus — kein Limit-Risiko.
 
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
@@ -17,7 +20,7 @@ import { awinProducts } from "../../database/schema";
 import { MERCHANT_PRIORITIES, fetchFullMerchantFeed, type AwinDatafeedProduct } from "./awin";
 
 const MAX_PRODUCTS_PER_MERCHANT = 300;
-const D1_BATCH_SIZE = 25; // konservativ wegen D1-Limit an gebundenen Parametern pro Statement
+const BATCH_SIZE = 50; // Anzahl Statements pro db.batch()-Aufruf
 
 type Merchant = (typeof MERCHANT_PRIORITIES)[number];
 
@@ -81,28 +84,34 @@ export async function syncAwinCatalog(): Promise<AwinSyncReport> {
         .map(p => toRow(p, merchant));
 
       let upserted = 0;
-      for (let i = 0; i < rows.length; i += D1_BATCH_SIZE) {
-        const chunk = rows.slice(i, i + D1_BATCH_SIZE);
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const chunk = rows.slice(i, i + BATCH_SIZE);
         if (chunk.length === 0) continue;
 
-        await db
-          .insert(awinProducts)
-          .values(chunk)
-          .onConflictDoUpdate({
-            target: awinProducts.id,
-            set: {
-              title: sql`excluded.title`,
-              description: sql`excluded.description`,
-              imageUrl: sql`excluded.image_url`,
-              category: sql`excluded.category`,
-              brand: sql`excluded.brand`,
-              deepLink: sql`excluded.deep_link`,
-              approxPrice: sql`excluded.approx_price`,
-              currency: sql`excluded.currency`,
-              inStock: sql`excluded.in_stock`,
-              lastSyncedAt: sql`excluded.last_synced_at`,
-            },
-          });
+        const statements = chunk.map(row =>
+          db
+            .insert(awinProducts)
+            .values(row)
+            .onConflictDoUpdate({
+              target: awinProducts.id,
+              set: {
+                title: sql`excluded.title`,
+                description: sql`excluded.description`,
+                imageUrl: sql`excluded.image_url`,
+                category: sql`excluded.category`,
+                brand: sql`excluded.brand`,
+                deepLink: sql`excluded.deep_link`,
+                approxPrice: sql`excluded.approx_price`,
+                currency: sql`excluded.currency`,
+                inStock: sql`excluded.in_stock`,
+                lastSyncedAt: sql`excluded.last_synced_at`,
+              },
+            })
+        );
+
+        // db.batch() braucht laut Typ mindestens 1 Statement — Cast nötig,
+        // da die Länge zur Build-Zeit nicht bekannt ist.
+        await db.batch(statements as [typeof statements[number], ...typeof statements]);
 
         upserted += chunk.length;
       }
