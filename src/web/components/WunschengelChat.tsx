@@ -292,7 +292,8 @@ export function WunschengelChat() {
   // alle anderen (authentifiziert) → voll funktional
   const isLanding = location === "/";
   const isListDetail = location.startsWith("/list/");
-  const isAuthPage = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password", "/dashboard", "/profile", "/admin", "/explore", "/feed", "/impressum", "/datenschutz", "/agb", "/share-target"].includes(location);
+ const isInspiration = location === "/explore" || location === "/feed";
+const isAuthPage = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password", "/dashboard", "/profile", "/admin", "/impressum", "/datenschutz", "/agb", "/share-target"].includes(location);
   const isAuthenticated = !!session?.user;
 
   const [step, setStep] = useState<Step>("recipient");
@@ -383,8 +384,8 @@ export function WunschengelChat() {
 
   // Auf Auth-Seiten komplett ausblenden (nach allen Hooks)
 if (isAuthPage) return null;
-if (!isLanding && !isListDetail) return null;;
-
+if (!isLanding && !isListDetail && !isInspiration) return null;;
+  
   return (
     <>
       <style>{`
