@@ -3,6 +3,7 @@
   "description": "A template for building a React application with Vite, Hono, and Cloudflare Workers",
   "private": true,
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.86",
     "@ai-sdk/openai": "^3.0.53",
     "@ai-sdk/react": "^3.0.170",
     "@radix-ui/react-slot": "^1.2.4",
