@@ -964,6 +964,21 @@ app.get("/admin/awin-rawrow/:fid", authenticatedOnly, adminOnly, async (c) => {
   }
 });
 
+app.get("/admin/ai-gateway-check", authenticatedOnly, adminOnly, async (c) => {
+  const baseUrl = (env as any).AI_GATEWAY_BASE_URL as string | undefined;
+  if (!baseUrl) return c.json({ error: "AI_GATEWAY_BASE_URL nicht gesetzt" }, 400);
+
+  try {
+    const u = new URL(baseUrl);
+    return c.json({
+      hostname: u.hostname,
+      pathPreview: u.pathname.split("/").map((seg, i) => (i <= 2 ? seg : "***")).join("/"),
+    });
+  } catch (err: any) {
+    return c.json({ error: "ungültige URL", message: err?.message }, 500);
+  }
+});
+
 export default {
   fetch: app.fetch,
   scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
