@@ -1,13 +1,19 @@
 import { stepCountIs, type SystemModelMessage, ToolLoopAgent } from "ai";
 import dedent from "dedent";
 import { env } from "cloudflare:workers";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { searchProducts } from "./search-tool";
 
+// Native Anthropic-Anbindung über Cloudflare AI Gateway (Anthropic-Provider-
+// Endpunkt). AI_GATEWAY_BASE_URL zeigt jetzt auf:
+//   https://gateway.ai.cloudflare.com/v1/{account_id}/default/anthropic
+// Abgerechnet wird über deinen eigenen Anthropic-Account (ANTHROPIC_API_KEY),
+// Cloudflare loggt nur den Traffic (Dashboard/Analytics bleiben erhalten).
+// Vorher liefen wir versehentlich über einen Runable-Proxy (api.runable.com).
 export function createAgent() {
-  const openai = createOpenAI({
+  const anthropic = createAnthropic({
+    apiKey: (env as any).ANTHROPIC_API_KEY,
     baseURL: env.AI_GATEWAY_BASE_URL,
-    apiKey: env.AI_GATEWAY_API_KEY,
   });
 
   const INSTRUCTIONS: SystemModelMessage[] = [
@@ -43,7 +49,7 @@ export function createAgent() {
   ];
 
   return new ToolLoopAgent({
-    model: openai.chat("anthropic/claude-haiku-4.5"),
+    model: anthropic("claude-haiku-4-5-20251001"),
     instructions: INSTRUCTIONS,
     tools: { searchProducts },
     stopWhen: [stepCountIs(10)],
