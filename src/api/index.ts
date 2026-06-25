@@ -979,6 +979,41 @@ app.get("/admin/ai-gateway-check", authenticatedOnly, adminOnly, async (c) => {
   }
 });
 
+app.get("/admin/anthropic-test", authenticatedOnly, adminOnly, async (c) => {
+  const apiKey = (env as any).ANTHROPIC_API_KEY as string | undefined;
+  const baseUrl = (env as any).AI_GATEWAY_BASE_URL as string | undefined;
+  if (!apiKey) return c.json({ error: "ANTHROPIC_API_KEY nicht gesetzt" }, 400);
+  if (!baseUrl) return c.json({ error: "AI_GATEWAY_BASE_URL nicht gesetzt" }, 400);
+
+  try {
+    const res = await fetch(`${baseUrl}/v1/messages`, {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 50,
+        messages: [{ role: "user", content: "Hallo" }],
+      }),
+    });
+
+    const text = await res.text();
+    return c.json({
+      requestedUrl: `${baseUrl}/v1/messages`,
+      keyLength: apiKey.length,
+      keyPrefix: apiKey.slice(0, 10) + "...",
+      status: res.status,
+      statusText: res.statusText,
+      bodyPreview: text.slice(0, 1000),
+    });
+  } catch (err: any) {
+    return c.json({ error: err?.message ?? String(err) }, 500);
+  }
+});
+
 export default {
   fetch: app.fetch,
   scheduled: async (_event: ScheduledEvent, _env: unknown, ctx: ExecutionContext) => {
