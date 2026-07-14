@@ -919,16 +919,56 @@ app.get("/admin/awin-feedlist", authenticatedOnly, adminOnly, async (c) => {
   }
 });
 
-// ── Admin: Awin-Katalog manuell synchronisieren (zum Testen) ────────────────
-app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
-  const result = await syncAwinCatalog();
-  return c.json(result);
-});
+// ── Admin: Kategorie-Report für gesyncte Awin-Produkte (einmalig für Keyword-Tabelle) ──
+// Zeigt pro Merchant die häufigsten category-Werte + ein paar Beispiel-Titel,
+// damit die Keyword-Map gegen echte Daten gebaut werden kann statt zu raten.
+app.get("/admin/awin-category-report", authenticatedOnly, adminOnly, async (c) => {
+  const db = drizzle(env.DB);
 
-// ── Admin: Awin-Katalog manuell synchronisieren (zum Testen) ────────────────
-app.post("/admin/awin-sync", authenticatedOnly, adminOnly, async (c) => {
-  const result = await syncAwinCatalog();
-  return c.json(result);
+  const rows = await db
+    .select({
+      merchantName: schema.awinProducts.merchantName,
+      merchantId: schema.awinProducts.merchantId,
+      category: schema.awinProducts.category,
+      title: schema.awinProducts.title,
+    })
+    .from(schema.awinProducts);
+
+  type Group = {
+    merchantId: string;
+    total: number;
+    categories: Record<string, number>;
+    sampleTitles: string[];
+  };
+  const byMerchant: Record<string, Group> = {};
+
+  for (const r of rows) {
+    const key = r.merchantName ?? r.merchantId;
+    if (!byMerchant[key]) {
+      byMerchant[key] = { merchantId: r.merchantId, total: 0, categories: {}, sampleTitles: [] };
+    }
+    const g = byMerchant[key];
+    g.total++;
+    const cat = r.category ?? "(leer)";
+    g.categories[cat] = (g.categories[cat] ?? 0) + 1;
+    if (g.sampleTitles.length < 8) g.sampleTitles.push(r.title);
+  }
+
+  const report: Record<string, any> = {};
+  for (const [merchant, g] of Object.entries(byMerchant)) {
+    const topCategories = Object.entries(g.categories)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([cat, count]) => ({ cat, count }));
+    report[merchant] = {
+      merchantId: g.merchantId,
+      totalProducts: g.total,
+      topCategories,
+      sampleTitles: g.sampleTitles,
+    };
+  }
+
+  return c.json({ generatedAt: new Date().toISOString(), totalProducts: rows.length, merchants: report });
 });
 
 // ── TEMPORÄR: Zeigt Header + erste Zeile eines Feeds im Klartext ────────────
