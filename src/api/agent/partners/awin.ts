@@ -18,6 +18,7 @@
 // Docs: https://wiki.awin.com/index.php/Product_Feeds_API
 
 import type { LiveProduct } from "../live-search";
+import { isGiftworthy } from "./gift-filter";
 
 export const AWIN_BASE = "https://productdata.awin.com/datafeed/download/apikey";
 const TIMEOUT_MS = 8000;
@@ -150,7 +151,12 @@ export async function fetchFullMerchantFeed(params: {
   merchantId: string; // = fid, NICHT die Advertiser-ID
   maxItems?: number;
   maxScan?: number; // Sicherheitsgrenze: max. Zeilen durchsehen (CPU-Schutz bei riesigen Feeds)
-}): Promise<AwinDatafeedProduct[]> {
+}): Promise<{
+  items: AwinDatafeedProduct[];
+  rawScanned: number;
+  eligibleSeen: number;
+  rejectedNonGift: number;
+}> {
   const { apiToken, merchantId, maxItems = 300, maxScan = 8000 } = params;
 
   const url = new URL(
@@ -164,7 +170,7 @@ export async function fetchFullMerchantFeed(params: {
     const res = await fetch(url.toString(), { signal: controller.signal });
     if (!res.ok || !res.body) {
       clearTimeout(timeout);
-      return [];
+      return { items: [], rawScanned: 0, eligibleSeen: 0, rejectedNonGift: 0 };
     }
 
     // Awin liefert die Datei gzip-komprimiert aus, OHNE den passenden
@@ -177,7 +183,9 @@ export async function fetchFullMerchantFeed(params: {
     let headers: string[] | null = null;
 
     const reservoir: AwinDatafeedProduct[] = [];
-    let seenCount = 0; // Anzahl gesehener Produktzeilen (ohne Header)
+    let rawScanned = 0;   // ALLE gelesenen Zeilen (für Sicherheitsgrenze maxScan)
+    let eligibleSeen = 0; // nur geschenktaugliche Zeilen (für Reservoir-Sampling-Mathematik)
+    let rejectedNonGift = 0;
 
     readLoop: while (true) {
       const { done, value } = await reader.read();
@@ -197,24 +205,36 @@ export async function fetchFullMerchantFeed(params: {
           continue;
         }
 
-        seenCount++;
+        rawScanned++;
 
-        if (reservoir.length < maxItems) {
-          // Reservoir noch nicht voll — einfach aufnehmen
-          reservoir.push(rowFromLine(line, headers));
+        const row = rowFromLine(line, headers);
+
+        // Nicht-geschenktaugliche Zeilen (Sanitär, Montage, Baumarkt, …)
+        // gar nicht erst ins Sample lassen — sonst verschwendet reservoir
+        // Sampling die maxItems-Quote an Artikel, die nie ein Geschenk
+        // werden. Siehe gift-filter.ts.
+        if (!isGiftworthy(row.product_name)) {
+          rejectedNonGift++;
         } else {
-          // Reservoir Sampling: mit Wahrscheinlichkeit maxItems/seenCount
-          // einen zufälligen bestehenden Eintrag ersetzen
-          const j = Math.floor(Math.random() * seenCount);
-          if (j < maxItems) {
-            reservoir[j] = rowFromLine(line, headers);
+          eligibleSeen++;
+
+          if (reservoir.length < maxItems) {
+            // Reservoir noch nicht voll — einfach aufnehmen
+            reservoir.push(row);
+          } else {
+            // Reservoir Sampling: mit Wahrscheinlichkeit maxItems/eligibleSeen
+            // einen zufälligen bestehenden Eintrag ersetzen
+            const j = Math.floor(Math.random() * eligibleSeen);
+            if (j < maxItems) {
+              reservoir[j] = row;
+            }
           }
         }
 
         // Sicherheitsgrenze: bei riesigen Feeds (z.B. OTTO mit 292k Zeilen)
         // nicht den ganzen Feed scannen — das würde den Worker an die
         // CPU-/Zeit-Grenze bringen und zu einem 503 führen.
-        if (seenCount >= maxScan) break readLoop;
+        if (rawScanned >= maxScan) break readLoop;
       }
     }
 
@@ -225,10 +245,10 @@ export async function fetchFullMerchantFeed(params: {
     }
 
     clearTimeout(timeout);
-    return reservoir;
+    return { items: reservoir, rawScanned, eligibleSeen, rejectedNonGift };
   } catch {
     clearTimeout(timeout);
-    return [];
+    return { items: [], rawScanned: 0, eligibleSeen: 0, rejectedNonGift: 0 };
   }
 }
 
