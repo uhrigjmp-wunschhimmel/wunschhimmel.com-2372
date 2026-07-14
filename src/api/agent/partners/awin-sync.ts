@@ -48,7 +48,13 @@ function toRow(p: AwinDatafeedProduct, merchant: Merchant) {
 export type AwinSyncReport = {
   ok: boolean;
   reason?: string;
-  merchants: Record<string, { fetched: number; upserted: number; error?: string }>;
+  merchants: Record<string, {
+    fetched: number;
+    upserted: number;
+    rawScanned?: number;
+    rejectedNonGift?: number;
+    error?: string;
+  }>;
   totalUpserted: number;
   durationMs: number;
 };
@@ -73,7 +79,7 @@ export async function syncAwinCatalog(): Promise<AwinSyncReport> {
 
   for (const merchant of MERCHANT_PRIORITIES) {
     try {
-      const items = await fetchFullMerchantFeed({
+      const { items, rawScanned, eligibleSeen, rejectedNonGift } = await fetchFullMerchantFeed({
         apiToken,
         merchantId: merchant.id,
         maxItems: MAX_PRODUCTS_PER_MERCHANT,
@@ -116,7 +122,7 @@ export async function syncAwinCatalog(): Promise<AwinSyncReport> {
         upserted += chunk.length;
       }
 
-      report[merchant.name] = { fetched: items.length, upserted };
+      report[merchant.name] = { fetched: items.length, upserted, rawScanned, rejectedNonGift };
       totalUpserted += upserted;
     } catch (err: any) {
       report[merchant.name] = { fetched: 0, upserted: 0, error: err?.message ?? String(err) };
