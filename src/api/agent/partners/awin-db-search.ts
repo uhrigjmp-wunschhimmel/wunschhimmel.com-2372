@@ -47,12 +47,14 @@ export async function searchAwinCatalog(params: {
 
   const db = drizzle(env.DB);
 
+  // Nur Titel, Kategorie, Marke — NICHT Beschreibung. Beschreibungstexte
+  // enthalten zu viele Zufallstreffer (z.B. "zum Laufen geeignet" bei
+  // Kinderschuhen matcht fälschlich das Interesse "Laufen").
   const kwConditions = keywords.slice(0, 5).map(k =>
     or(
       like(awinProducts.title, `%${k}%`),
       like(awinProducts.category, `%${k}%`),
-      like(awinProducts.brand, `%${k}%`),
-      like(awinProducts.description, `%${k}%`)
+      like(awinProducts.brand, `%${k}%`)
     )
   );
 
@@ -65,22 +67,31 @@ export async function searchAwinCatalog(params: {
       .select()
       .from(awinProducts)
       .where(and(or(...kwConditions), ...priceConditions))
-      .limit(pageSize * 3); // großzügiger laden, dann nach Relevanz sortieren
+      .limit(pageSize * 5); // großzügiger laden, dann nach Relevanz filtern + sortieren
 
     if (rows.length === 0) {
       return { products: [], error: "Awin-Katalog: keine Treffer für diese Keywords" };
     }
 
+    // Score: nur Titel-Treffer zählen für die Relevanz-Reihenfolge.
+    // Zeilen mit Score 0 (nur über Kategorie/Marke gematcht, nicht über den
+    // Titel) werden aussortiert — das sind meist Zufallstreffer ohne echten
+    // inhaltlichen Bezug.
     const scored = rows
       .map(r => {
         const t = r.title.toLowerCase();
         const score = keywords.filter(k => t.includes(k.toLowerCase())).length;
         return { r, score };
       })
+      .filter(x => x.score > 0)
       .sort((a, b) => b.score - a.score);
 
+    if (scored.length === 0) {
+      return { products: [], error: "Awin-Katalog: keine Titel-Treffer für diese Keywords" };
+    }
+
     const products = scored.slice(0, pageSize).map(x => toLiveProduct(x.r));
-    return { products, totalFound: rows.length };
+    return { products, totalFound: scored.length };
   } catch (err: any) {
     return { products: [], error: `Awin-DB-Suche Fehler: ${err?.message}` };
   }

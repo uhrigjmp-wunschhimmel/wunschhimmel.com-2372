@@ -25,7 +25,9 @@ const FULL_FEED_TIMEOUT_MS = 30000; // großzügiger, da wir bei großen Feeds l
 
 // Merchant-Feeds (echte Feed-IDs, Stand: Lookup vom 22.06.2026)
 export const MERCHANT_PRIORITIES = [
-  { id: "54165",  name: "OTTO DE",           weight: 10 }, // Wohnen, Spielzeug und Baumarkt
+  { id: "54179",  name: "OTTO DE – Technik & Sport",    weight: 10 },
+  { id: "54165",  name: "OTTO DE – Wohnen & Spielzeug",  weight: 10 },
+  { id: "54183",  name: "OTTO DE – Mode & Beauty",       weight: 9  },
   { id: "104979", name: "babymarkt DE",      weight: 8  },
   // Avocadostore DE: Awin-Programm wurde gekündigt (Stand 22.06.2026) —
   // entfernt. Bereits gesyncte Produkte mit DELETE FROM awin_products
