@@ -142,10 +142,49 @@ function rowFromLine(line: string, headers: string[]): AwinDatafeedProduct {
   return row as unknown as AwinDatafeedProduct;
 }
 
+// ── Leichtgewichtiger Teil-Parser: liest NUR bis zur gewünschten Spalte ────
+// Der volle CSV-Parser (parseCsvLine) verarbeitet die komplette Zeile,
+// inklusive des oft sehr langen "description"-Felds — das kostet CPU-Zeit,
+// selbst wenn wir für die Vorprüfung nur den Titel brauchen. product_name
+// steht als 2. Spalte VOR description, daher bricht dieser Parser ab,
+// sobald das Zielfeld gelesen ist, statt die restliche Zeile mitzuverarbeiten.
+function extractFieldAt(line: string, targetIndex: number): string {
+  let idx = 0;
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        cur += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ",") {
+        if (idx === targetIndex) return cur;
+        idx++;
+        cur = "";
+      } else {
+        cur += ch;
+      }
+    }
+  }
+  return idx === targetIndex ? cur : "";
+}
+
 // ── Voller Katalog-Download mit Reservoir Sampling ───────────────────────────
 // Liest den kompletten Feed gestreamt durch (kein Speicherproblem), behält
 // aber eine zufällige, gleichmäßig über den GESAMTEN Feed verteilte Stich-
-// probe von `maxItems` Produkten statt einfach "die ersten N".
+// probe von `maxItems` Produkten — nicht einfach "die ersten N".
 export async function fetchFullMerchantFeed(params: {
   apiToken: string;
   merchantId: string; // = fid, NICHT die Advertiser-ID
@@ -157,7 +196,7 @@ export async function fetchFullMerchantFeed(params: {
   eligibleSeen: number;
   rejectedNonGift: number;
 }> {
-  const { apiToken, merchantId, maxItems = 300, maxScan = 8000 } = params;
+  const { apiToken, merchantId, maxItems = 300, maxScan = 3000 } = params;
 
   const url = new URL(
     `${AWIN_BASE}/${apiToken}/language/de/fid/${merchantId}/columns/${AWIN_COLUMNS}/format/csv/`
@@ -186,6 +225,7 @@ export async function fetchFullMerchantFeed(params: {
     let rawScanned = 0;   // ALLE gelesenen Zeilen (für Sicherheitsgrenze maxScan)
     let eligibleSeen = 0; // nur geschenktaugliche Zeilen (für Reservoir-Sampling-Mathematik)
     let rejectedNonGift = 0;
+    let productNameIdx = -1;
 
     readLoop: while (true) {
       const { done, value } = await reader.read();
@@ -202,31 +242,37 @@ export async function fetchFullMerchantFeed(params: {
 
         if (!headers) {
           headers = parseCsvLine(line).map(h => h.trim());
+          productNameIdx = headers.indexOf("product_name");
           continue;
         }
 
         rawScanned++;
 
-        const row = rowFromLine(line, headers);
+        // Nur den Titel leicht herausparsen (bricht VOR dem langen
+        // description-Feld ab) — die teure Vollständig-Parse (rowFromLine,
+        // parst auch description) passiert erst weiter unten, und zwar nur
+        // für Zeilen, die tatsächlich ins Sample aufgenommen werden.
+        const titleOnly = extractFieldAt(line, productNameIdx);
 
         // Nicht-geschenktaugliche Zeilen (Sanitär, Montage, Baumarkt, …)
         // gar nicht erst ins Sample lassen — sonst verschwendet reservoir
         // Sampling die maxItems-Quote an Artikel, die nie ein Geschenk
         // werden. Siehe gift-filter.ts.
-        if (!isGiftworthy(row.product_name)) {
+        if (!isGiftworthy(titleOnly)) {
           rejectedNonGift++;
         } else {
           eligibleSeen++;
 
           if (reservoir.length < maxItems) {
-            // Reservoir noch nicht voll — einfach aufnehmen
-            reservoir.push(row);
+            // Reservoir noch nicht voll — einfach aufnehmen (jetzt erst
+            // vollständig parsen, inkl. description/Bild/Preis/etc.)
+            reservoir.push(rowFromLine(line, headers));
           } else {
             // Reservoir Sampling: mit Wahrscheinlichkeit maxItems/eligibleSeen
             // einen zufälligen bestehenden Eintrag ersetzen
             const j = Math.floor(Math.random() * eligibleSeen);
             if (j < maxItems) {
-              reservoir[j] = row;
+              reservoir[j] = rowFromLine(line, headers);
             }
           }
         }
@@ -237,6 +283,7 @@ export async function fetchFullMerchantFeed(params: {
         if (rawScanned >= maxScan) break readLoop;
       }
     }
+
 
     try {
       await reader.cancel();
