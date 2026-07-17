@@ -77,57 +77,67 @@ export async function syncAwinCatalog(): Promise<AwinSyncReport> {
   const report: AwinSyncReport["merchants"] = {};
   let totalUpserted = 0;
 
-  for (const merchant of MERCHANT_PRIORITIES) {
-    try {
-      const { items, rawScanned, eligibleSeen, rejectedNonGift } = await fetchFullMerchantFeed({
-        apiToken,
-        merchantId: merchant.id,
-        maxItems: MAX_PRODUCTS_PER_MERCHANT,
-      });
+  // WICHTIG: Merchants werden PARALLEL abgefragt, nicht nacheinander.
+  // Sequenziell (10x await in einer for-Schleife) kann bei bis zu 30s
+  // Timeout pro Feed eine Gesamtlaufzeit von mehreren Minuten ergeben —
+  // das reißt das Zeitlimit des Workers, und Cloudflare killt den Request
+  // mit einer generischen 503-HTML-Fehlerseite (kein JSON, kein Log aus
+  // unserem eigenen Code). Parallel laufen alle Feed-Downloads gleichzeitig,
+  // die Gesamtlaufzeit ist dann ≈ die des langsamsten einzelnen Feeds statt
+  // die Summe aller Feeds.
+  await Promise.allSettled(
+    MERCHANT_PRIORITIES.map(async merchant => {
+      try {
+        const { items, rawScanned, eligibleSeen, rejectedNonGift } = await fetchFullMerchantFeed({
+          apiToken,
+          merchantId: merchant.id,
+          maxItems: MAX_PRODUCTS_PER_MERCHANT,
+        });
 
-      const rows = items
-        .filter(p => p.product_name && p.aw_deep_link)
-        .map(p => toRow(p, merchant));
+        const rows = items
+          .filter(p => p.product_name && p.aw_deep_link)
+          .map(p => toRow(p, merchant));
 
-      let upserted = 0;
-      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-        const chunk = rows.slice(i, i + BATCH_SIZE);
-        if (chunk.length === 0) continue;
+        let upserted = 0;
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const chunk = rows.slice(i, i + BATCH_SIZE);
+          if (chunk.length === 0) continue;
 
-        const statements = chunk.map(row =>
-          db
-            .insert(awinProducts)
-            .values(row)
-            .onConflictDoUpdate({
-              target: awinProducts.id,
-              set: {
-                title: sql`excluded.title`,
-                description: sql`excluded.description`,
-                imageUrl: sql`excluded.image_url`,
-                category: sql`excluded.category`,
-                brand: sql`excluded.brand`,
-                deepLink: sql`excluded.deep_link`,
-                approxPrice: sql`excluded.approx_price`,
-                currency: sql`excluded.currency`,
-                inStock: sql`excluded.in_stock`,
-                lastSyncedAt: sql`excluded.last_synced_at`,
-              },
-            })
-        );
+          const statements = chunk.map(row =>
+            db
+              .insert(awinProducts)
+              .values(row)
+              .onConflictDoUpdate({
+                target: awinProducts.id,
+                set: {
+                  title: sql`excluded.title`,
+                  description: sql`excluded.description`,
+                  imageUrl: sql`excluded.image_url`,
+                  category: sql`excluded.category`,
+                  brand: sql`excluded.brand`,
+                  deepLink: sql`excluded.deep_link`,
+                  approxPrice: sql`excluded.approx_price`,
+                  currency: sql`excluded.currency`,
+                  inStock: sql`excluded.in_stock`,
+                  lastSyncedAt: sql`excluded.last_synced_at`,
+                },
+              })
+          );
 
-        // db.batch() braucht laut Typ mindestens 1 Statement — Cast nötig,
-        // da die Länge zur Build-Zeit nicht bekannt ist.
-        await db.batch(statements as [typeof statements[number], ...typeof statements]);
+          // db.batch() braucht laut Typ mindestens 1 Statement — Cast nötig,
+          // da die Länge zur Build-Zeit nicht bekannt ist.
+          await db.batch(statements as [typeof statements[number], ...typeof statements]);
 
-        upserted += chunk.length;
+          upserted += chunk.length;
+        }
+
+        report[merchant.name] = { fetched: items.length, upserted, rawScanned, rejectedNonGift };
+        totalUpserted += upserted;
+      } catch (err: any) {
+        report[merchant.name] = { fetched: 0, upserted: 0, error: err?.message ?? String(err) };
       }
-
-      report[merchant.name] = { fetched: items.length, upserted, rawScanned, rejectedNonGift };
-      totalUpserted += upserted;
-    } catch (err: any) {
-      report[merchant.name] = { fetched: 0, upserted: 0, error: err?.message ?? String(err) };
-    }
-  }
+    })
+  );
 
   return { ok: true, merchants: report, totalUpserted, durationMs: Date.now() - t0 };
 }
