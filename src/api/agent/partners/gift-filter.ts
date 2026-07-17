@@ -73,15 +73,24 @@ const NON_GIFT_BLOCKLIST = [
   "pfanne", "topf", "töpfe", "bräter", "kasserolle", "wok", "kochgeschirr",
 ] as const;
 
+// Einmal kompilierter Regex statt 65 sequenzieller .includes()-Aufrufe pro
+// Titel — bei großen Feeds (OTTO: bis zu 8000 gescannte Zeilen) summieren
+// sich Einzelvergleiche schnell zu Millionen String-Operationen pro Sync-
+// Request und können das CPU-Zeit-Limit des Workers reißen. Ein Regex mit
+// Alternation prüft alle Begriffe in einem Durchgang.
+const NON_GIFT_REGEX = new RegExp(
+  NON_GIFT_BLOCKLIST.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+  "i"
+);
+
 /**
  * Prüft, ob ein Produkttitel geschenktauglich ist (grobe Vorfilterung).
- * Case-insensitive Substring-Check gegen eine Blockliste aus Sanitär-,
+ * Case-insensitive Regex-Check gegen eine Blockliste aus Sanitär-,
  * Montage- und Baumarkt-Begriffen. Bewusst konservativ Richtung "lieber
  * rausfiltern": im Zweifel fliegt ein Grenzfall lieber raus, als dass ein
  * unpassendes Produkt als Geschenk vorgeschlagen wird.
  */
 export function isGiftworthy(title: string): boolean {
   if (!title) return false;
-  const t = title.toLowerCase();
-  return !NON_GIFT_BLOCKLIST.some(term => t.includes(term));
+  return !NON_GIFT_REGEX.test(title);
 }
